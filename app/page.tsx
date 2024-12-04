@@ -428,8 +428,7 @@ export default function ContrastChecker() {
   useEffect(() => {
     const text = searchParams.get("text");
     const bg = searchParams.get("background");
-    `    console.log(calculateAPCAContrast(background, foreground));
-`;
+
     if (typeof text === "string" && typeof bg === "string") {
       setForeground(hexToRgb(text));
       setBackground(hexToRgb(bg));
