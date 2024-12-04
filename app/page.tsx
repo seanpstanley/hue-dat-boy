@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Clipboard,
@@ -11,14 +11,15 @@ import {
   X,
   Maximize2,
 } from "lucide-react";
-import {
-  APCAcontrast,
-  sRGBtoY,
-  displayP3toY,
-  adobeRGBtoY,
-  alphaBlend,
-  calcAPCA,
-} from "apca-w3";
+// import {
+//   APCAcontrast,
+//   sRGBtoY,
+//   displayP3toY,
+//   adobeRGBtoY,
+//   alphaBlend,
+//   calcAPCA,
+// } from "apca-w3";
+import { calcAPCA } from "apca-w3";
 
 import {
   Tooltip,
@@ -31,8 +32,8 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+// import { Slider } from "@/components/ui/slider";
+// import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -41,7 +42,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+// import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -645,7 +646,6 @@ export default function ContrastChecker() {
                       setForegroundHex(color);
                       setForeground(hexToRgb(color));
                     }}
-                    useAPCA={useAPCA}
                     className="absolute size-10 md:size-12 left-3 md:left-4 top-1/2 -translate-y-1/2 border-2"
                   />
                   <Input
@@ -759,7 +759,6 @@ export default function ContrastChecker() {
                         setBackgroundHex(color);
                         setBackground(hexToRgb(color));
                       }}
-                      useAPCA={useAPCA}
                       className="absolute size-12 left-4 top-1/2 -translate-y-1/2 "
                     />
                   </div>

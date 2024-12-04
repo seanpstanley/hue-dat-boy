@@ -1,9 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  HexColorPicker,
-  RgbaColorPicker,
-  RgbColorPicker,
-} from "react-colorful";
+import { RgbaColorPicker } from "react-colorful";
 import {
   Popover,
   PopoverContent,
@@ -32,7 +28,7 @@ function hexToRgba(hex: string): RgbaColor {
     : { r: 0, g: 0, b: 0, a: 1 };
 }
 
-function rgbaToHex({ r, g, b, a }: RgbaColor): string {
+function rgbaToHex({ r, g, b }: RgbaColor): string {
   return `#${[r, g, b]
     .map((x) => Math.round(x).toString(16).padStart(2, "0"))
     .join("")}`;
@@ -41,14 +37,12 @@ function rgbaToHex({ r, g, b, a }: RgbaColor): string {
 interface ColorPickerProps {
   color: string;
   onChange: (color: string) => void;
-  useAPCA: boolean;
   className?: string;
 }
 
 export const ColorPicker = ({
   color,
   onChange,
-  useAPCA,
   className,
 }: ColorPickerProps) => {
   const [internalColor, setInternalColor] = useState<RgbaColor>(
@@ -77,12 +71,7 @@ export const ColorPicker = ({
         />
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0 border-none">
-        {useAPCA ? (
-          <RgbaColorPicker color={internalColor} onChange={handleChange} />
-        ) : (
-          // <HexColorPicker color={internalColor} onChange={handleChange} />
-          <RgbaColorPicker color={internalColor} onChange={handleChange} />
-        )}
+        <RgbaColorPicker color={internalColor} onChange={handleChange} />
       </PopoverContent>
     </Popover>
   );
