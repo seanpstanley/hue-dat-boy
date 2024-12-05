@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Clipboard,
   ArrowLeftRight,
   Github,
   Twitter,
+  Linkedin,
   Check,
   X,
   Maximize2,
@@ -28,11 +29,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+import { debounce } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-// import { Slider } from "@/components/ui/slider";
 // import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import {
@@ -42,7 +43,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-// import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -54,6 +54,13 @@ import { ColorPicker } from "@/components/color-picker";
 
 const getCurrentYear = () => new Date().getFullYear();
 
+function calculateRelativeLuminance({ r, g, b }: RGB) {
+  const [rs, gs, bs] = [r / 255, g / 255, b / 255].map((c) =>
+    c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
+  );
+  return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+}
+
 function calculateContrastRatio(bg: RGB, fg: RGB) {
   const bgLuminance = calculateRelativeLuminance(bg);
   const fgLuminance = calculateRelativeLuminance(fg);
@@ -64,22 +71,17 @@ function calculateContrastRatio(bg: RGB, fg: RGB) {
   return (lighter + 0.05) / (darker + 0.05);
 }
 
-function calculateRelativeLuminance({ r, g, b }: RGB) {
-  const [rs, gs, bs] = [r / 255, g / 255, b / 255].map((c) =>
-    c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
+function calculateAPCAContrast(background: RGB, foreground: RGB) {
+  return Number(
+    calcAPCA(
+      [...Object.values(foreground), 1] as [number, number, number, number],
+      [...Object.values(background)] as [number, number, number]
+    )
   );
-  return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
 }
 
 function rgbToHex({ r, g, b }: RGB): string {
   return `#${[r, g, b].map((x) => x.toString(16).padStart(2, "0")).join("")}`;
-}
-
-function calculateAPCAContrast(background: RGB, foreground: RGB) {
-  return calcAPCA(
-    [...Object.values(foreground), 1] as [number, number, number, number],
-    [...Object.values(background)] as [number, number, number]
-  );
 }
 
 function hexToRgb(hex: string): RGB {
@@ -194,9 +196,12 @@ function getDisplayColor(
 function enhanceContrast(
   background: RGB,
   foreground: RGB,
-  type: "text" | "background" | "both"
+  type: "text" | "background" | "both",
+  useAPCA: boolean
 ): { background: RGB; foreground: RGB } {
-  const initialContrast = calculateContrastRatio(background, foreground);
+  const initialContrast = useAPCA
+    ? calculateAPCAContrast(background, foreground)
+    : calculateContrastRatio(background, foreground);
   let newBackground = { ...background };
   let newForeground = { ...foreground };
 
@@ -205,6 +210,8 @@ function enhanceContrast(
     const step = 1;
     let bestContrast = isBackground
       ? initialContrast
+      : useAPCA
+      ? calculateAPCAContrast(background, color)
       : calculateContrastRatio(background, color);
     let bestColor = color;
 
@@ -217,10 +224,18 @@ function enhanceContrast(
       const darkerRGB = hslToRgb(darkerHSL);
 
       const lighterContrast = isBackground
-        ? calculateContrastRatio(lighterRGB, newForeground)
+        ? useAPCA
+          ? calculateAPCAContrast(lighterRGB, newForeground)
+          : calculateContrastRatio(lighterRGB, newForeground)
+        : useAPCA
+        ? calculateAPCAContrast(background, lighterRGB)
         : calculateContrastRatio(background, lighterRGB);
       const darkerContrast = isBackground
-        ? calculateContrastRatio(darkerRGB, newForeground)
+        ? useAPCA
+          ? calculateAPCAContrast(darkerRGB, newForeground)
+          : calculateContrastRatio(darkerRGB, newForeground)
+        : useAPCA
+        ? calculateAPCAContrast(background, darkerRGB)
         : calculateContrastRatio(background, darkerRGB);
 
       if (lighterContrast > bestContrast) {
@@ -233,11 +248,11 @@ function enhanceContrast(
         bestColor = darkerRGB;
       }
 
-      if (bestContrast >= 7) break; // Stop if we've reached AAA level contrast
+      if (useAPCA ? Math.abs(bestContrast) >= 75 : bestContrast >= 7) break; // Stop if we've reached the highest level
     }
 
-    // If we still haven't reached AA level, try adjusting saturation
-    if (bestContrast < 4.5) {
+    // If we still haven't reached the desired level, try adjusting saturation
+    if (useAPCA ? Math.abs(bestContrast) < 60 : bestContrast < 4.5) {
       const currentHSL = rgbToHsl(bestColor);
       for (let i = 0; i <= 100; i += step) {
         const lessSaturatedHSL = {
@@ -253,10 +268,18 @@ function enhanceContrast(
         const moreSaturatedRGB = hslToRgb(moreSaturatedHSL);
 
         const lessSaturatedContrast = isBackground
-          ? calculateContrastRatio(lessSaturatedRGB, newForeground)
+          ? useAPCA
+            ? calculateAPCAContrast(lessSaturatedRGB, newForeground)
+            : calculateContrastRatio(lessSaturatedRGB, newForeground)
+          : useAPCA
+          ? calculateAPCAContrast(background, lessSaturatedRGB)
           : calculateContrastRatio(background, lessSaturatedRGB);
         const moreSaturatedContrast = isBackground
-          ? calculateContrastRatio(moreSaturatedRGB, newForeground)
+          ? useAPCA
+            ? calculateAPCAContrast(moreSaturatedRGB, newForeground)
+            : calculateContrastRatio(moreSaturatedRGB, newForeground)
+          : useAPCA
+          ? calculateAPCAContrast(background, moreSaturatedRGB)
           : calculateContrastRatio(background, moreSaturatedRGB);
 
         if (lessSaturatedContrast > bestContrast) {
@@ -269,7 +292,7 @@ function enhanceContrast(
           bestColor = moreSaturatedRGB;
         }
 
-        if (bestContrast >= 7) break;
+        if (useAPCA ? Math.abs(bestContrast) >= 75 : bestContrast >= 7) break;
       }
     }
 
@@ -284,22 +307,26 @@ function enhanceContrast(
     newBackground = adjustColor(background, true);
   }
 
-  // If we still haven't reached AA level, consider switching to black or white
-  const finalContrast = calculateContrastRatio(newBackground, newForeground);
-  if (finalContrast < 4.5) {
-    const blackContrast = calculateContrastRatio(newBackground, {
-      r: 0,
-      g: 0,
-      b: 0,
-    });
-    const whiteContrast = calculateContrastRatio(newBackground, {
-      r: 255,
-      g: 255,
-      b: 255,
-    });
+  // If we still haven't reached the desired level, consider switching to black or white
+  const finalContrast = useAPCA
+    ? calculateAPCAContrast(newBackground, newForeground)
+    : calculateContrastRatio(newBackground, newForeground);
+  if (useAPCA ? Math.abs(finalContrast) < 60 : finalContrast < 4.5) {
+    const blackContrast = useAPCA
+      ? calculateAPCAContrast(newBackground, { r: 0, g: 0, b: 0 })
+      : calculateContrastRatio(newBackground, { r: 0, g: 0, b: 0 });
+    // ? calculateAPCAContrast(newBackground, { r: 0, g: 0, b: 0, a: 1 })
+    // : calculateContrastRatio(newBackground, { r: 0, g: 0, b: 0, a: 1 });
+    const whiteContrast = useAPCA
+      ? calculateAPCAContrast(newBackground, { r: 255, g: 255, b: 255 })
+      : calculateContrastRatio(newBackground, { r: 255, g: 255, b: 255 });
+    // ? calculateAPCAContrast(newBackground, { r: 255, g: 255, b: 255, a: 1 })
+    // : calculateContrastRatio(newBackground, { r: 255, g: 255, b: 255, a: 1 });
     newForeground =
-      blackContrast > whiteContrast
-        ? { r: 0, g: 0, b: 0 }
+      Math.abs(blackContrast) > Math.abs(whiteContrast)
+        ? // ? { r: 0, g: 0, b: 0,a: 1 }
+          // : { r: 255, g: 255, b: 255, a: 1 };
+          { r: 0, g: 0, b: 0 }
         : { r: 255, g: 255, b: 255 };
   }
 
@@ -358,10 +385,28 @@ function simulateColorBlindness(color: RGB, type: ColorBlindnessType): RGB {
 
 const SAMPLE_TEXT = "temp";
 
+const GOOGLE_FONTS = [
+  "Inter",
+  "Roboto",
+  "Open Sans",
+  "Lato",
+  "Montserrat",
+  "Poppins",
+  "Source Sans Pro",
+  "Ubuntu",
+];
+
 interface RGB {
   r: number;
   g: number;
   b: number;
+}
+
+interface RGBA {
+  r: number;
+  g: number;
+  b: number;
+  a: number;
 }
 
 interface HSL {
@@ -371,19 +416,17 @@ interface HSL {
 }
 
 export default function ContrastChecker() {
-  const router = useRouter();
+  const { replace } = useRouter();
 
   const searchParams = useSearchParams();
   const searchParamsInitText = searchParams.get("text") as string;
   const searchParamsInitBg = searchParams.get("background") as string;
 
   const [background, setBackground] = useState<RGB>(
-    searchParamsInitBg ? hexToRgb(searchParamsInitBg) : { r: 0, g: 0, b: 0 }
+    searchParamsInitBg ? hexToRgb(searchParamsInitBg) : hexToRgb("#f5b4c5")
   );
   const [foreground, setForeground] = useState<RGB>(
-    searchParamsInitText
-      ? hexToRgb(searchParamsInitText)
-      : { r: 255, g: 255, b: 255 }
+    searchParamsInitText ? hexToRgb(searchParamsInitText) : hexToRgb("#322e2b")
   );
   const [backgroundHex, setBackgroundHex] = useState(rgbToHex(background));
   const [foregroundHex, setForegroundHex] = useState(rgbToHex(foreground));
@@ -391,16 +434,48 @@ export default function ContrastChecker() {
   const [colorBlindnessType, setColorBlindnessType] =
     useState<ColorBlindnessType>("normal");
   const [enhanceMenuOpen, setEnhanceMenuOpen] = useState(false);
+  const [font, setFont] = useState("Inter");
 
-  const contrastRatio = calculateContrastRatio(background, foreground);
+  const wcagContrast = calculateContrastRatio(background, foreground);
   const apcaContrast = calculateAPCAContrast(background, foreground);
 
   const wcagResults = {
-    AANormal: contrastRatio >= 4.5,
-    AAANormal: contrastRatio >= 7,
-    AALarge: contrastRatio >= 3,
-    AAALarge: contrastRatio >= 4.5,
+    AANormal: wcagContrast >= 4.5,
+    AAANormal: wcagContrast >= 7,
+    AALarge: wcagContrast >= 3,
+    AAALarge: wcagContrast >= 4.5,
   };
+
+  const handleColorChange = useCallback(
+    (color: "background" | "foreground") => {
+      return debounce((value: string) => {
+        if (/^#?[0-9A-Fa-f]{6,8}$/.test(value)) {
+          const colorValue = value.startsWith("#") ? value : `#${value}`;
+          const newColor = hexToRgb(colorValue);
+          if (color === "background") {
+            setBackground(newColor);
+            setBackgroundHex(colorValue);
+          } else {
+            setForeground(newColor);
+            setForegroundHex(colorValue);
+          }
+        } else if (/^(\d{1,3},){3}(\d*\.?\d+)$/.test(value)) {
+          const [r, g, b, a] = value.split(",").map(Number);
+          if (r <= 255 && g <= 255 && b <= 255 && a >= 0 && a <= 1) {
+            const newRgb = { r, g, b, a };
+            if (color === "background") {
+              setBackground(newRgb);
+              setBackgroundHex(rgbToHex(newRgb));
+            } else {
+              setForeground(newRgb);
+              setForegroundHex(rgbToHex(newRgb));
+            }
+          }
+        }
+      }, 50);
+    },
+    []
+  );
 
   const handleReverseColors = () => {
     const newBackground = foreground;
@@ -409,47 +484,32 @@ export default function ContrastChecker() {
     setForeground(newForeground);
     setBackgroundHex(rgbToHex(newBackground));
     setForegroundHex(rgbToHex(newForeground));
-    // if (router.isReady) {
-    //   const fgParam = rgbToUrlParam(newForeground);
-    //   const bgParam = rgbToUrlParam(newBackground);
-    //   router.push(`?fg=${fgParam}&bg=${bgParam}`, undefined, { shallow: true });
-    // }
+  };
+
+  const handleCopyUrl = () => {
+    navigator.clipboard.writeText(window.location.toString());
   };
 
   const handleEnhanceContrast = (type: "text" | "background" | "both") => {
     const { background: newBackground, foreground: newForeground } =
-      enhanceContrast(background, foreground, type);
+      enhanceContrast(background, foreground, type, useAPCA);
     setBackground(newBackground);
     setBackgroundHex(rgbToHex(newBackground));
     setForeground(newForeground);
     setForegroundHex(rgbToHex(newForeground));
   };
 
-  useEffect(() => {
-    const text = searchParams.get("text");
-    const bg = searchParams.get("background");
-
-    if (typeof text === "string" && typeof bg === "string") {
-      setForeground(hexToRgb(text));
-      setBackground(hexToRgb(bg));
-      setForegroundHex(text);
-      setBackgroundHex(bg);
-    } else {
-      const newParams = new URLSearchParams();
-
-      newParams.set("text", foregroundHex.replace("#", ""));
-      newParams.set("background", backgroundHex.replace("#", ""));
-      router.replace(`?${newParams.toString()}`);
-    }
-  }, []);
-
-  useEffect(() => {
+  const updateUrl = () => {
     const newParams = new URLSearchParams();
 
     newParams.set("text", foregroundHex.replace("#", ""));
     newParams.set("background", backgroundHex.replace("#", ""));
-    router.replace(`?${newParams.toString()}`);
-  }, [foreground, background, router]);
+    replace(`?${newParams.toString()}`);
+  };
+
+  useEffect(() => {
+    updateUrl();
+  }, [foreground, background, updateUrl]);
 
   return (
     <div
@@ -460,8 +520,8 @@ export default function ContrastChecker() {
     >
       <main className="mx-auto container">
         <div className="mb-16 text-center">
-          <h1
-            className="font-bold"
+          <span
+            className="font-medium"
             style={{
               color: getDisplayColor(
                 background,
@@ -471,6 +531,21 @@ export default function ContrastChecker() {
             }}
           >
             hue dat boy.
+          </span>
+        </div>
+
+        <div className="mb-8">
+          <h1
+            className="font-bold text-2xl md:text-3xl"
+            style={{
+              color: getDisplayColor(
+                background,
+                foreground,
+                colorBlindnessType
+              ),
+            }}
+          >
+            color contrast checker
           </h1>
         </div>
 
@@ -486,7 +561,7 @@ export default function ContrastChecker() {
               contrast value
             </Label>
             <div
-              className="flex gap-10 items-center rounded-lg border-3 p-3"
+              className="flex gap-10 items-center rounded-lg border-3 px-2.5 py-4"
               style={{
                 borderColor: getDisplayColor(
                   background,
@@ -501,11 +576,11 @@ export default function ContrastChecker() {
               >
                 {useAPCA ? (
                   <>
-                    {Number(apcaContrast).toFixed(2)} L
+                    {apcaContrast.toFixed(2)} L
                     <sup className="-ml-3 md:-ml-4 -top-3.5 md:-top-6">c</sup>
                   </>
                 ) : (
-                  <>{contrastRatio.toFixed(2)} : 1</>
+                  <>{wcagContrast.toFixed(2)} : 1</>
                 )}
               </h2>
             </div>
@@ -560,14 +635,11 @@ export default function ContrastChecker() {
                 ),
               }}
               disabled={
-                (!useAPCA && contrastRatio >= 4.5) ||
-                (useAPCA && apcaContrast >= Number(apcaContrast).toFixed(0))
+                (!useAPCA && wcagContrast >= 4.5) ||
+                (useAPCA && Math.abs(apcaContrast) >= 75)
               }
             >
               enhance contrast
-              {apcaContrast >= Number(apcaContrast).toFixed(0)
-                ? "true"
-                : "false"}
             </Button>
           </PopoverTrigger>
           <PopoverContent
@@ -621,6 +693,11 @@ export default function ContrastChecker() {
           </PopoverContent>
         </Popover>
 
+        <Button variant="ghost" onClick={handleCopyUrl} className="gap-x-1">
+          <Clipboard className="h-4 w-4" />
+          share these colors
+        </Button>
+
         {/* Main content area */}
         <div className="flex flex-col lg:flex-col gap-8">
           {/* Color controls */}
@@ -634,21 +711,37 @@ export default function ContrastChecker() {
               ),
             }}
           >
-            <div className="flex  flex-col md:flex-row justify-between items-center gap-x-12 gap-y-3">
+            <div className="flex  flex-col md:flex-row justify-between items-center gap-x-8 gap-y-2">
               {/* Text color */}
               <div className="flex flex-col gap-y-2">
                 <Label className="text-base md:text-lg">text color</Label>
                 <div className="relative">
                   <ColorPicker
                     color={foregroundHex}
-                    onChange={(color: string) => {
-                      setForegroundHex(color);
-                      setForeground(hexToRgb(color));
-                    }}
-                    className="absolute size-10 md:size-12 left-3 md:left-4 top-1/2 -translate-y-1/2 border-2"
+                    // onChange={(color: string) => {
+                    //   setForegroundHex(color);
+                    //   setForeground(hexToRgb(color));
+                    // }}
+                    externalColor={backgroundHex}
+                    onChange={handleColorChange("foreground")}
+                    className="absolute size-10 md:size-12 left-3 md:left-4 top-1/2 -translate-y-1/2"
                   />
                   <Input
                     value={foregroundHex}
+                    // onChange={(e) => {
+                    //   const value = e.target.value;
+                    //   if (value.length <= 7) {
+                    //     setForegroundHex(value);
+                    //     if (/^#?[0-9A-Fa-f]{6}$/.test(value)) {
+                    //       const colorValue = value.startsWith("#")
+                    //         ? value
+                    //         : `#${value}`;
+                    //       setForeground(hexToRgb(colorValue));
+                    //       setForegroundHex(colorValue);
+                    //     }
+                    //   }
+                    // }}
+
                     onChange={(e) => {
                       const value = e.target.value;
                       if (value.length <= 7) {
@@ -673,16 +766,40 @@ export default function ContrastChecker() {
                     maxLength={7}
                     className="font-medium px-14 md:px-20 bg-transparent font-mono text-2xl h-fit py-2 leading-none md:text-5xl border-3"
                   />
-                  <Button
-                    size="auto"
-                    variant="ghost"
-                    className="absolute size-10 md:size-12 right-3 md:right-4 top-1/2 -translate-y-1/2"
-                    onClick={() =>
-                      navigator.clipboard.writeText(rgbToHex(foreground))
-                    }
-                  >
-                    <Clipboard className="h-4 w-4" />
-                  </Button>
+
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          size="auto"
+                          variant="ghost"
+                          className="absolute size-12 right-4 top-1/2 -translate-y-1/2 p-2"
+                          onClick={() =>
+                            navigator.clipboard.writeText(rgbToHex(foreground))
+                          }
+                        >
+                          <Clipboard className="!size-full" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent
+                        style={{
+                          borderColor: getDisplayColor(
+                            background,
+                            foreground,
+                            colorBlindnessType
+                          ),
+                          backgroundColor: rgbToHex(background),
+                          color: getDisplayColor(
+                            background,
+                            foreground,
+                            colorBlindnessType
+                          ),
+                        }}
+                      >
+                        <span>copy color</span>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
               </div>
 
@@ -693,11 +810,11 @@ export default function ContrastChecker() {
                     <Button
                       variant="ghost"
                       size="auto"
-                      className="size-12 shrink-0 "
+                      className="size-12 p-2 shrink-0"
                       onClick={handleReverseColors}
                     >
                       <span className="sr-only">Swap colors</span>
-                      <ArrowLeftRight className=" -rotate-90 md:rotate-0 transition-transform" />
+                      <ArrowLeftRight className="-rotate-90 md:rotate-0 transition-transform !size-full" />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent
@@ -758,7 +875,8 @@ export default function ContrastChecker() {
                         setBackgroundHex(color);
                         setBackground(hexToRgb(color));
                       }}
-                      className="absolute size-12 left-4 top-1/2 -translate-y-1/2 "
+                      externalColor={foregroundHex}
+                      className="absolute size-12 left-4 top-1/2 -translate-y-1/2"
                     />
                   </div>
 
@@ -789,150 +907,238 @@ export default function ContrastChecker() {
                     }}
                     className="px-20 font-mono bg-transparent text-xl h-fit  py-2 leading-none md:text-5xl  border-3"
                   />
-                  <Button
-                    size="auto"
-                    variant="ghost"
-                    className="absolute size-12 right-4 top-1/2 -translate-y-1/2"
-                    onClick={() =>
-                      navigator.clipboard.writeText(rgbToHex(background))
-                    }
-                  >
-                    <Clipboard className="size-full" />
-                  </Button>
+
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          size="auto"
+                          variant="ghost"
+                          className="absolute size-12 right-4 top-1/2 -translate-y-1/2 p-2"
+                          onClick={() =>
+                            navigator.clipboard.writeText(rgbToHex(background))
+                          }
+                        >
+                          <Clipboard className="!size-full" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent
+                        style={{
+                          borderColor: getDisplayColor(
+                            background,
+                            foreground,
+                            colorBlindnessType
+                          ),
+                          backgroundColor: rgbToHex(background),
+                          color: getDisplayColor(
+                            background,
+                            foreground,
+                            colorBlindnessType
+                          ),
+                        }}
+                      >
+                        <span>copy color</span>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Sample Text Section */}
-          <div className="lg:w-1/2 space-y-4">
-            {/* <div className="space-y-4">
-              <Label>Typeface</Label>
-              <Select value={font} onValueChange={setFont}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {GOOGLE_FONTS.map((font) => (
-                    <SelectItem key={font} value={font}>
-                      {font}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div> */}
+          <div className="flex flex-col gap-y-8">
+            {/* Font and Color Blindness Controls */}
+            <div className="flex flex-col md:flex-row gap-x-8 gap-y-4">
+              <div
+                className="flex flex-col gap-y-2 flex-1"
+                style={{
+                  color: getDisplayColor(
+                    background,
+                    foreground,
+                    colorBlindnessType
+                  ),
+                }}
+              >
+                <Label
+                  htmlFor="typeface-select"
+                  className="text-base md:text-lg"
+                >
+                  typeface
+                </Label>
+                <Select
+                  value={font}
+                  onValueChange={setFont}
+                  name="typeface-select"
+                >
+                  <SelectTrigger
+                    className="bg-transparent border-3 h-fit py-2 text-lg md:text-2xl"
+                    style={{
+                      borderColor: getDisplayColor(
+                        background,
+                        foreground,
+                        colorBlindnessType
+                      ),
+                    }}
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent
+                    className="border-3 max-h-72 overflow-y-scroll"
+                    style={{
+                      borderColor: getDisplayColor(
+                        background,
+                        foreground,
+                        colorBlindnessType
+                      ),
+                      color: getDisplayColor(
+                        background,
+                        foreground,
+                        colorBlindnessType
+                      ),
+                      backgroundColor: rgbToHex(background),
+                    }}
+                  >
+                    {GOOGLE_FONTS.map((font) => (
+                      <SelectItem
+                        key={font}
+                        value={font}
+                        className="text-lg md:text-2xl"
+                      >
+                        {font}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <div
-              className="flex flex-col gap-y-2"
-              style={{
-                color: getDisplayColor(
-                  background,
-                  foreground,
-                  colorBlindnessType
-                ),
-              }}
-            >
-              <Label
-                htmlFor="colorblind-select"
-                className="text-base md:text-lg"
+              <div
+                className="flex flex-col gap-y-2 flex-1"
+                style={{
+                  color: getDisplayColor(
+                    background,
+                    foreground,
+                    colorBlindnessType
+                  ),
+                }}
               >
-                simulate colorblindness
-              </Label>
-              <Select
-                value={colorBlindnessType}
-                onValueChange={(value: ColorBlindnessType) =>
-                  setColorBlindnessType(value)
-                }
-                name="colorblind-select"
-              >
-                <SelectTrigger
-                  className="bg-transparent border-3 h-fit py-2 text-lg md:text-2xl"
-                  style={{
-                    borderColor: getDisplayColor(
-                      background,
-                      foreground,
-                      colorBlindnessType
-                    ),
-                  }}
+                <Label
+                  htmlFor="colorblind-select"
+                  className="text-base md:text-lg"
                 >
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent
-                  className="border-3"
-                  style={{
-                    borderColor: getDisplayColor(
-                      background,
-                      foreground,
-                      colorBlindnessType
-                    ),
-                    color: getDisplayColor(
-                      background,
-                      foreground,
-                      colorBlindnessType
-                    ),
-                    backgroundColor: rgbToHex(background),
-                  }}
+                  simulate colorblindness
+                </Label>
+                <Select
+                  value={colorBlindnessType}
+                  onValueChange={(value: ColorBlindnessType) =>
+                    setColorBlindnessType(value)
+                  }
+                  name="colorblind-select"
                 >
-                  <SelectItem value="normal" className="text-lg md:text-2xl">
-                    normal vision
-                  </SelectItem>
-                  <SelectItem
-                    value="protanopia"
-                    className="text-lg md:text-2xl"
+                  <SelectTrigger
+                    className="bg-transparent border-3 h-fit py-2 text-lg md:text-2xl"
+                    style={{
+                      borderColor: getDisplayColor(
+                        background,
+                        foreground,
+                        colorBlindnessType
+                      ),
+                    }}
                   >
-                    protanopia
-                  </SelectItem>
-                  <SelectItem
-                    value="deuteranopia"
-                    className="text-lg md:text-2xl"
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent
+                    className="border-3"
+                    style={{
+                      borderColor: getDisplayColor(
+                        background,
+                        foreground,
+                        colorBlindnessType
+                      ),
+                      color: getDisplayColor(
+                        background,
+                        foreground,
+                        colorBlindnessType
+                      ),
+                      backgroundColor: rgbToHex(background),
+                    }}
                   >
-                    deuteranopia
-                  </SelectItem>
-                  <SelectItem
-                    value="tritanopia"
-                    className="text-lg md:text-2xl"
-                  >
-                    tritanopia
-                  </SelectItem>
-                  <SelectItem
-                    value="achromatopsia"
-                    className="text-lg md:text-2xl"
-                  >
-                    achromatopsia
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+                    <SelectItem value="normal" className="text-lg md:text-2xl">
+                      normal vision
+                    </SelectItem>
+                    <SelectItem
+                      value="protanopia"
+                      className="text-lg md:text-2xl"
+                    >
+                      protanopia
+                    </SelectItem>
+                    <SelectItem
+                      value="deuteranopia"
+                      className="text-lg md:text-2xl"
+                    >
+                      deuteranopia
+                    </SelectItem>
+                    <SelectItem
+                      value="tritanopia"
+                      className="text-lg md:text-2xl"
+                    >
+                      tritanopia
+                    </SelectItem>
+                    <SelectItem
+                      value="achromatopsia"
+                      className="text-lg md:text-2xl"
+                    >
+                      achromatopsia
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
-            <Sheet>
-              <Card
-                className="overflow-hidden bg-transparent border-3"
-                style={{ borderColor: rgbToHex(foreground) }}
+            {/* Sample Text Section */}
+            <section className="flex flex-col gap-y-4" id="sample-text">
+              <h3
+                className="font-bold text-xl md:text-2xl"
+                style={{
+                  color: getDisplayColor(
+                    background,
+                    foreground,
+                    colorBlindnessType
+                  ),
+                }}
               >
-                <div
-                  className="py-2 px-4  relative"
-                  style={{ backgroundColor: rgbToHex(foreground) }}
-                >
-                  <h3
-                    className="text-xl md:text-3xl font-bold"
-                    style={{ color: rgbToHex(background) }}
+                sample text
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8">
+                <Sheet>
+                  <Card
+                    className="overflow-hidden bg-transparent border-3"
+                    style={{ borderColor: rgbToHex(foreground) }}
                   >
-                    large text
-                  </h3>
-                  <SheetTrigger asChild>
-                    {/* <TooltipProvider>
+                    <div
+                      className="py-2 px-4  relative"
+                      style={{ backgroundColor: rgbToHex(foreground) }}
+                    >
+                      <h4
+                        className="text-xl md:text-3xl font-bold"
+                        style={{ color: rgbToHex(background) }}
+                      >
+                        large text
+                      </h4>
+                      <SheetTrigger asChild>
+                        {/* <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild> */}
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="absolute top-1/2 -translate-y-1/2 right-1"
-                      style={{ color: rgbToHex(background) }}
-                    >
-                      <Maximize2 />
-                      <span className="sr-only">Fullscreen view</span>
-                    </Button>
-                    {/* </TooltipTrigger>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="absolute top-1/2 -translate-y-1/2 right-1"
+                          style={{ color: rgbToHex(background) }}
+                        >
+                          <Maximize2 />
+                          <span className="sr-only">Fullscreen view</span>
+                        </Button>
+                        {/* </TooltipTrigger>
                         <TooltipContent
                           style={{
                             borderColor: getDisplayColor(
@@ -952,102 +1158,108 @@ export default function ContrastChecker() {
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider> */}
-                  </SheetTrigger>
-                </div>
-                <div className="p-4">
-                  <p
-                    className="text-2xl"
-                    style={{
-                      color: rgbToHex(foreground),
-                    }}
+                      </SheetTrigger>
+                    </div>
+                    <div className="p-4">
+                      <p
+                        className="text-2xl"
+                        style={{
+                          color: rgbToHex(foreground),
+                          fontFamily: font,
+                        }}
+                      >
+                        {SAMPLE_TEXT}
+                      </p>
+                    </div>
+                  </Card>
+
+                  <SheetContent
+                    className="h-full flex flex-col justify-center items-center border-none"
+                    style={{ backgroundColor: rgbToHex(background) }}
+                    side={"bottom"}
                   >
-                    {SAMPLE_TEXT}
-                  </p>
-                </div>
-              </Card>
+                    <p
+                      className="max-w-2xl text-2xl"
+                      style={{
+                        color: rgbToHex(foreground),
+                        fontFamily: font,
+                      }}
+                    >
+                      {SAMPLE_TEXT}
+                    </p>
+                  </SheetContent>
+                </Sheet>
 
-              <SheetContent
-                className="h-full flex flex-col justify-center items-center border-none"
-                style={{ backgroundColor: rgbToHex(background) }}
-                side={"bottom"}
-              >
-                <p
-                  className="max-w-2xl text-2xl"
-                  style={{
-                    color: rgbToHex(foreground),
-                  }}
+                <Card
+                  className="overflow-hidden bg-transparent border-3"
+                  style={{ borderColor: rgbToHex(foreground) }}
                 >
-                  {SAMPLE_TEXT}
-                </p>
-              </SheetContent>
-            </Sheet>
-
-            <Card
-              className="overflow-hidden bg-transparent border-3"
-              style={{ borderColor: rgbToHex(foreground) }}
-            >
-              <div
-                className="py-2 px-4"
-                style={{ backgroundColor: rgbToHex(foreground) }}
-              >
-                <h3
-                  className="text-xl md:text-3xl font-bold"
-                  style={{ color: rgbToHex(background) }}
-                >
-                  small text
-                </h3>
+                  <div
+                    className="py-2 px-4"
+                    style={{ backgroundColor: rgbToHex(foreground) }}
+                  >
+                    <h4
+                      className="text-xl md:text-3xl font-bold"
+                      style={{ color: rgbToHex(background) }}
+                    >
+                      small text
+                    </h4>
+                  </div>
+                  <div className="p-4">
+                    <p
+                      className="text-base"
+                      style={{
+                        color: rgbToHex(foreground),
+                      }}
+                    >
+                      {SAMPLE_TEXT}
+                    </p>
+                  </div>
+                </Card>
               </div>
-              <div className="p-4">
-                <p
-                  className="text-base"
-                  style={{
-                    color: rgbToHex(foreground),
-                  }}
-                >
-                  {SAMPLE_TEXT}
-                </p>
-              </div>
-            </Card>
+            </section>
           </div>
-
-          {/* </div> */}
         </div>
       </main>
 
       <footer
         className="mt-12 py-6 container mx-auto"
         style={{
-          color: contrastRatio < 3 ? "black" : rgbToHex(foreground),
+          color: wcagContrast < 3 ? "black" : rgbToHex(foreground),
         }}
       >
         <div className="flex flex-col items-center sm:flex-row-reverse justify-between gap-4">
           <div className="flex gap-x-4">
             <Button
               asChild
-              variant={"outline"}
+              variant={"ghost"}
               size={"auto"}
-              className="size-10 p-0"
+              className="size-12 p-2"
             >
               <Link
                 href="https://github.com/seanpstanley"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="size-full"
               >
-                <Github className="size-10" />
+                <Github className="!size-full" />
                 <span className="sr-only">GitHub</span>
               </Link>
             </Button>
-
-            <a
-              href="https://twitter.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-blue-200 size-7"
+            <Button
+              asChild
+              variant={"ghost"}
+              size={"auto"}
+              className="size-12 p-2"
             >
-              <Twitter className="size-full" />
-              <span className="sr-only">Twitter</span>
-            </a>
+              <Link
+                href="https://www.linkedin.com/in/seanpstanley/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Linkedin className="!size-full" />
+                <span className="sr-only">Twitter</span>
+              </Link>
+            </Button>
           </div>
           <small className="text-sm">
             © {getCurrentYear()} Sean Stanley. Built with shadcn.

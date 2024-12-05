@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { RgbaColorPicker } from "react-colorful";
 import {
   Popover,
@@ -15,7 +15,6 @@ interface RgbaColor {
   a: number;
 }
 
-// Helper functions
 function hexToRgba(hex: string): RgbaColor {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
@@ -36,43 +35,46 @@ function rgbaToHex({ r, g, b }: RgbaColor): string {
 
 interface ColorPickerProps {
   color: string;
+  externalColor: string;
   onChange: (color: string) => void;
   className?: string;
 }
 
-export const ColorPicker = ({
-  color,
-  onChange,
-  className,
-}: ColorPickerProps) => {
-  const [internalColor, setInternalColor] = useState<RgbaColor>(
-    hexToRgba(color)
-  );
+export const ColorPicker = React.memo(
+  ({ color, externalColor, onChange, className }: ColorPickerProps) => {
+    const [internalColor, setInternalColor] = useState<RgbaColor>(
+      hexToRgba(color)
+    );
 
-  useEffect(() => {
-    setInternalColor(hexToRgba(color));
-  }, [color]);
+    useEffect(() => {
+      setInternalColor(hexToRgba(color));
+    }, [color]);
 
-  const handleChange = (newColor: RgbaColor) => {
-    setInternalColor(newColor);
-    onChange(rgbaToHex(newColor));
-  };
+    const handleChange = useCallback(
+      (newColor: RgbaColor) => {
+        setInternalColor(newColor);
+        onChange(rgbaToHex(newColor));
+      },
+      [onChange]
+    );
 
-  return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          variant="naked"
-          className={cn("size-6 rounded-sm border-2", className)}
-          style={{
-            backgroundColor: rgbaToHex(internalColor),
-          }}
-          aria-label="Pick a color"
-        />
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0 border-none">
-        <RgbaColorPicker color={internalColor} onChange={handleChange} />
-      </PopoverContent>
-    </Popover>
-  );
-};
+    return (
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant="naked"
+            className={cn("size-6 rounded-sm border-3", className)}
+            style={{
+              backgroundColor: rgbaToHex(internalColor),
+              borderColor: externalColor,
+            }}
+            aria-label="Pick a color"
+          />
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0 border-none">
+          <RgbaColorPicker color={internalColor} onChange={handleChange} />
+        </PopoverContent>
+      </Popover>
+    );
+  }
+);

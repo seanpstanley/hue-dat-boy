@@ -1,17 +1,36 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import {
+  Roboto,
+  Open_Sans,
+  Montserrat,
+  Poppins,
+  Lato,
+  Inter,
+  Roboto_Condensed,
+  Roboto_Mono,
+  Oswald,
+  Noto_Sans,
+  Raleway,
+  Nunito_Sans,
+  Nunito,
+} from "next/font/google";
+
 import "./globals.css";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+const roboto = Roboto({ weight: "400", subsets: ["latin"] });
+const openSans = Open_Sans({ subsets: ["latin"] });
+const montserrat = Montserrat({ subsets: ["latin"] });
+const poppins = Poppins({ weight: "400", subsets: ["latin"] });
+const lato = Lato({ weight: "400", subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"] });
+const robotoCondensed = Roboto_Condensed({ subsets: ["latin"] });
+const robotoMono = Roboto_Mono({ subsets: ["latin"] });
+const oswald = Oswald({ subsets: ["latin"] });
+const notoSans = Noto_Sans({ subsets: ["latin"] });
+const raleway = Raleway({ subsets: ["latin"] });
+const nunitoSans = Nunito_Sans({ subsets: ["latin"] });
+const nunito = Nunito({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -26,7 +45,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${roboto.className} ${inter.className} ${nunito.className} antialiased`}
       >
         {children}
       </body>
