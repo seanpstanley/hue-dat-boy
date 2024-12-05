@@ -1,19 +1,18 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import {
-  Roboto,
-  Open_Sans,
-  Montserrat,
-  Poppins,
-  Lato,
+  // Roboto,
+  // Open_Sans,
+  // Montserrat,
+  // Poppins,
+  // Lato,
   Inter,
-  Roboto_Condensed,
-  Roboto_Mono,
-  Oswald,
-  Noto_Sans,
-  Raleway,
-  Nunito_Sans,
-  Nunito,
+  // Roboto_Condensed,
+  // Roboto_Mono,
+  // Oswald,
+  // Noto_Sans,
+  // Raleway,
+  // Nunito_Sans,
+  // Nunito,
 } from "next/font/google";
 
 import "./globals.css";

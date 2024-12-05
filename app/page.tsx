@@ -50,7 +50,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import ColorPicker from "@/components/color-picker";
-import { RgbColor, RgbaColor, HslColor } from "@/lib/types";
+import { RgbColor } from "@/lib/types";
 import { rgbToHex, hexToRgb, hslToRgb, rgbToHsl } from "@/lib/utils";
 
 const getCurrentYear = () => new Date().getFullYear();
@@ -430,7 +430,7 @@ export default function ContrastChecker() {
     newParams.set("text", foregroundHex.replace("#", ""));
     newParams.set("background", backgroundHex.replace("#", ""));
     replace(`?${newParams.toString()}`);
-  }, [replace, foreground, background]);
+  }, [replace, foregroundHex, backgroundHex]);
 
   // useEffect(() => {
   //   updateUrl();
@@ -1086,7 +1086,7 @@ export default function ContrastChecker() {
                       style={{ backgroundColor: rgbToHex(foreground) }}
                     >
                       <h4
-                        className="text-xl md:text-3xl font-bold"
+                        className="text-xl md:text-3xl font-semibold"
                         style={{ color: rgbToHex(background) }}
                       >
                         large text
@@ -1165,7 +1165,7 @@ export default function ContrastChecker() {
                     style={{ backgroundColor: rgbToHex(foreground) }}
                   >
                     <h4
-                      className="text-xl md:text-3xl font-bold"
+                      className="text-xl md:text-3xl font-semibold"
                       style={{ color: rgbToHex(background) }}
                     >
                       small text
