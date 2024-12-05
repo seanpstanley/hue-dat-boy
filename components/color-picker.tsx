@@ -1,37 +1,14 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { memo, useState, useEffect, useCallback } from "react";
 import { RgbaColorPicker } from "react-colorful";
+
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-
-interface RgbaColor {
-  r: number;
-  g: number;
-  b: number;
-  a: number;
-}
-
-function hexToRgba(hex: string): RgbaColor {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result
-    ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16),
-        a: 1,
-      }
-    : { r: 0, g: 0, b: 0, a: 1 };
-}
-
-function rgbaToHex({ r, g, b }: RgbaColor): string {
-  return `#${[r, g, b]
-    .map((x) => Math.round(x).toString(16).padStart(2, "0"))
-    .join("")}`;
-}
+import { cn, hexToRgba, rgbaToHex } from "@/lib/utils";
+import { RgbaColor } from "@/lib/types";
 
 interface ColorPickerProps {
   color: string;
@@ -40,7 +17,7 @@ interface ColorPickerProps {
   className?: string;
 }
 
-export const ColorPicker = React.memo(
+export const ColorPicker = memo(
   ({ color, externalColor, onChange, className }: ColorPickerProps) => {
     const [internalColor, setInternalColor] = useState<RgbaColor>(
       hexToRgba(color)

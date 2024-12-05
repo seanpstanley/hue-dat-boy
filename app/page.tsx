@@ -6,7 +6,6 @@ import {
   Clipboard,
   ArrowLeftRight,
   Github,
-  Twitter,
   Linkedin,
   Check,
   X,
@@ -51,17 +50,19 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ColorPicker } from "@/components/color-picker";
+import { RgbColor, RgbaColor, HslColor } from "@/lib/types";
+import { rgbToHex, hexToRgb, hslToRgb, rgbToHsl } from "@/lib/utils";
 
 const getCurrentYear = () => new Date().getFullYear();
 
-function calculateRelativeLuminance({ r, g, b }: RGB) {
+function calculateRelativeLuminance({ r, g, b }: RgbColor) {
   const [rs, gs, bs] = [r / 255, g / 255, b / 255].map((c) =>
     c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
   );
   return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
 }
 
-function calculateContrastRatio(bg: RGB, fg: RGB) {
+function calculateContrastRatio(bg: RgbColor, fg: RgbColor) {
   const bgLuminance = calculateRelativeLuminance(bg);
   const fgLuminance = calculateRelativeLuminance(fg);
 
@@ -71,7 +72,7 @@ function calculateContrastRatio(bg: RGB, fg: RGB) {
   return (lighter + 0.05) / (darker + 0.05);
 }
 
-function calculateAPCAContrast(background: RGB, foreground: RGB) {
+function calculateAPCAContrast(background: RgbColor, foreground: RgbColor) {
   return Number(
     calcAPCA(
       [...Object.values(foreground), 1] as [number, number, number, number],
@@ -80,69 +81,9 @@ function calculateAPCAContrast(background: RGB, foreground: RGB) {
   );
 }
 
-function rgbToHex({ r, g, b }: RGB): string {
-  return `#${[r, g, b].map((x) => x.toString(16).padStart(2, "0")).join("")}`;
-}
-
-function hexToRgb(hex: string): RGB {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result
-    ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16),
-      }
-    : { r: 0, g: 0, b: 0 };
-}
-
-function rgbToHsl({ r, g, b }: RGB): HSL {
-  r /= 255;
-  g /= 255;
-  b /= 255;
-
-  const max = Math.max(r, g, b);
-  const min = Math.min(r, g, b);
-  let h = 0;
-  let s = 0;
-  const l = (max + min) / 2;
-
-  if (max !== min) {
-    const d = max - min;
-    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-    switch (max) {
-      case r:
-        h = (g - b) / d + (g < b ? 6 : 0);
-        break;
-      case g:
-        h = (b - r) / d + 2;
-        break;
-      case b:
-        h = (r - g) / d + 4;
-        break;
-    }
-    h /= 6;
-  }
-
-  return { h: h * 360, s: s * 100, l: l * 100 };
-}
-
-function hslToRgb({ h, s, l }: HSL): RGB {
-  s /= 100;
-  l /= 100;
-  const k = (n: number) => (n + h / 30) % 12;
-  const a = s * Math.min(l, 1 - l);
-  const f = (n: number) =>
-    l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
-  return {
-    r: Math.round(255 * f(0)),
-    g: Math.round(255 * f(8)),
-    b: Math.round(255 * f(4)),
-  };
-}
-
 function getDisplayColor(
-  background: RGB,
-  foreground: RGB,
+  background: RgbColor,
+  foreground: RgbColor,
   colorBlindnessType?: ColorBlindnessType
 ): string {
   if (colorBlindnessType) {
@@ -194,18 +135,18 @@ function getDisplayColor(
 }
 
 function enhanceContrast(
-  background: RGB,
-  foreground: RGB,
+  background: RgbColor,
+  foreground: RgbColor,
   type: "text" | "background" | "both",
   useAPCA: boolean
-): { background: RGB; foreground: RGB } {
+): { background: RgbColor; foreground: RgbColor } {
   const initialContrast = useAPCA
     ? calculateAPCAContrast(background, foreground)
     : calculateContrastRatio(background, foreground);
   let newBackground = { ...background };
   let newForeground = { ...foreground };
 
-  const adjustColor = (color: RGB, isBackground: boolean): RGB => {
+  const adjustColor = (color: RgbColor, isBackground: boolean): RgbColor => {
     const hsl = rgbToHsl(color);
     const step = 1;
     let bestContrast = isBackground
@@ -340,11 +281,14 @@ type ColorBlindnessType =
   | "tritanopia"
   | "achromatopsia";
 
-function simulateColorBlindness(color: RGB, type: ColorBlindnessType): RGB {
+function simulateColorBlindness(
+  color: RgbColor,
+  type: ColorBlindnessType
+): RgbColor {
   if (type === "normal") return color;
 
   const { r, g, b } = color;
-  let simulatedColor: RGB;
+  let simulatedColor: RgbColor;
 
   switch (type) {
     case "protanopia":
@@ -396,25 +340,6 @@ const GOOGLE_FONTS = [
   "Ubuntu",
 ];
 
-interface RGB {
-  r: number;
-  g: number;
-  b: number;
-}
-
-interface RGBA {
-  r: number;
-  g: number;
-  b: number;
-  a: number;
-}
-
-interface HSL {
-  h: number;
-  s: number;
-  l: number;
-}
-
 export default function ContrastChecker() {
   const { replace } = useRouter();
 
@@ -422,10 +347,10 @@ export default function ContrastChecker() {
   const searchParamsInitText = searchParams.get("text") as string;
   const searchParamsInitBg = searchParams.get("background") as string;
 
-  const [background, setBackground] = useState<RGB>(
+  const [background, setBackground] = useState<RgbColor>(
     searchParamsInitBg ? hexToRgb(searchParamsInitBg) : hexToRgb("#f5b4c5")
   );
-  const [foreground, setForeground] = useState<RGB>(
+  const [foreground, setForeground] = useState<RgbColor>(
     searchParamsInitText ? hexToRgb(searchParamsInitText) : hexToRgb("#322e2b")
   );
   const [backgroundHex, setBackgroundHex] = useState(rgbToHex(background));
@@ -609,13 +534,50 @@ export default function ContrastChecker() {
             ))}
           </div>
         </section>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-x-2">
+          <Label
+            htmlFor="contrast-mode"
+            className="text-base md:text-lg"
+            style={{
+              color: getDisplayColor(
+                background,
+                foreground,
+                colorBlindnessType
+              ),
+            }}
+          >
+            wcag 2.2
+          </Label>
           <Switch
-            id="apca-mode"
+            id="contrast-mode"
             checked={useAPCA}
             onCheckedChange={setUseAPCA}
+            style={{
+              borderColor: getDisplayColor(
+                background,
+                foreground,
+                colorBlindnessType
+              ),
+              backgroundColor: getDisplayColor(
+                foreground,
+                background,
+                colorBlindnessType
+              ),
+            }}
           />
-          <Label htmlFor="apca-mode">Use APCA</Label>
+          <Label
+            htmlFor="contrast-mode"
+            className="text-base md:text-lg"
+            style={{
+              color: getDisplayColor(
+                background,
+                foreground,
+                colorBlindnessType
+              ),
+            }}
+          >
+            apca
+          </Label>
         </div>
 
         <Popover open={enhanceMenuOpen} onOpenChange={setEnhanceMenuOpen}>
