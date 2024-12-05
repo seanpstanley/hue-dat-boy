@@ -55,3 +55,7 @@ export const ColorPicker = memo(
     );
   }
 );
+
+ColorPicker.displayName = "ColorPicker";
+
+export default ColorPicker;

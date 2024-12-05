@@ -49,7 +49,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { ColorPicker } from "@/components/color-picker";
+import ColorPicker from "@/components/color-picker";
 import { RgbColor, RgbaColor, HslColor } from "@/lib/types";
 import { rgbToHex, hexToRgb, hslToRgb, rgbToHsl } from "@/lib/utils";
 
@@ -424,17 +424,21 @@ export default function ContrastChecker() {
     setForegroundHex(rgbToHex(newForeground));
   };
 
-  const updateUrl = () => {
+  const updateUrl = useCallback(() => {
     const newParams = new URLSearchParams();
 
     newParams.set("text", foregroundHex.replace("#", ""));
     newParams.set("background", backgroundHex.replace("#", ""));
     replace(`?${newParams.toString()}`);
-  };
+  }, [replace, foreground, background]);
+
+  // useEffect(() => {
+  //   updateUrl();
+  // }, [foreground, background, updateUrl]);
 
   useEffect(() => {
     updateUrl();
-  }, [foreground, background, updateUrl]);
+  }, [updateUrl]);
 
   return (
     <div
