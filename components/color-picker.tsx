@@ -7,30 +7,30 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { cn, hexToRgba, rgbaToHex } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { RgbaColor } from "@/lib/types";
 
 interface ColorPickerProps {
-  color: string;
+  color: RgbaColor; // Use RGBA object directly
   externalColor: string;
-  onChange: (color: string) => void;
+  onChange: (color: RgbaColor) => void; // Pass back RGBA object
   className?: string;
 }
 
 export const ColorPicker = memo(
   ({ color, externalColor, onChange, className }: ColorPickerProps) => {
-    const [internalColor, setInternalColor] = useState<RgbaColor>(
-      hexToRgba(color)
-    );
+    const [internalColor, setInternalColor] = useState<RgbaColor>(color);
 
+    // Sync internal state when the color prop changes
     useEffect(() => {
-      setInternalColor(hexToRgba(color));
+      setInternalColor(color);
     }, [color]);
 
+    // Handle changes from the color picker
     const handleChange = useCallback(
       (newColor: RgbaColor) => {
         setInternalColor(newColor);
-        onChange(rgbaToHex(newColor));
+        onChange(newColor); // Pass back the RGBA object directly
       },
       [onChange]
     );
@@ -42,13 +42,16 @@ export const ColorPicker = memo(
             variant="naked"
             className={cn("size-6 rounded-sm border-3", className)}
             style={{
-              backgroundColor: rgbaToHex(internalColor),
+              backgroundColor: `rgba(${internalColor.r}, ${internalColor.g}, ${internalColor.b}, ${internalColor.a})`,
               borderColor: externalColor,
             }}
             aria-label="Pick a color"
           />
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0 border-none">
+        <PopoverContent
+          collisionPadding={16}
+          className="w-auto p-0 border-none"
+        >
           <RgbaColorPicker color={internalColor} onChange={handleChange} />
         </PopoverContent>
       </Popover>

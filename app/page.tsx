@@ -2,24 +2,9 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  Clipboard,
-  ArrowLeftRight,
-  Github,
-  Linkedin,
-  Check,
-  X,
-  Maximize2,
-} from "lucide-react";
-// import {
-//   APCAcontrast,
-//   sRGBtoY,
-//   displayP3toY,
-//   adobeRGBtoY,
-//   alphaBlend,
-//   calcAPCA,
-// } from "apca-w3";
+import { Clipboard, ArrowLeftRight, Check, X } from "lucide-react";
 import { calcAPCA } from "apca-w3";
+import useSWR from "swr";
 
 import {
   Tooltip,
@@ -28,12 +13,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-import { debounce } from "@/lib/utils";
+import { debounce, getDisplayColor, rgbaToHex } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-// import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -42,35 +25,80 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import Link from "next/link";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import ColorPicker from "@/components/color-picker";
-import { RgbColor } from "@/lib/types";
+import { RgbColor, ColorBlindnessType } from "@/lib/types";
 import { rgbToHex, hexToRgb, hslToRgb, rgbToHsl } from "@/lib/utils";
+import { Footer } from "@/components/footer";
+import { RgbaColor } from "react-colorful";
+import { CopyColorButton } from "@/components/copy-color-button";
+import { SampleTextCard } from "@/components/sample-text-card";
 
-const getCurrentYear = () => new Date().getFullYear();
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-function calculateRelativeLuminance({ r, g, b }: RgbColor) {
+export function calculateRelativeLuminance({ r, g, b }: RgbColor) {
   const [rs, gs, bs] = [r / 255, g / 255, b / 255].map((c) =>
     c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
   );
   return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
 }
 
-function calculateContrastRatio(bg: RgbColor, fg: RgbColor) {
-  const bgLuminance = calculateRelativeLuminance(bg);
-  const fgLuminance = calculateRelativeLuminance(fg);
+export function calculateWCAGContrast(
+  bg: RgbColor,
+  fg: RgbColor,
+  solidBg?: RgbColor
+): number {
+  const blendedFg = blendColors(fg, solidBg || bg);
+  const blendedBg = solidBg || bg;
+
+  const bgLuminance = calculateRelativeLuminance(blendedBg);
+  const fgLuminance = calculateRelativeLuminance(blendedFg);
 
   const lighter = Math.max(bgLuminance, fgLuminance);
   const darker = Math.min(bgLuminance, fgLuminance);
 
   return (lighter + 0.05) / (darker + 0.05);
 }
+
+function calculateWCAGContrastRange(
+  bg: RgbColor,
+  fg: RgbColor
+): { min: number; max: number } {
+  const blackBg: RgbColor = { r: 0, g: 0, b: 0, a: 1 };
+  const whiteBg: RgbColor = { r: 255, g: 255, b: 255, a: 1 };
+
+  const minContrast = calculateWCAGContrast(bg, fg, blackBg);
+  const maxContrast = calculateWCAGContrast(bg, fg, whiteBg);
+
+  return {
+    min: Math.min(minContrast, maxContrast),
+    max: Math.max(minContrast, maxContrast),
+  };
+}
+
+function blendColors(fg: RgbColor, bg: RgbColor): RgbColor {
+  const alpha = fg.a;
+  return {
+    r: Math.round(fg.r * alpha + bg.r * (1 - alpha)),
+    g: Math.round(fg.g * alpha + bg.g * (1 - alpha)),
+    b: Math.round(fg.b * alpha + bg.b * (1 - alpha)),
+    a: 1,
+  };
+}
+
+// export function calculateWCAGContrast(bg: RgbColor, fg: RgbColor) {
+//   const bgLuminance = calculateRelativeLuminance(bg);
+//   const fgLuminance = calculateRelativeLuminance(fg);
+
+//   const lighter = Math.max(bgLuminance, fgLuminance);
+//   const darker = Math.min(bgLuminance, fgLuminance);
+
+//   return (lighter + 0.05) / (darker + 0.05);
+// }
 
 function calculateAPCAContrast(background: RgbColor, foreground: RgbColor) {
   return Number(
@@ -81,59 +109,6 @@ function calculateAPCAContrast(background: RgbColor, foreground: RgbColor) {
   );
 }
 
-function getDisplayColor(
-  background: RgbColor,
-  foreground: RgbColor,
-  colorBlindnessType?: ColorBlindnessType
-): string {
-  if (colorBlindnessType) {
-    const simulatedBackground = simulateColorBlindness(
-      background,
-      colorBlindnessType
-    );
-    const simulatedForeground = simulateColorBlindness(
-      foreground,
-      colorBlindnessType
-    );
-    const contrastRatio = calculateContrastRatio(
-      simulatedBackground,
-      simulatedForeground
-    );
-    if (contrastRatio >= 3.0) {
-      return rgbToHex(simulatedForeground);
-    }
-
-    const blackContrast = calculateContrastRatio(
-      simulatedBackground,
-      simulateColorBlindness({ r: 0, g: 0, b: 0 }, colorBlindnessType)
-    );
-    const whiteContrast = calculateContrastRatio(
-      simulatedBackground,
-      simulateColorBlindness({ r: 255, g: 255, b: 255 }, colorBlindnessType)
-    );
-
-    return blackContrast > whiteContrast ? "#000000" : "#ffffff";
-  } else {
-    const contrastRatio = calculateContrastRatio(background, foreground);
-    if (contrastRatio >= 3.0) {
-      return rgbToHex(foreground);
-    }
-
-    const blackContrast = calculateContrastRatio(background, {
-      r: 0,
-      g: 0,
-      b: 0,
-    });
-    const whiteContrast = calculateContrastRatio(background, {
-      r: 255,
-      g: 255,
-      b: 255,
-    });
-
-    return blackContrast > whiteContrast ? "#000000" : "#ffffff";
-  }
-}
-
 function enhanceContrast(
   background: RgbColor,
   foreground: RgbColor,
@@ -142,7 +117,7 @@ function enhanceContrast(
 ): { background: RgbColor; foreground: RgbColor } {
   const initialContrast = useAPCA
     ? calculateAPCAContrast(background, foreground)
-    : calculateContrastRatio(background, foreground);
+    : calculateWCAGContrast(background, foreground);
   let newBackground = { ...background };
   let newForeground = { ...foreground };
 
@@ -153,7 +128,7 @@ function enhanceContrast(
       ? initialContrast
       : useAPCA
       ? calculateAPCAContrast(background, color)
-      : calculateContrastRatio(background, color);
+      : calculateWCAGContrast(background, color);
     let bestColor = color;
 
     // Try adjusting lightness
@@ -167,17 +142,17 @@ function enhanceContrast(
       const lighterContrast = isBackground
         ? useAPCA
           ? calculateAPCAContrast(lighterRGB, newForeground)
-          : calculateContrastRatio(lighterRGB, newForeground)
+          : calculateWCAGContrast(lighterRGB, newForeground)
         : useAPCA
         ? calculateAPCAContrast(background, lighterRGB)
-        : calculateContrastRatio(background, lighterRGB);
+        : calculateWCAGContrast(background, lighterRGB);
       const darkerContrast = isBackground
         ? useAPCA
           ? calculateAPCAContrast(darkerRGB, newForeground)
-          : calculateContrastRatio(darkerRGB, newForeground)
+          : calculateWCAGContrast(darkerRGB, newForeground)
         : useAPCA
         ? calculateAPCAContrast(background, darkerRGB)
-        : calculateContrastRatio(background, darkerRGB);
+        : calculateWCAGContrast(background, darkerRGB);
 
       if (lighterContrast > bestContrast) {
         bestContrast = lighterContrast;
@@ -211,17 +186,17 @@ function enhanceContrast(
         const lessSaturatedContrast = isBackground
           ? useAPCA
             ? calculateAPCAContrast(lessSaturatedRGB, newForeground)
-            : calculateContrastRatio(lessSaturatedRGB, newForeground)
+            : calculateWCAGContrast(lessSaturatedRGB, newForeground)
           : useAPCA
           ? calculateAPCAContrast(background, lessSaturatedRGB)
-          : calculateContrastRatio(background, lessSaturatedRGB);
+          : calculateWCAGContrast(background, lessSaturatedRGB);
         const moreSaturatedContrast = isBackground
           ? useAPCA
             ? calculateAPCAContrast(moreSaturatedRGB, newForeground)
-            : calculateContrastRatio(moreSaturatedRGB, newForeground)
+            : calculateWCAGContrast(moreSaturatedRGB, newForeground)
           : useAPCA
           ? calculateAPCAContrast(background, moreSaturatedRGB)
-          : calculateContrastRatio(background, moreSaturatedRGB);
+          : calculateWCAGContrast(background, moreSaturatedRGB);
 
         if (lessSaturatedContrast > bestContrast) {
           bestContrast = lessSaturatedContrast;
@@ -251,83 +226,24 @@ function enhanceContrast(
   // If we still haven't reached the desired level, consider switching to black or white
   const finalContrast = useAPCA
     ? calculateAPCAContrast(newBackground, newForeground)
-    : calculateContrastRatio(newBackground, newForeground);
+    : calculateWCAGContrast(newBackground, newForeground);
   if (useAPCA ? Math.abs(finalContrast) < 60 : finalContrast < 4.5) {
     const blackContrast = useAPCA
-      ? calculateAPCAContrast(newBackground, { r: 0, g: 0, b: 0 })
-      : calculateContrastRatio(newBackground, { r: 0, g: 0, b: 0 });
-    // ? calculateAPCAContrast(newBackground, { r: 0, g: 0, b: 0, a: 1 })
-    // : calculateContrastRatio(newBackground, { r: 0, g: 0, b: 0, a: 1 });
+      ? calculateAPCAContrast(newBackground, { r: 0, g: 0, b: 0, a: 1 })
+      : calculateWCAGContrast(newBackground, { r: 0, g: 0, b: 0, a: 1 });
+
     const whiteContrast = useAPCA
-      ? calculateAPCAContrast(newBackground, { r: 255, g: 255, b: 255 })
-      : calculateContrastRatio(newBackground, { r: 255, g: 255, b: 255 });
-    // ? calculateAPCAContrast(newBackground, { r: 255, g: 255, b: 255, a: 1 })
-    // : calculateContrastRatio(newBackground, { r: 255, g: 255, b: 255, a: 1 });
+      ? calculateAPCAContrast(newBackground, { r: 255, g: 255, b: 255, a: 1 })
+      : calculateWCAGContrast(newBackground, { r: 255, g: 255, b: 255, a: 1 });
+
     newForeground =
       Math.abs(blackContrast) > Math.abs(whiteContrast)
-        ? // ? { r: 0, g: 0, b: 0,a: 1 }
-          // : { r: 255, g: 255, b: 255, a: 1 };
-          { r: 0, g: 0, b: 0 }
-        : { r: 255, g: 255, b: 255 };
+        ? { r: 0, g: 0, b: 0, a: 1 }
+        : { r: 255, g: 255, b: 255, a: 1 };
   }
 
   return { background: newBackground, foreground: newForeground };
 }
-
-type ColorBlindnessType =
-  | "normal"
-  | "protanopia"
-  | "deuteranopia"
-  | "tritanopia"
-  | "achromatopsia";
-
-function simulateColorBlindness(
-  color: RgbColor,
-  type: ColorBlindnessType
-): RgbColor {
-  if (type === "normal") return color;
-
-  const { r, g, b } = color;
-  let simulatedColor: RgbColor;
-
-  switch (type) {
-    case "protanopia":
-      simulatedColor = {
-        r: 0.567 * r + 0.433 * g,
-        g: 0.558 * r + 0.442 * g,
-        b: 0.242 * r + 0.758 * b,
-      };
-      break;
-    case "deuteranopia":
-      simulatedColor = {
-        r: 0.625 * r + 0.375 * g,
-        g: 0.7 * r + 0.3 * g,
-        b: 0.3 * r + 0.7 * b,
-      };
-      break;
-    case "tritanopia":
-      simulatedColor = {
-        r: 0.95 * r + 0.05 * g,
-        g: 0.433 * r + 0.567 * g,
-        b: 0.475 * r + 0.525 * g,
-      };
-      break;
-    case "achromatopsia":
-      const gray = 0.299 * r + 0.587 * g + 0.114 * b;
-      simulatedColor = { r: gray, g: gray, b: gray };
-      break;
-    default:
-      simulatedColor = color;
-  }
-
-  return {
-    r: Math.round(simulatedColor.r),
-    g: Math.round(simulatedColor.g),
-    b: Math.round(simulatedColor.b),
-  };
-}
-
-const SAMPLE_TEXT = "temp";
 
 const GOOGLE_FONTS = [
   "Inter",
@@ -346,6 +262,9 @@ export default function ContrastChecker() {
   const searchParams = useSearchParams();
   const searchParamsInitText = searchParams.get("text") as string;
   const searchParamsInitBg = searchParams.get("background") as string;
+  const searchParamsInitStandard = searchParams.get("standard") as string;
+  const searchParamsInitFont = searchParams.get("font") as string;
+  const searchParamsInitSimulation = searchParams.get("simulation") as string;
 
   const [background, setBackground] = useState<RgbColor>(
     searchParamsInitBg ? hexToRgb(searchParamsInitBg) : hexToRgb("#f5b4c5")
@@ -355,13 +274,22 @@ export default function ContrastChecker() {
   );
   const [backgroundHex, setBackgroundHex] = useState(rgbToHex(background));
   const [foregroundHex, setForegroundHex] = useState(rgbToHex(foreground));
-  const [useAPCA, setUseAPCA] = useState(false);
+  const [useAPCA, setUseAPCA] = useState(
+    searchParamsInitStandard === "wcag" ? false : true
+  );
+  const [font, setFont] = useState(
+    searchParamsInitFont ? searchParamsInitFont : "Inter"
+  );
   const [colorBlindnessType, setColorBlindnessType] =
-    useState<ColorBlindnessType>("normal");
+    useState<ColorBlindnessType>(
+      searchParamsInitSimulation
+        ? (searchParamsInitSimulation as ColorBlindnessType)
+        : "normal"
+    );
   const [enhanceMenuOpen, setEnhanceMenuOpen] = useState(false);
-  const [font, setFont] = useState("Inter");
 
-  const wcagContrast = calculateContrastRatio(background, foreground);
+  const wcagContrast = calculateWCAGContrast(background, foreground);
+  const wcagContrastRange = calculateWCAGContrastRange(background, foreground);
   const apcaContrast = calculateAPCAContrast(background, foreground);
 
   const wcagResults = {
@@ -371,35 +299,40 @@ export default function ContrastChecker() {
     AAALarge: wcagContrast >= 4.5,
   };
 
-  const handleColorChange = useCallback(
-    (color: "background" | "foreground") => {
-      return debounce((value: string) => {
-        if (/^#?[0-9A-Fa-f]{6,8}$/.test(value)) {
-          const colorValue = value.startsWith("#") ? value : `#${value}`;
-          const newColor = hexToRgb(colorValue);
-          if (color === "background") {
-            setBackground(newColor);
-            setBackgroundHex(colorValue);
+  const debouncedColorChange = debounce(
+    (colorType: "background" | "foreground", value: string) => {
+      if (/^#?[0-9A-Fa-f]{6,8}$/.test(value)) {
+        const colorValue = value.startsWith("#") ? value : `#${value}`;
+        const newColor = hexToRgb(colorValue);
+        if (colorType === "background") {
+          setBackground(newColor);
+          setBackgroundHex(colorValue);
+        } else {
+          setForeground(newColor);
+          setForegroundHex(colorValue);
+        }
+      } else if (/^(\d{1,3},){3}(\d*\.?\d+)$/.test(value)) {
+        const [r, g, b, a] = value.split(",").map(Number);
+        if (r <= 255 && g <= 255 && b <= 255 && a >= 0 && a <= 1) {
+          const newRgb = { r, g, b, a };
+          if (colorType === "background") {
+            setBackground(newRgb);
+            setBackgroundHex(rgbToHex(newRgb));
           } else {
-            setForeground(newColor);
-            setForegroundHex(colorValue);
-          }
-        } else if (/^(\d{1,3},){3}(\d*\.?\d+)$/.test(value)) {
-          const [r, g, b, a] = value.split(",").map(Number);
-          if (r <= 255 && g <= 255 && b <= 255 && a >= 0 && a <= 1) {
-            const newRgb = { r, g, b, a };
-            if (color === "background") {
-              setBackground(newRgb);
-              setBackgroundHex(rgbToHex(newRgb));
-            } else {
-              setForeground(newRgb);
-              setForegroundHex(rgbToHex(newRgb));
-            }
+            setForeground(newRgb);
+            setForegroundHex(rgbToHex(newRgb));
           }
         }
-      }, 50);
+      }
     },
-    []
+    50
+  );
+
+  const handleColorChange = useCallback(
+    (colorType: "background" | "foreground", value: RgbaColor) => {
+      debouncedColorChange(colorType, rgbaToHex(value));
+    },
+    [debouncedColorChange]
   );
 
   const handleReverseColors = () => {
@@ -429,34 +362,46 @@ export default function ContrastChecker() {
 
     newParams.set("text", foregroundHex.replace("#", ""));
     newParams.set("background", backgroundHex.replace("#", ""));
-    replace(`?${newParams.toString()}`);
-  }, [replace, foregroundHex, backgroundHex]);
-
-  // useEffect(() => {
-  //   updateUrl();
-  // }, [foreground, background, updateUrl]);
+    newParams.set("standard", useAPCA ? "apca" : "wcag");
+    newParams.set("font", font);
+    newParams.set("simulation", colorBlindnessType);
+    replace(`?${newParams.toString()}`, { scroll: false });
+  }, [
+    replace,
+    foregroundHex,
+    backgroundHex,
+    useAPCA,
+    font,
+    colorBlindnessType,
+  ]);
 
   useEffect(() => {
     updateUrl();
   }, [updateUrl]);
 
+  const { data, error, isLoading } = useSWR(
+    "https://api.kanye.rest/",
+    fetcher,
+    {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    }
+  );
+
   return (
     <div
-      className={`min-h-screen p-4 pt-8 transition-colors selection:bg-[#${rgbToHex(
+      className={`min-h-screen p-4 pt-8 transition-[background-color] selection:bg-[#${rgbToHex(
         background
       )}] selection:text-[${rgbToHex(background)}]`}
       style={{ backgroundColor: rgbToHex(background) }}
     >
       <main className="mx-auto container">
-        <div className="mb-16 text-center">
+        <div className="mb-12 md:mb-16 text-center">
           <span
             className="font-medium"
             style={{
-              color: getDisplayColor(
-                background,
-                foreground,
-                colorBlindnessType
-              ),
+              color: getDisplayColor(background, foreground),
             }}
           >
             hue dat boy.
@@ -467,14 +412,10 @@ export default function ContrastChecker() {
           <h1
             className="font-bold text-2xl md:text-3xl"
             style={{
-              color: getDisplayColor(
-                background,
-                foreground,
-                colorBlindnessType
-              ),
+              color: getDisplayColor(background, foreground),
             }}
           >
-            color contrast checker
+            color contrast checker (& more!)
           </h1>
         </div>
 
@@ -482,7 +423,7 @@ export default function ContrastChecker() {
         <section
           className="flex flex-col mb-8 lg:flex-row justify-between items-center lg:items-end gap-6 text-4xl font-bold"
           style={{
-            color: getDisplayColor(background, foreground, colorBlindnessType),
+            color: getDisplayColor(background, foreground),
           }}
         >
           <div className="flex flex-col gap-y-2">
@@ -492,11 +433,7 @@ export default function ContrastChecker() {
             <div
               className="flex gap-10 items-center rounded-lg border-3 px-2.5 py-4"
               style={{
-                borderColor: getDisplayColor(
-                  background,
-                  foreground,
-                  colorBlindnessType
-                ),
+                borderColor: getDisplayColor(background, foreground),
               }}
             >
               <h2
@@ -509,14 +446,25 @@ export default function ContrastChecker() {
                     <sup className="-ml-3 md:-ml-4 -top-3.5 md:-top-6">c</sup>
                   </>
                 ) : (
-                  <>{wcagContrast.toFixed(2)} : 1</>
+                  <>
+                    {background.a < 1 ? (
+                      <>
+                        {wcagContrastRange.min.toFixed(2)} : 1 to{" "}
+                        {wcagContrastRange.max.toFixed(2)} : 1 alpha:
+                        {background.a}
+                      </>
+                    ) : (
+                      <>
+                        {wcagContrast.toFixed(2)} : 1<>alpha:{background.a}</>
+                      </>
+                    )}
+                  </>
                 )}
               </h2>
             </div>
           </div>
-          {/* <span className="text-2xl md:text-4xl">{message}</span> */}
 
-          <div className="grid grid-cols-1 mx-auto sm:grid-cols-2 lg:grid-cols-4 gap-2 justify-center">
+          {/* <div className="grid grid-cols-1 mx-auto sm:grid-cols-2 lg:grid-cols-4 gap-2 justify-center">
             {Object.entries(wcagResults).map(([level, passes]) => (
               <div
                 key={level}
@@ -536,133 +484,116 @@ export default function ContrastChecker() {
                 )}
               </div>
             ))}
-          </div>
+          </div> */}
         </section>
-        <div className="flex items-center gap-x-2">
-          <Label
-            htmlFor="contrast-mode"
-            className="text-base md:text-lg"
-            style={{
-              color: getDisplayColor(
-                background,
-                foreground,
-                colorBlindnessType
-              ),
-            }}
-          >
-            wcag 2.2
-          </Label>
-          <Switch
-            id="contrast-mode"
-            checked={useAPCA}
-            onCheckedChange={setUseAPCA}
-            style={{
-              borderColor: getDisplayColor(
-                background,
-                foreground,
-                colorBlindnessType
-              ),
-              backgroundColor: getDisplayColor(
-                foreground,
-                background,
-                colorBlindnessType
-              ),
-            }}
-          />
-          <Label
-            htmlFor="contrast-mode"
-            className="text-base md:text-lg"
-            style={{
-              color: getDisplayColor(
-                background,
-                foreground,
-                colorBlindnessType
-              ),
-            }}
-          >
-            apca
-          </Label>
-        </div>
 
-        <Popover open={enhanceMenuOpen} onOpenChange={setEnhanceMenuOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-x-4 gap-y-4 mb-8">
+          <div className="flex items-center gap-x-2">
+            <Label
+              htmlFor="contrast-standard"
+              className="text-base md:text-lg"
               style={{
-                color: getDisplayColor(
-                  background,
-                  foreground,
-                  colorBlindnessType
-                ),
-                borderColor: getDisplayColor(
-                  background,
-                  foreground,
-                  colorBlindnessType
-                ),
+                color: getDisplayColor(background, foreground),
               }}
-              disabled={
-                (!useAPCA && wcagContrast >= 4.5) ||
-                (useAPCA && Math.abs(apcaContrast) >= 75)
-              }
             >
-              enhance contrast
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent
-            className="w-fit p-0 border-3"
+              wcag 2.2
+            </Label>
+            <Switch
+              id="contrast-standard"
+              checked={useAPCA}
+              onCheckedChange={setUseAPCA}
+              style={{
+                borderColor: getDisplayColor(background, foreground),
+                backgroundColor: backgroundHex,
+              }}
+              color={getDisplayColor(background, foreground)}
+            />
+            <Label
+              htmlFor="contrast-standard"
+              className="text-base md:text-lg"
+              style={{
+                color: getDisplayColor(background, foreground),
+              }}
+            >
+              apca
+            </Label>
+          </div>
+
+          <Popover open={enhanceMenuOpen} onOpenChange={setEnhanceMenuOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                style={{
+                  color: getDisplayColor(background, foreground),
+                  borderColor: getDisplayColor(background, foreground),
+                }}
+                size="xl"
+                disabled={
+                  (!useAPCA && wcagContrast >= 4.5) ||
+                  (useAPCA && Math.abs(apcaContrast) >= 75)
+                }
+                className="sm:ml-auto w-full sm:w-fit text-base"
+              >
+                enhance contrast
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent
+              className="w-fit p-0 border-3"
+              style={{
+                color: getDisplayColor(background, foreground),
+                borderColor: getDisplayColor(background, foreground),
+                backgroundColor: rgbToHex(background),
+              }}
+            >
+              <div className="grid gap-2 p-2">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => {
+                    setEnhanceMenuOpen(false);
+                    handleEnhanceContrast("text");
+                  }}
+                >
+                  adjust text color
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => {
+                    setEnhanceMenuOpen(false);
+                    handleEnhanceContrast("background");
+                  }}
+                >
+                  adjust background color
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => {
+                    setEnhanceMenuOpen(false);
+                    handleEnhanceContrast("both");
+                  }}
+                >
+                  adjust both colors
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          <Button
+            variant="outline"
+            onClick={handleCopyUrl}
+            size="xl"
+            className="gap-x-1 w-full sm:w-fit text-base"
             style={{
-              color: getDisplayColor(
-                background,
-                foreground,
-                colorBlindnessType
-              ),
-              borderColor: getDisplayColor(
-                background,
-                foreground,
-                colorBlindnessType
-              ),
-              backgroundColor: rgbToHex(background),
+              color: getDisplayColor(background, foreground),
+              borderColor: getDisplayColor(background, foreground),
             }}
           >
-            <div className="grid gap-2 p-2">
-              <Button
-                variant="ghost"
-                className="w-full justify-start"
-                onClick={() => {
-                  setEnhanceMenuOpen(false);
-                  handleEnhanceContrast("text");
-                }}
-              >
-                adjust text color
-              </Button>
-              <Button
-                variant="ghost"
-                className="w-full justify-start"
-                onClick={() => {
-                  setEnhanceMenuOpen(false);
-                  handleEnhanceContrast("background");
-                }}
-              >
-                adjust background color
-              </Button>
-              <Button
-                variant="ghost"
-                className="w-full justify-start"
-                onClick={() => {
-                  setEnhanceMenuOpen(false);
-                  handleEnhanceContrast("both");
-                }}
-              >
-                adjust both colors
-              </Button>
-            </div>
-          </PopoverContent>
-        </Popover>
-
-        <Button variant="ghost" onClick={handleCopyUrl} className="gap-x-1">
-          <Clipboard className="h-4 w-4" />
-          share these colors
-        </Button>
+            share these colors
+            <Clipboard className="h-4 w-4" />
+          </Button>
+        </div>
 
         {/* Main content area */}
         <div className="flex flex-col lg:flex-col gap-8">
@@ -670,44 +601,22 @@ export default function ContrastChecker() {
           <div
             className="flex flex-col gap-y-4 lg:w-full"
             style={{
-              color: getDisplayColor(
-                background,
-                foreground,
-                colorBlindnessType
-              ),
+              color: getDisplayColor(background, foreground),
             }}
           >
-            <div className="flex  flex-col md:flex-row justify-between items-center gap-x-8 gap-y-2">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-x-8 gap-y-2">
               {/* Text color */}
               <div className="flex flex-col gap-y-2">
                 <Label className="text-base md:text-lg">text color</Label>
                 <div className="relative">
                   <ColorPicker
-                    color={foregroundHex}
-                    // onChange={(color: string) => {
-                    //   setForegroundHex(color);
-                    //   setForeground(hexToRgb(color));
-                    // }}
-                    externalColor={backgroundHex}
-                    onChange={handleColorChange("foreground")}
-                    className="absolute size-10 md:size-12 left-3 md:left-4 top-1/2 -translate-y-1/2"
+                    color={foreground}
+                    externalColor={getDisplayColor(background, foreground)}
+                    onChange={(value) => handleColorChange("foreground", value)}
+                    className="absolute size-9 md:size-12 left-2.5 md:left-4 top-1/2 -translate-y-1/2"
                   />
                   <Input
                     value={foregroundHex}
-                    // onChange={(e) => {
-                    //   const value = e.target.value;
-                    //   if (value.length <= 7) {
-                    //     setForegroundHex(value);
-                    //     if (/^#?[0-9A-Fa-f]{6}$/.test(value)) {
-                    //       const colorValue = value.startsWith("#")
-                    //         ? value
-                    //         : `#${value}`;
-                    //       setForeground(hexToRgb(colorValue));
-                    //       setForegroundHex(colorValue);
-                    //     }
-                    //   }
-                    // }}
-
                     onChange={(e) => {
                       const value = e.target.value;
                       if (value.length <= 7) {
@@ -722,50 +631,18 @@ export default function ContrastChecker() {
                       }
                     }}
                     style={{
-                      borderColor: getDisplayColor(
-                        background,
-                        foreground,
-                        colorBlindnessType
-                      ),
+                      borderColor: getDisplayColor(background, foreground),
                     }}
                     spellCheck={false}
                     maxLength={7}
-                    className="font-medium px-14 md:px-20 bg-transparent font-mono text-2xl h-fit py-2 leading-none md:text-5xl border-3"
+                    className="font-medium px-14 md:px-20 bg-transparent font-mono text-3xl h-fit py-2 leading-none md:text-5xl border-3"
                   />
 
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          size="auto"
-                          variant="ghost"
-                          className="absolute size-12 right-4 top-1/2 -translate-y-1/2 p-2"
-                          onClick={() =>
-                            navigator.clipboard.writeText(rgbToHex(foreground))
-                          }
-                        >
-                          <Clipboard className="!size-full" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent
-                        style={{
-                          borderColor: getDisplayColor(
-                            background,
-                            foreground,
-                            colorBlindnessType
-                          ),
-                          backgroundColor: rgbToHex(background),
-                          color: getDisplayColor(
-                            background,
-                            foreground,
-                            colorBlindnessType
-                          ),
-                        }}
-                      >
-                        <span>copy color</span>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  <CopyColorButton
+                    color="text"
+                    foreground={foreground}
+                    background={background}
+                  />
                 </div>
               </div>
 
@@ -785,17 +662,9 @@ export default function ContrastChecker() {
                   </TooltipTrigger>
                   <TooltipContent
                     style={{
-                      borderColor: getDisplayColor(
-                        background,
-                        foreground,
-                        colorBlindnessType
-                      ),
+                      borderColor: getDisplayColor(background, foreground),
                       backgroundColor: rgbToHex(background),
-                      color: getDisplayColor(
-                        background,
-                        foreground,
-                        colorBlindnessType
-                      ),
+                      color: getDisplayColor(background, foreground),
                     }}
                   >
                     <span>swap colors</span>
@@ -807,16 +676,8 @@ export default function ContrastChecker() {
               <div
                 className="flex flex-col gap-y-2"
                 style={{
-                  color: getDisplayColor(
-                    background,
-                    foreground,
-                    colorBlindnessType
-                  ),
-                  borderColor: getDisplayColor(
-                    background,
-                    foreground,
-                    colorBlindnessType
-                  ),
+                  color: getDisplayColor(background, foreground),
+                  borderColor: getDisplayColor(background, foreground),
                 }}
               >
                 <Label
@@ -828,21 +689,16 @@ export default function ContrastChecker() {
                 <div className="relative">
                   <div
                     style={{
-                      borderColor: getDisplayColor(
-                        background,
-                        foreground,
-                        colorBlindnessType
-                      ),
+                      borderColor: getDisplayColor(background, foreground),
                     }}
                   >
                     <ColorPicker
-                      color={backgroundHex}
-                      onChange={(color: string) => {
-                        setBackgroundHex(color);
-                        setBackground(hexToRgb(color));
-                      }}
-                      externalColor={foregroundHex}
-                      className="absolute size-12 left-4 top-1/2 -translate-y-1/2"
+                      color={background}
+                      onChange={(value) =>
+                        handleColorChange("background", value)
+                      }
+                      externalColor={getDisplayColor(background, foreground)}
+                      className="absolute size-9 md:size-12 left-2.5 md:left-4 top-1/2 -translate-y-1/2"
                     />
                   </div>
 
@@ -863,375 +719,198 @@ export default function ContrastChecker() {
                       }
                     }}
                     spellCheck={false}
-                    maxLength={7}
+                    // maxLength={7}
                     style={{
-                      borderColor: getDisplayColor(
-                        background,
-                        foreground,
-                        colorBlindnessType
-                      ),
+                      borderColor: getDisplayColor(background, foreground),
                     }}
-                    className="px-20 font-mono bg-transparent text-xl h-fit  py-2 leading-none md:text-5xl  border-3"
+                    className="font-medium px-14 md:px-20 bg-transparent font-mono text-3xl h-fit py-2 leading-none md:text-5xl border-3"
                   />
 
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          size="auto"
-                          variant="ghost"
-                          className="absolute size-12 right-4 top-1/2 -translate-y-1/2 p-2"
-                          onClick={() =>
-                            navigator.clipboard.writeText(rgbToHex(background))
-                          }
-                        >
-                          <Clipboard className="!size-full" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent
-                        style={{
-                          borderColor: getDisplayColor(
-                            background,
-                            foreground,
-                            colorBlindnessType
-                          ),
-                          backgroundColor: rgbToHex(background),
-                          color: getDisplayColor(
-                            background,
-                            foreground,
-                            colorBlindnessType
-                          ),
-                        }}
-                      >
-                        <span>copy color</span>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  <CopyColorButton
+                    color="background"
+                    foreground={foreground}
+                    background={background}
+                  />
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="flex flex-col gap-y-8">
-            {/* Font and Color Blindness Controls */}
-            <div className="flex flex-col md:flex-row gap-x-8 gap-y-4">
+          {/* Standard levels */}
+          <div className="grid grid-cols-1 mx-auto sm:grid-cols-2 lg:grid-cols-4 gap-2 justify-center">
+            {Object.entries(wcagResults).map(([level, passes]) => (
               <div
-                className="flex flex-col gap-y-2 flex-1"
+                key={level}
+                className="inline-flex items-center justify-between gap-x-2 rounded-full font-semibold transition-colors text-base md:text-lg py-2 px-4 border-3 bg-transparent"
                 style={{
-                  color: getDisplayColor(
-                    background,
-                    foreground,
-                    colorBlindnessType
-                  ),
+                  borderColor: getDisplayColor(background, foreground),
+                  backgroundColor: rgbToHex(background),
+                  color: getDisplayColor(background, foreground),
                 }}
               >
-                <Label
-                  htmlFor="typeface-select"
-                  className="text-base md:text-lg"
-                >
-                  typeface
-                </Label>
-                <Select
-                  value={font}
-                  onValueChange={setFont}
-                  name="typeface-select"
-                >
-                  <SelectTrigger
-                    className="bg-transparent border-3 h-fit py-2 text-lg md:text-2xl"
-                    style={{
-                      borderColor: getDisplayColor(
-                        background,
-                        foreground,
-                        colorBlindnessType
-                      ),
-                    }}
-                  >
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent
-                    className="border-3 max-h-72 overflow-y-scroll"
-                    style={{
-                      borderColor: getDisplayColor(
-                        background,
-                        foreground,
-                        colorBlindnessType
-                      ),
-                      color: getDisplayColor(
-                        background,
-                        foreground,
-                        colorBlindnessType
-                      ),
-                      backgroundColor: rgbToHex(background),
-                    }}
-                  >
-                    {GOOGLE_FONTS.map((font) => (
-                      <SelectItem
-                        key={font}
-                        value={font}
-                        className="text-lg md:text-2xl"
-                      >
-                        {font}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                {level.replace(/([A-Z])/g, " $1").trim()}{" "}
+                {passes ? (
+                  <>
+                    <span className="sr-only">Pass</span>
+                    <Check className="h-6 w-6" />
+                  </>
+                ) : (
+                  <>
+                    <span className="sr-only">Fail</span>
+                    <X className="h-6 w-6" />
+                  </>
+                )}
               </div>
+            ))}
+          </div>
 
-              <div
-                className="flex flex-col gap-y-2 flex-1"
-                style={{
-                  color: getDisplayColor(
-                    background,
-                    foreground,
-                    colorBlindnessType
-                  ),
-                }}
+          {/* Font and Color Blindness Controls */}
+          <div className="flex flex-col md:flex-row gap-x-8 gap-y-4">
+            <div
+              className="flex flex-col gap-y-2 flex-1"
+              style={{
+                color: getDisplayColor(background, foreground),
+              }}
+            >
+              <Label htmlFor="typeface-select" className="text-base md:text-lg">
+                typeface
+              </Label>
+              <Select
+                value={font}
+                onValueChange={setFont}
+                name="typeface-select"
               >
-                <Label
-                  htmlFor="colorblind-select"
-                  className="text-base md:text-lg"
+                <SelectTrigger
+                  className="bg-transparent border-3 h-fit py-2 text-lg md:text-2xl"
+                  style={{
+                    borderColor: getDisplayColor(background, foreground),
+                  }}
                 >
-                  simulate colorblindness
-                </Label>
-                <Select
-                  value={colorBlindnessType}
-                  onValueChange={(value: ColorBlindnessType) =>
-                    setColorBlindnessType(value)
-                  }
-                  name="colorblind-select"
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent
+                  className="border-3 max-h-72 overflow-y-scroll"
+                  style={{
+                    borderColor: getDisplayColor(background, foreground),
+                    color: getDisplayColor(background, foreground),
+                    backgroundColor: rgbToHex(background),
+                  }}
                 >
-                  <SelectTrigger
-                    className="bg-transparent border-3 h-fit py-2 text-lg md:text-2xl"
-                    style={{
-                      borderColor: getDisplayColor(
-                        background,
-                        foreground,
-                        colorBlindnessType
-                      ),
-                    }}
-                  >
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent
-                    className="border-3"
-                    style={{
-                      borderColor: getDisplayColor(
-                        background,
-                        foreground,
-                        colorBlindnessType
-                      ),
-                      color: getDisplayColor(
-                        background,
-                        foreground,
-                        colorBlindnessType
-                      ),
-                      backgroundColor: rgbToHex(background),
-                    }}
-                  >
-                    <SelectItem value="normal" className="text-lg md:text-2xl">
-                      normal vision
-                    </SelectItem>
+                  {GOOGLE_FONTS.map((font) => (
                     <SelectItem
-                      value="protanopia"
+                      key={font}
+                      value={font}
                       className="text-lg md:text-2xl"
                     >
-                      protanopia
+                      {font}
                     </SelectItem>
-                    <SelectItem
-                      value="deuteranopia"
-                      className="text-lg md:text-2xl"
-                    >
-                      deuteranopia
-                    </SelectItem>
-                    <SelectItem
-                      value="tritanopia"
-                      className="text-lg md:text-2xl"
-                    >
-                      tritanopia
-                    </SelectItem>
-                    <SelectItem
-                      value="achromatopsia"
-                      className="text-lg md:text-2xl"
-                    >
-                      achromatopsia
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
-            {/* Sample Text Section */}
-            <section className="flex flex-col gap-y-4" id="sample-text">
-              <h3
-                className="font-bold text-xl md:text-2xl"
-                style={{
-                  color: getDisplayColor(
-                    background,
-                    foreground,
-                    colorBlindnessType
-                  ),
-                }}
+            <div
+              className="flex flex-col gap-y-2 flex-1"
+              style={{
+                color: getDisplayColor(background, foreground),
+              }}
+            >
+              <Label
+                htmlFor="colorblind-select"
+                className="text-base md:text-lg"
               >
-                sample text
-              </h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8">
-                <Sheet>
-                  <Card
-                    className="overflow-hidden bg-transparent border-3"
-                    style={{ borderColor: rgbToHex(foreground) }}
-                  >
-                    <div
-                      className="py-2 px-4  relative"
-                      style={{ backgroundColor: rgbToHex(foreground) }}
-                    >
-                      <h4
-                        className="text-xl md:text-3xl font-semibold"
-                        style={{ color: rgbToHex(background) }}
-                      >
-                        large text
-                      </h4>
-                      <SheetTrigger asChild>
-                        {/* <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild> */}
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="absolute top-1/2 -translate-y-1/2 right-1"
-                          style={{ color: rgbToHex(background) }}
-                        >
-                          <Maximize2 />
-                          <span className="sr-only">Fullscreen view</span>
-                        </Button>
-                        {/* </TooltipTrigger>
-                        <TooltipContent
-                          style={{
-                            borderColor: getDisplayColor(
-                              background,
-                              foreground,
-                              colorBlindnessType
-                            ),
-                            backgroundColor: rgbToHex(background),
-                            color: getDisplayColor(
-                              background,
-                              foreground,
-                              colorBlindnessType
-                            ),
-                          }}
-                        >
-                          <span>view fullscreen</span>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider> */}
-                      </SheetTrigger>
-                    </div>
-                    <div className="p-4">
-                      <p
-                        className="text-2xl"
-                        style={{
-                          color: rgbToHex(foreground),
-                          fontFamily: font,
-                        }}
-                      >
-                        {SAMPLE_TEXT}
-                      </p>
-                    </div>
-                  </Card>
-
-                  <SheetContent
-                    className="h-full flex flex-col justify-center items-center border-none"
-                    style={{ backgroundColor: rgbToHex(background) }}
-                    side={"bottom"}
-                  >
-                    <p
-                      className="max-w-2xl text-2xl"
-                      style={{
-                        color: rgbToHex(foreground),
-                        fontFamily: font,
-                      }}
-                    >
-                      {SAMPLE_TEXT}
-                    </p>
-                  </SheetContent>
-                </Sheet>
-
-                <Card
-                  className="overflow-hidden bg-transparent border-3"
-                  style={{ borderColor: rgbToHex(foreground) }}
+                simulate colorblindness
+              </Label>
+              <Select
+                value={colorBlindnessType}
+                onValueChange={(value: ColorBlindnessType) =>
+                  setColorBlindnessType(value)
+                }
+                name="colorblind-select"
+              >
+                <SelectTrigger
+                  className="bg-transparent border-3 h-fit py-2 text-lg md:text-2xl"
+                  style={{
+                    borderColor: getDisplayColor(background, foreground),
+                  }}
                 >
-                  <div
-                    className="py-2 px-4"
-                    style={{ backgroundColor: rgbToHex(foreground) }}
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent
+                  className="border-3"
+                  style={{
+                    borderColor: getDisplayColor(background, foreground),
+                    color: getDisplayColor(background, foreground),
+                    backgroundColor: rgbToHex(background),
+                  }}
+                >
+                  <SelectItem value="normal" className="text-lg md:text-2xl">
+                    normal vision
+                  </SelectItem>
+                  <SelectItem
+                    value="protanopia"
+                    className="text-lg md:text-2xl"
                   >
-                    <h4
-                      className="text-xl md:text-3xl font-semibold"
-                      style={{ color: rgbToHex(background) }}
-                    >
-                      small text
-                    </h4>
-                  </div>
-                  <div className="p-4">
-                    <p
-                      className="text-base"
-                      style={{
-                        color: rgbToHex(foreground),
-                      }}
-                    >
-                      {SAMPLE_TEXT}
-                    </p>
-                  </div>
-                </Card>
-              </div>
-            </section>
+                    protanopia
+                  </SelectItem>
+                  <SelectItem
+                    value="deuteranopia"
+                    className="text-lg md:text-2xl"
+                  >
+                    deuteranopia
+                  </SelectItem>
+                  <SelectItem
+                    value="tritanopia"
+                    className="text-lg md:text-2xl"
+                  >
+                    tritanopia
+                  </SelectItem>
+                  <SelectItem
+                    value="achromatopsia"
+                    className="text-lg md:text-2xl"
+                  >
+                    achromatopsia
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
+
+          {/* Sample Text Section */}
+          <section className="flex flex-col gap-y-4" id="sample-text">
+            <h3
+              className="font-bold text-xl md:text-2xl"
+              style={{
+                color: getDisplayColor(background, foreground),
+              }}
+            >
+              sample text
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+              <SampleTextCard
+                foreground={foreground}
+                background={background}
+                font={font}
+                colorBlindnessType={colorBlindnessType}
+                textSize="normal"
+                content={error ? error : isLoading ? "Loading..." : data?.quote}
+              />
+
+              <SampleTextCard
+                foreground={foreground}
+                background={background}
+                font={font}
+                colorBlindnessType={colorBlindnessType}
+                textSize="large"
+                content={error ? error : isLoading ? "Loading..." : data?.quote}
+              />
+            </div>
+          </section>
         </div>
       </main>
 
-      <footer
-        className="mt-12 py-6 container mx-auto"
-        style={{
-          color: wcagContrast < 3 ? "black" : rgbToHex(foreground),
-        }}
-      >
-        <div className="flex flex-col items-center sm:flex-row-reverse justify-between gap-4">
-          <div className="flex gap-x-4">
-            <Button
-              asChild
-              variant={"ghost"}
-              size={"auto"}
-              className="size-12 p-2"
-            >
-              <Link
-                href="https://github.com/seanpstanley"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Github className="!size-full" />
-                <span className="sr-only">GitHub</span>
-              </Link>
-            </Button>
-            <Button
-              asChild
-              variant={"ghost"}
-              size={"auto"}
-              className="size-12 p-2"
-            >
-              <Link
-                href="https://www.linkedin.com/in/seanpstanley/"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Linkedin className="!size-full" />
-                <span className="sr-only">Twitter</span>
-              </Link>
-            </Button>
-          </div>
-          <small className="text-sm">
-            © {getCurrentYear()} Sean Stanley. Built with shadcn.
-          </small>
-        </div>
-      </footer>
+      <Footer background={background} foreground={foreground} />
     </div>
   );
 }

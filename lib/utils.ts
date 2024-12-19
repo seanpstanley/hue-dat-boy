@@ -1,9 +1,35 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { RgbColor, RgbaColor, HslColor } from "@/lib/types";
+import { calculateWCAGContrast } from "@/app/page";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
+}
+
+export function getDisplayColor(
+  background: RgbColor,
+  foreground: RgbColor
+): string {
+  const contrastRatio = calculateWCAGContrast(background, foreground);
+  if (contrastRatio >= 3.0) {
+    return rgbToHex(foreground);
+  }
+
+  const blackContrast = calculateWCAGContrast(background, {
+    r: 0,
+    g: 0,
+    b: 0,
+    a: 1,
+  });
+  const whiteContrast = calculateWCAGContrast(background, {
+    r: 255,
+    g: 255,
+    b: 255,
+    a: 1,
+  });
+
+  return blackContrast > whiteContrast ? "#000000" : "#ffffff";
 }
 
 export function debounce<T extends (...args: any[]) => any>(
@@ -40,15 +66,39 @@ export function rgbToHex({ r, g, b }: RgbColor): string {
   return `#${[r, g, b].map((x) => x.toString(16).padStart(2, "0")).join("")}`;
 }
 
+// export function hexToRgb(hex: string): RgbColor {
+//   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+//   return result
+//     ? {
+//         r: parseInt(result[1], 16),
+//         g: parseInt(result[2], 16),
+//         b: parseInt(result[3], 16),
+//         a: result[4] ? parseInt(result[4], 16) / 255 : 1,
+//       }
+//     : { r: 0, g: 0, b: 0, a: 1 };
+// }
+
 export function hexToRgb(hex: string): RgbColor {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result
-    ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16),
-      }
-    : { r: 0, g: 0, b: 0 };
+  const parsedHex = hex.replace("#", "");
+  let r, g, b, a;
+
+  if (parsedHex.length === 6) {
+    // No alpha
+    r = parseInt(parsedHex.slice(0, 2), 16);
+    g = parseInt(parsedHex.slice(2, 4), 16);
+    b = parseInt(parsedHex.slice(4, 6), 16);
+    a = 1; // Default alpha
+  } else if (parsedHex.length === 8) {
+    // With alpha
+    r = parseInt(parsedHex.slice(0, 2), 16);
+    g = parseInt(parsedHex.slice(2, 4), 16);
+    b = parseInt(parsedHex.slice(4, 6), 16);
+    a = parseInt(parsedHex.slice(6, 8), 16) / 255; // Normalize alpha
+  } else {
+    throw new Error("Invalid HEX color format");
+  }
+
+  return { r, g, b, a };
 }
 
 export function rgbToHsl({ r, g, b }: RgbColor): HslColor {
@@ -93,5 +143,6 @@ export function hslToRgb({ h, s, l }: HslColor): RgbColor {
     r: Math.round(255 * f(0)),
     g: Math.round(255 * f(8)),
     b: Math.round(255 * f(4)),
+    a,
   };
 }
