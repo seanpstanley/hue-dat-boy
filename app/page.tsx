@@ -231,6 +231,7 @@ export default function ContrastChecker() {
   const { replace } = useRouter();
 
   const searchParams = useSearchParams();
+
   const searchParamsInitText = searchParams.get("text") as string;
   const searchParamsInitBg = searchParams.get("background") as string;
   const searchParamsInitStandard = searchParams.get("standard") as string;
@@ -246,7 +247,11 @@ export default function ContrastChecker() {
   const [backgroundHex, setBackgroundHex] = useState(rgbToHex(background));
   const [foregroundHex, setForegroundHex] = useState(rgbToHex(foreground));
   const [useAPCA, setUseAPCA] = useState(
-    searchParamsInitStandard === "wcag" ? false : true
+    searchParamsInitStandard
+      ? searchParamsInitStandard === "wcag"
+        ? true
+        : false
+      : false
   );
   const [font, setFont] = useState(
     searchParamsInitFont ? searchParamsInitFont : "Inter"

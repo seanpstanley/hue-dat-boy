@@ -1,7 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { rgbToHex } from "@/lib/utils";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { AccessibleIcon } from "@radix-ui/react-accessible-icon";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { rgbToHex, cn } from "@/lib/utils";
 import { RgbaColor, ColorBlindnessType } from "@/lib/types";
 import { TooltipButton } from "@/components/tooltip-button";
 import { Maximize2 } from "lucide-react";
@@ -123,8 +130,9 @@ export function SampleTextCard({
                 className="absolute top-1/2 -translate-y-1/2 right-0.5"
                 style={{ color: rgbToHex(background) }}
               >
-                <Maximize2 />
-                <span className="sr-only">Fullscreen view</span>
+                <AccessibleIcon label="Fullscreen view">
+                  <Maximize2 />
+                </AccessibleIcon>
               </Button>
             </SheetTrigger>
           </TooltipButton>
@@ -139,7 +147,7 @@ export function SampleTextCard({
         >
           <blockquote
             cite="https://kanye.rest"
-            className={textSize === "normal" ? "text-base" : "text-2xl"}
+            className={textSize === "large" ? "text-2xl" : "text-base"}
             style={{
               color: rgbToHex(
                 simulateColorBlindness(foreground, colorBlindnessType)
@@ -165,9 +173,12 @@ export function SampleTextCard({
         }}
         side={"bottom"}
       >
+        <VisuallyHidden>
+          <SheetTitle>Full screen {textSize} text</SheetTitle>
+        </VisuallyHidden>
         <blockquote
           cite="https://kanye.rest"
-          className={"max-w-2xl"}
+          className={cn("max-w-2xl", { "text-2xl": textSize === "large" })}
           style={{
             color: rgbToHex(
               simulateColorBlindness(foreground, colorBlindnessType)

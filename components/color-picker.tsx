@@ -7,7 +7,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn, rgbaToHex } from "@/lib/utils";
 import { RgbaColor } from "@/lib/types";
 
 interface ColorPickerProps {
@@ -23,6 +23,7 @@ export const ColorPicker = memo(
 
     // Sync internal state when the color prop changes
     useEffect(() => {
+      console.log(`set internal color ${rgbaToHex(color)}`);
       setInternalColor(color);
     }, [color]);
 
