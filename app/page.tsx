@@ -13,7 +13,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-import { debounce, getDisplayColor, rgbaToHex } from "@/lib/utils";
+import {
+  debounce,
+  getDisplayColor,
+  rgbaToHex,
+  calculateWCAGContrast,
+} from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -40,30 +45,6 @@ import { SampleTextCard } from "@/components/sample-text-card";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-export function calculateRelativeLuminance({ r, g, b }: RgbColor) {
-  const [rs, gs, bs] = [r / 255, g / 255, b / 255].map((c) =>
-    c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
-  );
-  return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
-}
-
-export function calculateWCAGContrast(
-  bg: RgbColor,
-  fg: RgbColor,
-  solidBg?: RgbColor
-): number {
-  const blendedFg = blendColors(fg, solidBg || bg);
-  const blendedBg = solidBg || bg;
-
-  const bgLuminance = calculateRelativeLuminance(blendedBg);
-  const fgLuminance = calculateRelativeLuminance(blendedFg);
-
-  const lighter = Math.max(bgLuminance, fgLuminance);
-  const darker = Math.min(bgLuminance, fgLuminance);
-
-  return (lighter + 0.05) / (darker + 0.05);
-}
-
 function calculateWCAGContrastRange(
   bg: RgbColor,
   fg: RgbColor
@@ -77,16 +58,6 @@ function calculateWCAGContrastRange(
   return {
     min: Math.min(minContrast, maxContrast),
     max: Math.max(minContrast, maxContrast),
-  };
-}
-
-function blendColors(fg: RgbColor, bg: RgbColor): RgbColor {
-  const alpha = fg.a;
-  return {
-    r: Math.round(fg.r * alpha + bg.r * (1 - alpha)),
-    g: Math.round(fg.g * alpha + bg.g * (1 - alpha)),
-    b: Math.round(fg.b * alpha + bg.b * (1 - alpha)),
-    a: 1,
   };
 }
 

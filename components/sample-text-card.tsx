@@ -88,7 +88,7 @@ export function SampleTextCard({
             simulateColorBlindness(foreground, colorBlindnessType)
           ),
           backgroundColor: rgbToHex(
-            simulateColorBlindness(background, colorBlindnessType)
+            simulateColorBlindness(foreground, colorBlindnessType)
           ),
         }}
       >
@@ -129,7 +129,14 @@ export function SampleTextCard({
             </SheetTrigger>
           </TooltipButton>
         </div>
-        <div className="p-4">
+        <div
+          className="p-4 h-full"
+          style={{
+            backgroundColor: rgbToHex(
+              simulateColorBlindness(background, colorBlindnessType)
+            ),
+          }}
+        >
           <blockquote
             cite="https://kanye.rest"
             className={textSize === "normal" ? "text-base" : "text-2xl"}
