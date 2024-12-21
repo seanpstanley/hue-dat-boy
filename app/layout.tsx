@@ -32,7 +32,7 @@ const inter = Inter({ subsets: ["latin"] });
 // const nunito = Nunito({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Color Contrast Checker for WCAG/APCA",
+  title: "Color Contrast Checker for WCAG & APCA",
   description:
     "Calculate the contrast ratio of text and background colors to test against WCAG and APCA accessbility standards.",
 };

@@ -81,18 +81,18 @@ function calculateAPCAContrast(background: RgbColor, foreground: RgbColor) {
 }
 
 function enhanceContrast(
-  background: RgbColor,
-  foreground: RgbColor,
+  background: RgbaColor,
+  foreground: RgbaColor,
   type: "text" | "background" | "both",
   useAPCA: boolean
-): { background: RgbColor; foreground: RgbColor } {
+): { background: RgbaColor; foreground: RgbaColor } {
   const initialContrast = useAPCA
     ? calculateAPCAContrast(background, foreground)
     : calculateWCAGContrast(background, foreground);
   let newBackground = { ...background };
   let newForeground = { ...foreground };
 
-  const adjustColor = (color: RgbColor, isBackground: boolean): RgbColor => {
+  const adjustColor = (color: RgbaColor, isBackground: boolean): RgbaColor => {
     const hsl = rgbToHsl(color);
     const step = 1;
     let bestContrast = isBackground
@@ -395,13 +395,15 @@ export default function ContrastChecker() {
           </h1>
         </div>
 
-        {/* Contrast Ratio and WCAG Compliance */}
+        {/* Contrast Info and Standards Compliance */}
         <section
-          className="flex flex-col mb-8 lg:flex-row justify-between items-center lg:items-end gap-6 text-4xl font-bold"
+          className="flex flex-col mb-8 items-start gap-y-4"
           style={{
             color: getDisplayColor(background, foreground),
           }}
+          id="contrast-info"
         >
+          {/* Contrast Ratio */}
           <div className="flex flex-col gap-y-2">
             <Label htmlFor="contrast-value" className="text-base md:text-lg">
               contrast value
@@ -414,7 +416,7 @@ export default function ContrastChecker() {
             >
               <h2
                 id="contrast-value"
-                className="text-6xl md:text-8xl text-nowrap"
+                className="text-6xl md:text-8xl text-nowrap font-bold"
               >
                 {useAPCA ? (
                   <>
@@ -440,11 +442,21 @@ export default function ContrastChecker() {
             </div>
           </div>
 
-          {/* <div className="grid grid-cols-1 mx-auto sm:grid-cols-2 lg:grid-cols-4 gap-2 justify-center">
+          {/* Standards levels */}
+          <div className="grid grid-cols-1 ml-auto sm:grid-cols-2 lg:grid-cols-4 gap-2">
             {Object.entries(wcagResults).map(([level, passes]) => (
               <div
                 key={level}
                 className="inline-flex items-center justify-between gap-x-2 rounded-full font-semibold transition-colors text-base md:text-lg py-2 px-4 border-3 bg-transparent"
+                style={{
+                  borderColor: getDisplayColor(background, foreground),
+                  backgroundColor: passes
+                    ? getDisplayColor(background, foreground)
+                    : rgbToHex(background),
+                  color: passes
+                    ? getDisplayColor(foreground, background)
+                    : getDisplayColor(background, foreground),
+                }}
               >
                 {level.replace(/([A-Z])/g, " $1").trim()}{" "}
                 {passes ? (
@@ -460,7 +472,7 @@ export default function ContrastChecker() {
                 )}
               </div>
             ))}
-          </div> */}
+          </div>
         </section>
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-x-4 gap-y-4 mb-8">
@@ -572,172 +584,139 @@ export default function ContrastChecker() {
         </div>
 
         {/* Main content area */}
-        <div className="flex flex-col lg:flex-col gap-8">
+        <div className="flex flex-col gap-y-8">
           {/* Color controls */}
           <div
-            className="flex flex-col gap-y-4 lg:w-full"
+            className="flex flex-col md:flex-row justify-between items-center gap-x-4 gap-y-2 "
             style={{
               color: getDisplayColor(background, foreground),
             }}
           >
-            <div className="flex flex-col md:flex-row justify-between items-center gap-x-8 gap-y-2">
-              {/* Text color */}
-              <div className="flex flex-col gap-y-2">
-                <Label className="text-base md:text-lg">text color</Label>
-                <div className="relative">
-                  <ColorPicker
-                    color={foreground}
-                    externalColor={getDisplayColor(background, foreground)}
-                    onChange={(value) => handleColorChange("foreground", value)}
-                    className="absolute size-9 md:size-12 left-2.5 md:left-4 top-1/2 -translate-y-1/2"
-                  />
-                  <Input
-                    value={foregroundHex}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      if (value.length <= 7) {
-                        setForegroundHex(value);
-                        if (/^#?[0-9A-Fa-f]{6}$/.test(value)) {
-                          const colorValue = value.startsWith("#")
-                            ? value
-                            : `#${value}`;
-                          setForeground(hexToRgb(colorValue));
-                          setForegroundHex(colorValue);
-                        }
+            {/* Text color */}
+            <div className="flex flex-col gap-y-2 w-full">
+              <Label className="text-base md:text-lg">text color</Label>
+              <div className="relative">
+                <ColorPicker
+                  color={foreground}
+                  externalColor={getDisplayColor(background, foreground)}
+                  onChange={(value) => handleColorChange("foreground", value)}
+                  className="absolute size-9 md:size-12 left-2.5 md:left-4 top-1/2 -translate-y-1/2"
+                />
+                <Input
+                  value={foregroundHex}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value.length <= 7) {
+                      setForegroundHex(value);
+                      if (/^#?[0-9A-Fa-f]{6}$/.test(value)) {
+                        const colorValue = value.startsWith("#")
+                          ? value
+                          : `#${value}`;
+                        setForeground(hexToRgb(colorValue));
+                        setForegroundHex(colorValue);
                       }
-                    }}
-                    style={{
-                      borderColor: getDisplayColor(background, foreground),
-                    }}
-                    spellCheck={false}
-                    maxLength={7}
-                    className="font-medium px-14 md:px-20 bg-transparent font-mono text-3xl h-fit py-2 leading-none md:text-5xl border-3"
-                  />
+                    }
+                  }}
+                  style={{
+                    borderColor: getDisplayColor(background, foreground),
+                  }}
+                  spellCheck={false}
+                  maxLength={7}
+                  className="font-medium px-14 md:px-20 bg-transparent font-mono text-3xl h-fit py-2 leading-none md:text-4xl lg:text-5xl border-3"
+                />
 
-                  <CopyColorButton
-                    color="text"
-                    foreground={foreground}
-                    background={background}
-                  />
-                </div>
-              </div>
-
-              {/* Swap colors */}
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="auto"
-                      className="size-12 p-2 shrink-0"
-                      onClick={handleReverseColors}
-                    >
-                      <span className="sr-only">Swap colors</span>
-                      <ArrowLeftRight className="-rotate-90 md:rotate-0 transition-transform !size-full" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent
-                    style={{
-                      borderColor: getDisplayColor(background, foreground),
-                      backgroundColor: rgbToHex(background),
-                      color: getDisplayColor(background, foreground),
-                    }}
-                  >
-                    <span>swap colors</span>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-
-              {/* Background color */}
-              <div
-                className="flex flex-col gap-y-2"
-                style={{
-                  color: getDisplayColor(background, foreground),
-                  borderColor: getDisplayColor(background, foreground),
-                }}
-              >
-                <Label
-                  htmlFor="background-color"
-                  className="text-base md:text-lg"
-                >
-                  background color
-                </Label>
-                <div className="relative">
-                  <div
-                    style={{
-                      borderColor: getDisplayColor(background, foreground),
-                    }}
-                  >
-                    <ColorPicker
-                      color={background}
-                      onChange={(value) =>
-                        handleColorChange("background", value)
-                      }
-                      externalColor={getDisplayColor(background, foreground)}
-                      className="absolute size-9 md:size-12 left-2.5 md:left-4 top-1/2 -translate-y-1/2"
-                    />
-                  </div>
-
-                  <Input
-                    id="background-color"
-                    value={backgroundHex}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      if (value.length <= 7) {
-                        setBackgroundHex(value);
-                        if (/^#?[0-9A-Fa-f]{6}$/.test(value)) {
-                          const colorValue = value.startsWith("#")
-                            ? value
-                            : `#${value}`;
-                          setBackground(hexToRgb(colorValue));
-                          setBackgroundHex(colorValue);
-                        }
-                      }
-                    }}
-                    spellCheck={false}
-                    // maxLength={7}
-                    style={{
-                      borderColor: getDisplayColor(background, foreground),
-                    }}
-                    className="font-medium px-14 md:px-20 bg-transparent font-mono text-3xl h-fit py-2 leading-none md:text-5xl border-3"
-                  />
-
-                  <CopyColorButton
-                    color="background"
-                    foreground={foreground}
-                    background={background}
-                  />
-                </div>
+                <CopyColorButton
+                  color="text"
+                  foreground={foreground}
+                  background={background}
+                />
               </div>
             </div>
-          </div>
 
-          {/* Standard levels */}
-          <div className="grid grid-cols-1 mx-auto sm:grid-cols-2 lg:grid-cols-4 gap-2 justify-center">
-            {Object.entries(wcagResults).map(([level, passes]) => (
-              <div
-                key={level}
-                className="inline-flex items-center justify-between gap-x-2 rounded-full font-semibold transition-colors text-base md:text-lg py-2 px-4 border-3 bg-transparent"
-                style={{
-                  borderColor: getDisplayColor(background, foreground),
-                  backgroundColor: rgbToHex(background),
-                  color: getDisplayColor(background, foreground),
-                }}
+            {/* Swap colors */}
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="auto"
+                    className="size-12 p-2 shrink-0"
+                    onClick={handleReverseColors}
+                  >
+                    <span className="sr-only">Swap colors</span>
+                    <ArrowLeftRight className="-rotate-90 md:rotate-0 transition-transform !size-full" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent
+                  style={{
+                    borderColor: getDisplayColor(background, foreground),
+                    backgroundColor: rgbToHex(background),
+                    color: getDisplayColor(background, foreground),
+                  }}
+                >
+                  <span>swap colors</span>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            {/* Background color */}
+            <div
+              className="flex flex-col gap-y-2 w-full"
+              style={{
+                borderColor: getDisplayColor(background, foreground),
+              }}
+            >
+              <Label
+                htmlFor="background-color"
+                className="text-base md:text-lg"
               >
-                {level.replace(/([A-Z])/g, " $1").trim()}{" "}
-                {passes ? (
-                  <>
-                    <span className="sr-only">Pass</span>
-                    <Check className="h-6 w-6" />
-                  </>
-                ) : (
-                  <>
-                    <span className="sr-only">Fail</span>
-                    <X className="h-6 w-6" />
-                  </>
-                )}
+                background color
+              </Label>
+              <div className="relative">
+                <div
+                  style={{
+                    borderColor: getDisplayColor(background, foreground),
+                  }}
+                >
+                  <ColorPicker
+                    color={background}
+                    onChange={(value) => handleColorChange("background", value)}
+                    externalColor={getDisplayColor(background, foreground)}
+                    className="absolute size-9 md:size-12 left-2.5 md:left-4 top-1/2 -translate-y-1/2"
+                  />
+                </div>
+
+                <Input
+                  id="background-color"
+                  value={backgroundHex}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value.length <= 7) {
+                      setBackgroundHex(value);
+                      if (/^#?[0-9A-Fa-f]{6}$/.test(value)) {
+                        const colorValue = value.startsWith("#")
+                          ? value
+                          : `#${value}`;
+                        setBackground(hexToRgb(colorValue));
+                        setBackgroundHex(colorValue);
+                      }
+                    }
+                  }}
+                  spellCheck={false}
+                  // maxLength={7}
+                  style={{
+                    borderColor: getDisplayColor(background, foreground),
+                  }}
+                  className="font-medium w-full px-14 md:px-20 bg-transparent font-mono text-3xl h-fit py-2 leading-none md:text-4xl lg:text-5xl border-3"
+                />
+
+                <CopyColorButton
+                  color="background"
+                  foreground={foreground}
+                  background={background}
+                />
               </div>
-            ))}
+            </div>
           </div>
 
           {/* Font and Color Blindness Controls */}

@@ -8,7 +8,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { rgbToHex, cn } from "@/lib/utils";
+import { rgbToHex, cn, getDisplayColor } from "@/lib/utils";
 import { RgbaColor, ColorBlindnessType } from "@/lib/types";
 import { TooltipButton } from "@/components/tooltip-button";
 import { Maximize2 } from "lucide-react";
@@ -100,7 +100,7 @@ export function SampleTextCard({
         }}
       >
         <div
-          className="py-2 px-4 relative"
+          className="pt-2 pb-2.5 px-4 relative"
           style={{
             backgroundColor: rgbToHex(
               simulateColorBlindness(foreground, colorBlindnessType)
@@ -109,11 +109,7 @@ export function SampleTextCard({
         >
           <h4
             className="text-base md:text-lg font-medium leading-none"
-            style={{
-              color: rgbToHex(
-                simulateColorBlindness(background, colorBlindnessType)
-              ),
-            }}
+            style={{ color: getDisplayColor(foreground, background) }}
           >
             {textSize} text
           </h4>
@@ -127,11 +123,11 @@ export function SampleTextCard({
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute top-1/2 -translate-y-1/2 right-0.5"
-                style={{ color: rgbToHex(background) }}
+                className="absolute top-1/2 p-2 size-8 md:size-9 -translate-y-1/2 right-0.5"
+                style={{ color: getDisplayColor(foreground, background) }}
               >
                 <AccessibleIcon label="Fullscreen view">
-                  <Maximize2 />
+                  <Maximize2 className="!size-full" />
                 </AccessibleIcon>
               </Button>
             </SheetTrigger>
