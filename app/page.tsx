@@ -367,23 +367,24 @@ export default function ContrastChecker() {
 
   return (
     <div
-      className={`min-h-screen p-4 pt-8 transition-[background-color] selection:bg-[#${rgbToHex(
-        background
-      )}] selection:text-[${rgbToHex(background)}]`}
+      className={`min-h-screen p-4 pt-8 transition-[background-color]`}
       style={{ backgroundColor: rgbToHex(background) }}
     >
-      <main className="mx-auto container">
-        <div className="mb-12 md:mb-16 text-center">
-          <span
-            className="font-medium"
-            style={{
-              color: getDisplayColor(background, foreground),
-            }}
-          >
-            hue dat boy.
-          </span>
-        </div>
+      {/* Website Title */}
+      <header className="mb-12 md:mb-16 text-center">
+        <span
+          className="font-medium"
+          style={{
+            color: getDisplayColor(background, foreground),
+          }}
+        >
+          hue dat boy.
+        </span>
+      </header>
 
+      {/* Main Content Area */}
+      <main className="mx-auto container">
+        {/* Page Title */}
         <div className="mb-8">
           <h1
             className="font-bold text-2xl md:text-3xl"
@@ -395,7 +396,7 @@ export default function ContrastChecker() {
           </h1>
         </div>
 
-        {/* Contrast Info and Standards Compliance */}
+        {/* Contrast Info, Explanation, and Standards Compliance */}
         <section
           className="flex flex-col mb-8 items-start gap-y-4"
           style={{
@@ -403,43 +404,51 @@ export default function ContrastChecker() {
           }}
           id="contrast-info"
         >
-          {/* Contrast Ratio */}
-          <div className="flex flex-col gap-y-2">
-            <Label htmlFor="contrast-value" className="text-base md:text-lg">
-              contrast value
-            </Label>
-            <div
-              className="flex gap-10 items-center rounded-lg border-3 px-2.5 py-4"
-              style={{
-                borderColor: getDisplayColor(background, foreground),
-              }}
-            >
-              <h2
-                id="contrast-value"
-                className="text-6xl md:text-8xl text-nowrap font-bold"
+          {/* Contrast Ratio and Explanation */}
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex flex-col gap-y-2">
+              <Label htmlFor="contrast-value" className="text-base md:text-lg">
+                contrast value
+              </Label>
+
+              <div
+                className="flex gap-10 items-center rounded-lg border-3 px-2.5 py-4"
+                style={{
+                  borderColor: getDisplayColor(background, foreground),
+                }}
               >
-                {useAPCA ? (
-                  <>
-                    {apcaContrast.toFixed(2)} L
-                    <sup className="-ml-3 md:-ml-4 -top-3.5 md:-top-6">c</sup>
-                  </>
-                ) : (
-                  <>
-                    {background.a < 1 ? (
-                      <>
-                        {wcagContrastRange.min.toFixed(2)} : 1 to{" "}
-                        {wcagContrastRange.max.toFixed(2)} : 1 alpha:
-                        {background.a}
-                      </>
-                    ) : (
-                      <>
-                        {wcagContrast.toFixed(2)} : 1<>alpha:{background.a}</>
-                      </>
-                    )}
-                  </>
-                )}
-              </h2>
+                <h2
+                  id="contrast-value"
+                  className="text-6xl md:text-8xl text-nowrap font-bold"
+                >
+                  {useAPCA ? (
+                    <>
+                      {apcaContrast.toFixed(2)} L
+                      <sup className="-ml-3 md:-ml-4 -top-3.5 md:-top-6">c</sup>
+                    </>
+                  ) : (
+                    <>
+                      {background.a < 1 ? (
+                        <>
+                          {wcagContrastRange.min.toFixed(2)} : 1 to{" "}
+                          {wcagContrastRange.max.toFixed(2)} : 1 alpha:
+                          {background.a}
+                        </>
+                      ) : (
+                        <>
+                          {wcagContrast.toFixed(2)} : 1<>alpha:{background.a}</>
+                        </>
+                      )}
+                    </>
+                  )}
+                </h2>
+              </div>
             </div>
+
+            {/* Explanation */}
+            <span className="mt-auto" id="explanation">
+              This is enough contrast for any text.
+            </span>
           </div>
 
           {/* Standards levels */}
@@ -583,7 +592,6 @@ export default function ContrastChecker() {
           </Button>
         </div>
 
-        {/* Main content area */}
         <div className="flex flex-col gap-y-8">
           {/* Color controls */}
           <div
@@ -866,6 +874,17 @@ export default function ContrastChecker() {
       </main>
 
       <Footer background={background} foreground={foreground} />
+
+      {/* Dynamic Selection Color */}
+      <style jsx global>{`
+        ::selection {
+          background-color: var(
+            --selection-color,
+            ${getDisplayColor(background, foreground)}
+          );
+          color: var(--selection-text-color, ${rgbToHex(background)});
+        }
+      `}</style>
     </div>
   );
 }
