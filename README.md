@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Hue Dat Boy - Color Contrast Checker for WCAG & APCA
+
+**Website:** [Hue Dat Boy](https://huedatboy.com/)
+
+Hue Dat Boy is a color contrast checker built with Next.js, Tailwind CSS, and shadcn. It helps designers, developers, and anyone interested in web accessibility evaluate color combinations for compliance with the WCAG 2.2 and APCA standards.
+
+## Features
+
+- **Color Contrast Testing**: Select text and background colors to check their contrast ratio.
+- **Accessibility Standards**: Supports WCAG 2.2 (AA and AAA) and APCA compliance checks.
+- **Font Selection**: Choose from various Google Fonts to see how your color combinations will look in different typefaces.
+- **Simulation Modes**: Visualize colors as seen by individuals with different types of color blindness.
 
 ## Getting Started
 
-First, run the development server:
+Follow these steps to run the project locally:
 
+### Installation
+
+Clone the repository and navigate to the project directory:
+```bash
+git clone <repository_url>
+cd hue-dat-boy
+```
+
+Install dependencies:
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
+
+### Running the Development Server
+
+Start the development server:
 ```bash
 npm run dev
 # or
 yarn dev
 # or
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Contributing
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Contributions are welcome! Feel free to open an issue or submit a pull request for any bugs or feature requests.
 
-## Learn More
+## License
 
-To learn more about Next.js, take a look at the following resources:
+This project is licensed under the MIT License.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Acknowledgments
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- [Next.js](https://nextjs.org/) for the robust framework.
+- [WCAG Guidelines](https://www.w3.org/WAI/standards-guidelines/wcag/) for accessibility standards.
+- [Vercel](https://vercel.com/) for deployment and hosting.
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
