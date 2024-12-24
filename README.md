@@ -19,7 +19,7 @@ Follow these steps to run the project locally:
 
 Clone the repository and navigate to the project directory:
 ```bash
-git clone <repository_url>
+git clone https://github.com/seanpstanley/hue-dat-boy.git
 cd hue-dat-boy
 ```
 
