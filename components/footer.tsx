@@ -29,7 +29,7 @@ export function Footer({ background, foreground }: FooterProps) {
             className="size-12 p-2"
           >
             <Link
-              href="https://github.com/seanpstanley"
+              href="https://github.com/seanpstanley/hue-dat-boy"
               target="_blank"
               rel="noopener noreferrer"
             >

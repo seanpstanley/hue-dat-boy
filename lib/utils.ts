@@ -1,12 +1,12 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { RgbColor, RgbaColor, HslColor } from "@/lib/types";
+import { RgbaColor, HslaColor } from "@/lib/types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-function blendColors(fg: RgbColor, bg: RgbColor): RgbColor {
+function blendColors(fg: RgbaColor, bg: RgbaColor): RgbaColor {
   const alpha = fg.a;
   return {
     r: Math.round(fg.r * alpha + bg.r * (1 - alpha)),
@@ -16,7 +16,7 @@ function blendColors(fg: RgbColor, bg: RgbColor): RgbColor {
   };
 }
 
-function calculateRelativeLuminance({ r, g, b }: RgbColor) {
+function calculateRelativeLuminance({ r, g, b }: RgbaColor) {
   const [rs, gs, bs] = [r / 255, g / 255, b / 255].map((c) =>
     c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
   );
@@ -24,9 +24,9 @@ function calculateRelativeLuminance({ r, g, b }: RgbColor) {
 }
 
 export function calculateWCAGContrast(
-  bg: RgbColor,
-  fg: RgbColor,
-  solidBg?: RgbColor
+  bg: RgbaColor,
+  fg: RgbaColor,
+  solidBg?: RgbaColor
 ): number {
   const blendedFg = blendColors(fg, solidBg || bg);
   const blendedBg = solidBg || bg;
@@ -40,9 +40,22 @@ export function calculateWCAGContrast(
   return (lighter + 0.05) / (darker + 0.05);
 }
 
+// function calculateAPCAContrast(
+//   background: RgbaColor,
+//   foreground: RgbaColor,
+//   solidBg?: RgbaColor
+// ) {
+//   return Number(
+//     calcAPCA(
+//       [...Object.values(foreground), 1] as [number, number, number, number],
+//       [...Object.values(background)] as [number, number, number]
+//     )
+//   );
+// }
+
 export function getDisplayColor(
-  background: RgbColor,
-  foreground: RgbColor
+  background: RgbaColor,
+  foreground: RgbaColor
 ): string {
   const contrastRatio = calculateWCAGContrast(background, foreground);
   if (contrastRatio >= 3.0) {
@@ -89,13 +102,15 @@ export function hexToRgba(hex: string): RgbaColor {
     : { r: 0, g: 0, b: 0, a: 1 };
 }
 
-export function rgbaToHex({ r, g, b }: RgbaColor): string {
-  return `#${[r, g, b]
-    .map((x) => Math.round(x).toString(16).padStart(2, "0"))
-    .join("")}`;
+export function rgbaToHex({ r, g, b, a }: RgbaColor): string {
+  const toHex = (value: number) =>
+    Math.round(value).toString(16).padStart(2, "0");
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}${
+    a < 1 ? toHex(Math.round(a * 255)) : ""
+  }`;
 }
 
-export function rgbToHex({ r, g, b }: RgbColor): string {
+export function rgbToHex({ r, g, b }: RgbaColor): string {
   return `#${[r, g, b].map((x) => x.toString(16).padStart(2, "0")).join("")}`;
 }
 
@@ -111,7 +126,7 @@ export function rgbToHex({ r, g, b }: RgbColor): string {
 //     : { r: 0, g: 0, b: 0, a: 1 };
 // }
 
-export function hexToRgb(hex: string): RgbColor {
+export function hexToRgb(hex: string): RgbaColor {
   const parsedHex = hex.replace("#", "");
   let r, g, b, a;
 
@@ -134,7 +149,7 @@ export function hexToRgb(hex: string): RgbColor {
   return { r, g, b, a };
 }
 
-export function rgbToHsl({ r, g, b }: RgbColor): HslColor {
+export function rgbaToHsla({ r, g, b, a }: RgbaColor): HslaColor {
   r /= 255;
   g /= 255;
   b /= 255;
@@ -162,16 +177,15 @@ export function rgbToHsl({ r, g, b }: RgbColor): HslColor {
     h /= 6;
   }
 
-  return { h: h * 360, s: s * 100, l: l * 100 };
+  return { h: h * 360, s: s * 100, l: l * 100, a };
 }
 
-export function hslToRgb({ h, s, l }: HslColor): RgbColor {
+export function hslaToRgba({ h, s, l, a }: HslaColor): RgbaColor {
   s /= 100;
   l /= 100;
   const k = (n: number) => (n + h / 30) % 12;
-  const a = s * Math.min(l, 1 - l);
   const f = (n: number) =>
-    l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+    l - s * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
   return {
     r: Math.round(255 * f(0)),
     g: Math.round(255 * f(8)),

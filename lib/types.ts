@@ -13,10 +13,11 @@ export interface RgbaColor {
   a: number;
 }
 
-export interface HslColor {
+export interface HslaColor {
   h: number;
   s: number;
   l: number;
+  a: number;
 }
 
 export type ColorBlindnessType =
@@ -25,3 +26,16 @@ export type ColorBlindnessType =
   | "deuteranopia"
   | "tritanopia"
   | "achromatopsia";
+
+export interface AnimechanQuote {
+  anime: {
+    id: number;
+    name: string;
+    altName?: string;
+  };
+  character: {
+    id: number;
+    name: string;
+  };
+  content: string;
+}

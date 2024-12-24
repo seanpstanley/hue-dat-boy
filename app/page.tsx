@@ -37,7 +37,7 @@ import {
 } from "@/components/ui/popover";
 import ColorPicker from "@/components/color-picker";
 import { RgbColor, ColorBlindnessType } from "@/lib/types";
-import { rgbToHex, hexToRgb, hslToRgb, rgbToHsl } from "@/lib/utils";
+import { rgbToHex, hexToRgb, hslaToRgba, rgbaToHsla } from "@/lib/utils";
 import { Footer } from "@/components/footer";
 import { RgbaColor } from "react-colorful";
 import { CopyColorButton } from "@/components/copy-color-button";
@@ -45,16 +45,23 @@ import { SampleTextCard } from "@/components/sample-text-card";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-function calculateWCAGContrastRange(
-  bg: RgbColor,
-  fg: RgbColor
+function calculateContrastRange(
+  bg: RgbaColor,
+  fg: RgbaColor,
+  useAPCA: boolean
 ): { min: number; max: number } {
-  const blackBg: RgbColor = { r: 0, g: 0, b: 0, a: 1 };
-  const whiteBg: RgbColor = { r: 255, g: 255, b: 255, a: 1 };
+  const blackBg: RgbaColor = { r: 0, g: 0, b: 0, a: 1 };
+  const whiteBg: RgbaColor = { r: 255, g: 255, b: 255, a: 1 };
 
-  const minContrast = calculateWCAGContrast(bg, fg, blackBg);
-  const maxContrast = calculateWCAGContrast(bg, fg, whiteBg);
+  let minContrast, maxContrast;
 
+  if (useAPCA) {
+    minContrast = calculateWCAGContrast(bg, fg, blackBg);
+    maxContrast = calculateWCAGContrast(bg, fg, whiteBg);
+  } else {
+    minContrast = calculateWCAGContrast(bg, fg, blackBg);
+    maxContrast = calculateWCAGContrast(bg, fg, whiteBg);
+  }
   return {
     min: Math.min(minContrast, maxContrast),
     max: Math.max(minContrast, maxContrast),
@@ -93,7 +100,7 @@ function enhanceContrast(
   let newForeground = { ...foreground };
 
   const adjustColor = (color: RgbaColor, isBackground: boolean): RgbaColor => {
-    const hsl = rgbToHsl(color);
+    const hsl = rgbaToHsla(color);
     const step = 1;
     let bestContrast = isBackground
       ? initialContrast
@@ -107,8 +114,8 @@ function enhanceContrast(
       const lighterHSL = { ...hsl, l: Math.min(100, hsl.l + i) };
       const darkerHSL = { ...hsl, l: Math.max(0, hsl.l - i) };
 
-      const lighterRGB = hslToRgb(lighterHSL);
-      const darkerRGB = hslToRgb(darkerHSL);
+      const lighterRGB = hslaToRgba(lighterHSL);
+      const darkerRGB = hslaToRgba(darkerHSL);
 
       const lighterContrast = isBackground
         ? useAPCA
@@ -140,7 +147,7 @@ function enhanceContrast(
 
     // If we still haven't reached the desired level, try adjusting saturation
     if (useAPCA ? Math.abs(bestContrast) < 60 : bestContrast < 4.5) {
-      const currentHSL = rgbToHsl(bestColor);
+      const currentHSL = rgbaToHsla(bestColor);
       for (let i = 0; i <= 100; i += step) {
         const lessSaturatedHSL = {
           ...currentHSL,
@@ -151,8 +158,8 @@ function enhanceContrast(
           s: Math.min(100, currentHSL.s + i),
         };
 
-        const lessSaturatedRGB = hslToRgb(lessSaturatedHSL);
-        const moreSaturatedRGB = hslToRgb(moreSaturatedHSL);
+        const lessSaturatedRGB = hslaToRgba(lessSaturatedHSL);
+        const moreSaturatedRGB = hslaToRgba(moreSaturatedHSL);
 
         const lessSaturatedContrast = isBackground
           ? useAPCA
@@ -182,7 +189,7 @@ function enhanceContrast(
         if (useAPCA ? Math.abs(bestContrast) >= 75 : bestContrast >= 7) break;
       }
     }
-
+    console.log(bestColor);
     return bestColor;
   };
 
@@ -213,6 +220,10 @@ function enhanceContrast(
         : { r: 255, g: 255, b: 255, a: 1 };
   }
 
+  console.log("enhance contrast function:");
+  console.log(background.a);
+  console.log(newBackground);
+  console.log(newForeground);
   return { background: newBackground, foreground: newForeground };
 }
 
@@ -265,15 +276,20 @@ export default function ContrastChecker() {
   const [enhanceMenuOpen, setEnhanceMenuOpen] = useState(false);
 
   const wcagContrast = calculateWCAGContrast(background, foreground);
-  const wcagContrastRange = calculateWCAGContrastRange(background, foreground);
+  const contrastRange = calculateContrastRange(background, foreground, useAPCA);
   const apcaContrast = calculateAPCAContrast(background, foreground);
 
   const wcagResults = {
-    AANormal: wcagContrast >= 4.5,
-    AAANormal: wcagContrast >= 7,
-    AALarge: wcagContrast >= 3,
-    AAALarge: wcagContrast >= 4.5,
+    "AA Large": wcagContrast >= 3,
+    "AAA Large": wcagContrast >= 4.5,
+    "AA Normal": wcagContrast >= 4.5,
+    "AAA Normal": wcagContrast >= 7,
   };
+
+  // const message = {
+  //   "This is enough contrast for any text.":
+
+  // }
 
   const debouncedColorChange = debounce(
     (colorType: "background" | "foreground", value: string) => {
@@ -327,6 +343,8 @@ export default function ContrastChecker() {
   const handleEnhanceContrast = (type: "text" | "background" | "both") => {
     const { background: newBackground, foreground: newForeground } =
       enhanceContrast(background, foreground, type, useAPCA);
+
+    console.log("background inside handler: " + newBackground.a);
     setBackground(newBackground);
     setBackgroundHex(rgbToHex(newBackground));
     setForeground(newForeground);
@@ -355,15 +373,11 @@ export default function ContrastChecker() {
     updateUrl();
   }, [updateUrl]);
 
-  const { data, error, isLoading } = useSWR(
-    "https://api.kanye.rest/",
-    fetcher,
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    }
-  );
+  const { data, error, isLoading } = useSWR(`/api/quote`, fetcher, {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
 
   return (
     <div
@@ -430,14 +444,20 @@ export default function ContrastChecker() {
                     <>
                       {background.a < 1 ? (
                         <>
-                          {wcagContrastRange.min.toFixed(2)} : 1 to{" "}
-                          {wcagContrastRange.max.toFixed(2)} : 1 alpha:
-                          {background.a}
+                          {useAPCA ? (
+                            <>
+                              {contrastRange.min.toFixed(2)} to{" "}
+                              {contrastRange.max.toFixed(2)}
+                            </>
+                          ) : (
+                            <>
+                              {contrastRange.min.toFixed(2)} : 1 to{" "}
+                              {contrastRange.max.toFixed(2)} : 1
+                            </>
+                          )}
                         </>
                       ) : (
-                        <>
-                          {wcagContrast.toFixed(2)} : 1<>alpha:{background.a}</>
-                        </>
+                        <>{wcagContrast.toFixed(2)} : 1</>
                       )}
                     </>
                   )}
@@ -452,147 +472,159 @@ export default function ContrastChecker() {
           </div>
 
           {/* Standards levels */}
-          <div className="grid grid-cols-1 ml-auto sm:grid-cols-2 lg:grid-cols-4 gap-2">
-            {Object.entries(wcagResults).map(([level, passes]) => (
-              <div
-                key={level}
-                className="inline-flex items-center justify-between gap-x-2 rounded-full font-semibold transition-colors text-base md:text-lg py-2 px-4 border-3 bg-transparent"
-                style={{
-                  borderColor: getDisplayColor(background, foreground),
-                  backgroundColor: passes
-                    ? getDisplayColor(background, foreground)
-                    : rgbToHex(background),
-                  color: passes
-                    ? getDisplayColor(foreground, background)
-                    : getDisplayColor(background, foreground),
-                }}
-              >
-                {level.replace(/([A-Z])/g, " $1").trim()}{" "}
-                {passes ? (
-                  <>
-                    <span className="sr-only">Pass</span>
-                    <Check className="h-6 w-6" />
-                  </>
-                ) : (
-                  <>
-                    <span className="sr-only">Fail</span>
-                    <X className="h-6 w-6" />
-                  </>
-                )}
-              </div>
-            ))}
+          <div className="flex flex-col gap-y-2 ml-auto">
+            {/* <Label
+              htmlFor="contrast-value"
+              className="text-base md:text-lg ml-auto"
+            >
+              standards
+            </Label> */}
+            <div className="grid grid-cols-1 ml-auto sm:grid-cols-2 lg:grid-cols-4 gap-2">
+              {Object.entries(wcagResults).map(([level, passes]) => (
+                <div
+                  key={level}
+                  className="inline-flex items-center justify-between gap-x-2 rounded-full font-semibold transition-colors text-base md:text-lg py-2 px-4 border-3 bg-transparent"
+                  style={{
+                    borderColor: getDisplayColor(background, foreground),
+                    backgroundColor: passes
+                      ? getDisplayColor(background, foreground)
+                      : rgbToHex(background),
+                    color: passes
+                      ? getDisplayColor(foreground, background)
+                      : getDisplayColor(background, foreground),
+                  }}
+                >
+                  {level}
+                  {passes ? (
+                    <>
+                      <span className="sr-only">Pass</span>
+                      <Check className="h-6 w-6" />
+                    </>
+                  ) : (
+                    <>
+                      <span className="sr-only">Fail</span>
+                      <X className="h-6 w-6" />
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-x-4 gap-y-4 mb-8">
-          <div className="flex items-center gap-x-2">
-            <Label
-              htmlFor="contrast-standard"
-              className="text-base md:text-lg"
-              style={{
-                color: getDisplayColor(background, foreground),
-              }}
-            >
-              wcag 2.2
-            </Label>
-            <Switch
-              id="contrast-standard"
-              checked={useAPCA}
-              onCheckedChange={setUseAPCA}
-              style={{
-                borderColor: getDisplayColor(background, foreground),
-                backgroundColor: backgroundHex,
-              }}
-              color={getDisplayColor(background, foreground)}
-            />
-            <Label
-              htmlFor="contrast-standard"
-              className="text-base md:text-lg"
-              style={{
-                color: getDisplayColor(background, foreground),
-              }}
-            >
-              apca
-            </Label>
-          </div>
+        {/* User Controls */}
+        <section className="flex flex-col gap-y-8" id="controls">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-x-4 gap-y-4">
+            {/* Standards Toggle */}
+            <div className="flex items-center gap-x-2">
+              <Label
+                htmlFor="contrast-standard"
+                className="text-base md:text-lg"
+                style={{
+                  color: getDisplayColor(background, foreground),
+                }}
+              >
+                wcag 2.2
+              </Label>
+              <Switch
+                id="contrast-standard"
+                checked={useAPCA}
+                onCheckedChange={setUseAPCA}
+                style={{
+                  borderColor: getDisplayColor(background, foreground),
+                  backgroundColor: backgroundHex,
+                }}
+                color={getDisplayColor(background, foreground)}
+              />
+              <Label
+                htmlFor="contrast-standard"
+                className="text-base md:text-lg"
+                style={{
+                  color: getDisplayColor(background, foreground),
+                }}
+              >
+                apca
+              </Label>
+            </div>
 
-          <Popover open={enhanceMenuOpen} onOpenChange={setEnhanceMenuOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
+            {/* Enhance Colors Button */}
+            <Popover open={enhanceMenuOpen} onOpenChange={setEnhanceMenuOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  style={{
+                    color: getDisplayColor(background, foreground),
+                    borderColor: getDisplayColor(background, foreground),
+                  }}
+                  size="xl"
+                  disabled={
+                    (!useAPCA && wcagContrast >= 4.5) ||
+                    (useAPCA && Math.abs(apcaContrast) >= 75)
+                  }
+                  className="sm:ml-auto w-full sm:w-fit text-base"
+                >
+                  enhance contrast
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                className="w-fit p-0 border-3"
                 style={{
                   color: getDisplayColor(background, foreground),
                   borderColor: getDisplayColor(background, foreground),
+                  backgroundColor: rgbToHex(background),
                 }}
-                size="xl"
-                disabled={
-                  (!useAPCA && wcagContrast >= 4.5) ||
-                  (useAPCA && Math.abs(apcaContrast) >= 75)
-                }
-                className="sm:ml-auto w-full sm:w-fit text-base"
               >
-                enhance contrast
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent
-              className="w-fit p-0 border-3"
+                <div className="grid gap-2 p-2">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start"
+                    onClick={() => {
+                      setEnhanceMenuOpen(false);
+                      handleEnhanceContrast("text");
+                    }}
+                  >
+                    adjust text color
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start"
+                    onClick={() => {
+                      setEnhanceMenuOpen(false);
+                      handleEnhanceContrast("background");
+                    }}
+                  >
+                    adjust background color
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start"
+                    onClick={() => {
+                      setEnhanceMenuOpen(false);
+                      handleEnhanceContrast("both");
+                    }}
+                  >
+                    adjust both colors
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
+
+            {/* Copy Colors Button */}
+            <Button
+              variant="outline"
+              onClick={handleCopyUrl}
+              size="xl"
+              className="gap-x-1 w-full sm:w-fit text-base"
               style={{
                 color: getDisplayColor(background, foreground),
                 borderColor: getDisplayColor(background, foreground),
-                backgroundColor: rgbToHex(background),
               }}
             >
-              <div className="grid gap-2 p-2">
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start"
-                  onClick={() => {
-                    setEnhanceMenuOpen(false);
-                    handleEnhanceContrast("text");
-                  }}
-                >
-                  adjust text color
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start"
-                  onClick={() => {
-                    setEnhanceMenuOpen(false);
-                    handleEnhanceContrast("background");
-                  }}
-                >
-                  adjust background color
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start"
-                  onClick={() => {
-                    setEnhanceMenuOpen(false);
-                    handleEnhanceContrast("both");
-                  }}
-                >
-                  adjust both colors
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
+              share these colors
+              <Clipboard className="h-4 w-4" />
+            </Button>
+          </div>
 
-          <Button
-            variant="outline"
-            onClick={handleCopyUrl}
-            size="xl"
-            className="gap-x-1 w-full sm:w-fit text-base"
-            style={{
-              color: getDisplayColor(background, foreground),
-              borderColor: getDisplayColor(background, foreground),
-            }}
-          >
-            share these colors
-            <Clipboard className="h-4 w-4" />
-          </Button>
-        </div>
-
-        <div className="flex flex-col gap-y-8">
           {/* Color controls */}
           <div
             className="flex flex-col md:flex-row justify-between items-center gap-x-4 gap-y-2 "
@@ -727,7 +759,7 @@ export default function ContrastChecker() {
             </div>
           </div>
 
-          {/* Font and Color Blindness Controls */}
+          {/* Font and Color Blindness Dropdowns */}
           <div className="flex flex-col md:flex-row gap-x-8 gap-y-4">
             <div
               className="flex flex-col gap-y-2 flex-1"
@@ -857,20 +889,23 @@ export default function ContrastChecker() {
                 font={font}
                 colorBlindnessType={colorBlindnessType}
                 textSize="normal"
-                content={error ? error : isLoading ? "Loading..." : data?.quote}
+                isLoading={isLoading}
+                error={error}
+                data={data?.data?.data}
               />
-
               <SampleTextCard
                 foreground={foreground}
                 background={background}
                 font={font}
                 colorBlindnessType={colorBlindnessType}
                 textSize="large"
-                content={error ? error : isLoading ? "Loading..." : data?.quote}
+                isLoading={isLoading}
+                error={error}
+                data={data?.data?.data}
               />
             </div>
           </section>
-        </div>
+        </section>
       </main>
 
       <Footer background={background} foreground={foreground} />

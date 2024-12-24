@@ -51,7 +51,8 @@ export const ColorPicker = memo(
         </PopoverTrigger>
         <PopoverContent
           collisionPadding={16}
-          className="w-auto p-0 border-none"
+          className="w-auto p-0 border-3 rounded-xl"
+          style={{ borderColor: externalColor }}
         >
           <RgbaColorPicker color={internalColor} onChange={handleChange} />
         </PopoverContent>

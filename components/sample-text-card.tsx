@@ -8,8 +8,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { rgbToHex, cn, getDisplayColor } from "@/lib/utils";
-import { RgbaColor, ColorBlindnessType } from "@/lib/types";
+import { rgbToHex, rgbaToHex, cn, getDisplayColor } from "@/lib/utils";
+import { RgbaColor, ColorBlindnessType, AnimechanQuote } from "@/lib/types";
 import { TooltipButton } from "@/components/tooltip-button";
 import { Maximize2 } from "lucide-react";
 
@@ -75,7 +75,9 @@ interface SampleTextCardProps {
   font: string;
   colorBlindnessType: any;
   textSize: "normal" | "large";
-  content: string;
+  isLoading: boolean;
+  error: any;
+  data: AnimechanQuote;
 }
 
 export function SampleTextCard({
@@ -84,7 +86,9 @@ export function SampleTextCard({
   font,
   colorBlindnessType,
   textSize,
-  content,
+  isLoading,
+  error,
+  data,
 }: SampleTextCardProps) {
   return (
     <Sheet>
@@ -99,14 +103,7 @@ export function SampleTextCard({
           ),
         }}
       >
-        <div
-          className="pt-2 pb-2.5 px-4 relative"
-          style={{
-            backgroundColor: rgbToHex(
-              simulateColorBlindness(foreground, colorBlindnessType)
-            ),
-          }}
-        >
+        <div className="pt-2 pb-2.5 px-4 relative">
           <h4
             className="text-base md:text-lg font-medium leading-none"
             style={{ color: getDisplayColor(foreground, background) }}
@@ -136,26 +133,35 @@ export function SampleTextCard({
         <div
           className="p-4 h-full"
           style={{
-            backgroundColor: rgbToHex(
+            backgroundColor: rgbaToHex(
               simulateColorBlindness(background, colorBlindnessType)
             ),
           }}
         >
           <blockquote
-            cite="https://kanye.rest"
+            cite="https://animechan.io/api/v1"
             className={textSize === "large" ? "text-2xl" : "text-base"}
             style={{
-              color: rgbToHex(
+              color: rgbaToHex(
                 simulateColorBlindness(foreground, colorBlindnessType)
               ),
               fontFamily: font,
             }}
           >
             <p className="before:content-[open-quote] after:content-[close-quote] mb-2">
-              {content}
+              {error
+                ? "Failed to load resource."
+                : isLoading
+                ? "Loading..."
+                : data?.content}
             </p>
 
-            <cite className="text-end block">Kanye West</cite>
+            <cite className="text-end block">
+              <span className="not-italic">
+                &mdash; {data?.character?.name},
+              </span>{" "}
+              {data?.anime?.name}
+            </cite>
           </blockquote>
         </div>
       </Card>
@@ -163,7 +169,7 @@ export function SampleTextCard({
       <SheetContent
         className="h-full flex flex-col justify-center items-center border-none"
         style={{
-          backgroundColor: rgbToHex(
+          backgroundColor: rgbaToHex(
             simulateColorBlindness(background, colorBlindnessType)
           ),
         }}
@@ -173,20 +179,27 @@ export function SampleTextCard({
           <SheetTitle>Full screen {textSize} text</SheetTitle>
         </VisuallyHidden>
         <blockquote
-          cite="https://kanye.rest"
+          cite="https://animechan.io/api/v1"
           className={cn("max-w-2xl", { "text-2xl": textSize === "large" })}
           style={{
-            color: rgbToHex(
+            color: rgbaToHex(
               simulateColorBlindness(foreground, colorBlindnessType)
             ),
             fontFamily: font,
           }}
         >
           <p className="before:content-[open-quote] after:content-[close-quote] mb-2">
-            {content}
+            {error
+              ? "Failed to load resource."
+              : isLoading
+              ? "Loading..."
+              : data?.content}
           </p>
 
-          <cite className="text-end block">Kanye West</cite>
+          <cite className="text-end block">
+            <span className="not-italic">&mdash; {data?.character?.name},</span>{" "}
+            {data?.anime?.name}
+          </cite>
         </blockquote>
       </SheetContent>
     </Sheet>
