@@ -2,7 +2,7 @@
 
 **Website:** [Hue Dat Boy](https://huedatboy.com/)
 
-Hue Dat Boy is a color contrast checker built with Next.js, Tailwind CSS, and shadcn. It helps designers, developers, and anyone interested in web accessibility evaluate color combinations for compliance with the WCAG 2.2 and APCA standards.
+Hue Dat Boy is a color contrast checker built with Next.js, Tailwind CSS, and shadcn. It helps designers, developers, and anyone interested in web accessibility to evaluate color combinations for compliance with WCAG 2.2 and APCA standards.
 
 ## Features
 
