@@ -58,22 +58,22 @@ export function calculateWCAGContrast(
 //   return Number(ratio.toFixed(2));
 // }
 
-export function getDisplayColor(
-  background: RgbaColor,
-  foreground: RgbaColor
-): string {
-  const contrastRatio = calculateWCAGContrast(background, foreground);
+export function getDisplayColor(bg: RgbaColor, fg: RgbaColor): string {
+  const displayFg: RgbaColor = { r: fg.r, g: fg.g, b: fg.b, a: 1 };
+  const displayBg: RgbaColor = { r: bg.r, g: bg.g, b: bg.b, a: 1 };
+  const contrastRatio = calculateWCAGContrast(displayBg, displayFg);
+
   if (contrastRatio >= 3.0) {
-    return rgbToHex(foreground);
+    return rgbaToHex(displayFg);
   }
 
-  const blackContrast = calculateWCAGContrast(background, {
+  const blackContrast = calculateWCAGContrast(displayBg, {
     r: 0,
     g: 0,
     b: 0,
     a: 1,
   });
-  const whiteContrast = calculateWCAGContrast(background, {
+  const whiteContrast = calculateWCAGContrast(displayBg, {
     r: 255,
     g: 255,
     b: 255,

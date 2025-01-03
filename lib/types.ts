@@ -3,7 +3,6 @@ export interface RgbColor {
   r: number;
   g: number;
   b: number;
-  a: number;
 }
 
 export interface RgbaColor {

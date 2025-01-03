@@ -29,7 +29,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import ColorPicker from "@/components/color-picker";
-import { RgbColor, ColorBlindnessType } from "@/lib/types";
+import { ColorBlindnessType, RgbaColor } from "@/lib/types";
 import {
   rgbToHex,
   hexToRgb,
@@ -40,9 +40,9 @@ import {
   rgbaToHex,
   calculateWCAGContrast,
   blendColors,
+  hexToRgba,
 } from "@/lib/utils";
 import { Footer } from "@/components/footer";
-import { RgbaColor } from "react-colorful";
 import { CopyColorButton } from "@/components/copy-color-button";
 import { SampleTextCard } from "@/components/sample-text-card";
 
@@ -249,10 +249,10 @@ export default function ContrastChecker() {
   const searchParamsInitFont = searchParams.get("font") as string;
   const searchParamsInitSimulation = searchParams.get("simulation") as string;
 
-  const [background, setBackground] = useState<RgbColor>(
+  const [background, setBackground] = useState<RgbaColor>(
     searchParamsInitBg ? hexToRgb(searchParamsInitBg) : hexToRgb("#f5b4c5")
   );
-  const [foreground, setForeground] = useState<RgbColor>(
+  const [foreground, setForeground] = useState<RgbaColor>(
     searchParamsInitText ? hexToRgb(searchParamsInitText) : hexToRgb("#322e2b")
   );
   const [backgroundHex, setBackgroundHex] = useState(rgbToHex(background));
@@ -280,10 +280,12 @@ export default function ContrastChecker() {
   const apcaContrast = calculateAPCAContrast(background, foreground);
 
   const wcagResults = {
-    "AA Large": wcagContrast >= 3,
-    "AAA Large": wcagContrast >= 4.5,
-    "AA Normal": wcagContrast >= 4.5,
-    "AAA Normal": wcagContrast >= 7,
+    "AA Large": background.a < 1 ? contrastRange.min >= 3 : wcagContrast >= 3,
+    "AAA Large":
+      background.a < 1 ? contrastRange.min >= 4.5 : wcagContrast >= 4.5,
+    "AA Normal":
+      background.a < 1 ? contrastRange.min >= 4.5 : wcagContrast >= 4.5,
+    "AAA Normal": background.a < 1 ? contrastRange.min >= 7 : wcagContrast >= 7,
   };
 
   const debouncedColorChange = debounce(
@@ -327,8 +329,8 @@ export default function ContrastChecker() {
     const newForeground = background;
     setBackground(newBackground);
     setForeground(newForeground);
-    setBackgroundHex(rgbToHex(newBackground));
-    setForegroundHex(rgbToHex(newForeground));
+    setBackgroundHex(rgbaToHex(newBackground));
+    setForegroundHex(rgbaToHex(newForeground));
   };
 
   const handleCopyUrl = () => {
@@ -632,16 +634,18 @@ export default function ContrastChecker() {
                   value={foregroundHex}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (value.length <= 7) {
-                      setForegroundHex(value);
-                      if (/^#?[0-9A-Fa-f]{6}$/.test(value)) {
-                        const colorValue = value.startsWith("#")
-                          ? value
-                          : `#${value}`;
-                        setForeground(hexToRgb(colorValue));
-                        setForegroundHex(colorValue);
-                      }
-                    }
+                    // if (value.length <= 7) {
+                    //   setForegroundHex(value);
+                    //   if (/^#?[0-9A-Fa-f]{6}$/.test(value)) {
+                    //     const colorValue = value.startsWith("#")
+                    //       ? value
+                    //       : `#${value}`;
+                    //     setForeground(hexToRgb(colorValue));
+                    //     setForegroundHex(colorValue);
+                    //   }
+                    // }
+                    setForeground(hexToRgba(value));
+                    setForegroundHex(value);
                   }}
                   style={{
                     borderColor: getDisplayColor(background, foreground),
@@ -717,16 +721,18 @@ export default function ContrastChecker() {
                   value={backgroundHex}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (value.length <= 7) {
-                      setBackgroundHex(value);
-                      if (/^#?[0-9A-Fa-f]{6}$/.test(value)) {
-                        const colorValue = value.startsWith("#")
-                          ? value
-                          : `#${value}`;
-                        setBackground(hexToRgb(colorValue));
-                        setBackgroundHex(colorValue);
-                      }
-                    }
+                    // if (value.length <= 7) {
+                    //   setBackgroundHex(value);
+                    //   if (/^#?[0-9A-Fa-f]{6}$/.test(value)) {
+                    //     const colorValue = value.startsWith("#")
+                    //       ? value
+                    //       : `#${value}`;
+                    //     setBackground(hexToRgb(colorValue));
+                    //     setBackgroundHex(colorValue);
+                    //   }
+                    // }
+                    setBackground(hexToRgba(value));
+                    setBackgroundHex(value);
                   }}
                   spellCheck={false}
                   // maxLength={7}
