@@ -414,48 +414,46 @@ export default function ContrastChecker() {
           id="contrast-info"
         >
           {/* Contrast Ratio */}
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex flex-col gap-y-2">
-              <Label htmlFor="contrast-value" className="text-base md:text-lg">
-                contrast value
-              </Label>
+          <div className="flex flex-col gap-y-2">
+            <Label htmlFor="contrast-value" className="text-base md:text-lg">
+              contrast value
+            </Label>
 
-              <div
-                className="flex gap-10 items-center rounded-lg border-3 px-2.5 py-4"
-                style={{
-                  borderColor: getDisplayColor(background, foreground),
-                }}
+            <div
+              className="flex gap-10 items-center rounded-lg border-3 px-2.5 py-4"
+              style={{
+                borderColor: getDisplayColor(background, foreground),
+              }}
+            >
+              <h2
+                id="contrast-value"
+                className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold"
               >
-                <h2
-                  id="contrast-value"
-                  className="text-6xl md:text-8xl text-nowrap font-bold"
-                >
-                  {useAPCA ? (
-                    <>
-                      {apcaContrast} L
-                      <sup className="-ml-3 md:-ml-4 -top-3.5 md:-top-6">c</sup>
-                    </>
-                  ) : (
-                    <>
-                      {background.a < 1 ? (
-                        <>
-                          {useAPCA ? (
-                            <>
-                              {contrastRange.min} to {contrastRange.max}
-                            </>
-                          ) : (
-                            <>
-                              {contrastRange.min} : 1 to {contrastRange.max} : 1
-                            </>
-                          )}
-                        </>
-                      ) : (
-                        <>{wcagContrast} : 1</>
-                      )}
-                    </>
-                  )}
-                </h2>
-              </div>
+                {useAPCA ? (
+                  <>
+                    {apcaContrast} L
+                    <sup className="-ml-3 md:-ml-4 -top-3.5 md:-top-6">c</sup>
+                  </>
+                ) : (
+                  <>
+                    {background.a < 1 ? (
+                      <>
+                        {useAPCA ? (
+                          <>
+                            {contrastRange.min} to {contrastRange.max}
+                          </>
+                        ) : (
+                          <>
+                            {contrastRange.min} : 1 to {contrastRange.max} : 1
+                          </>
+                        )}
+                      </>
+                    ) : (
+                      <>{wcagContrast} : 1</>
+                    )}
+                  </>
+                )}
+              </h2>
             </div>
           </div>
 
