@@ -6,6 +6,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 const Sheet = SheetPrimitive.Root;
 
@@ -65,9 +66,15 @@ const SheetContent = React.forwardRef<
       {...props}
     >
       {children}
-      <SheetPrimitive.Close className="absolute size-8 right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
-        <X className="size-full" />
-        <span className="sr-only">Close</span>
+      <SheetPrimitive.Close asChild>
+        <Button
+          size="auto"
+          variant="ghost"
+          className="absolute right-4 top-4 md:size-9 p-1"
+        >
+          <X className="!size-full" />
+          <span className="sr-only">Close</span>
+        </Button>
       </SheetPrimitive.Close>
     </SheetPrimitive.Content>
   </SheetPortal>

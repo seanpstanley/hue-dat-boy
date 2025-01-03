@@ -12,13 +12,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-
-import {
-  debounce,
-  getDisplayColor,
-  rgbaToHex,
-  calculateWCAGContrast,
-} from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -37,7 +30,17 @@ import {
 } from "@/components/ui/popover";
 import ColorPicker from "@/components/color-picker";
 import { RgbColor, ColorBlindnessType } from "@/lib/types";
-import { rgbToHex, hexToRgb, hslaToRgba, rgbaToHsla } from "@/lib/utils";
+import {
+  rgbToHex,
+  hexToRgb,
+  hslaToRgba,
+  rgbaToHsla,
+  debounce,
+  getDisplayColor,
+  rgbaToHex,
+  calculateWCAGContrast,
+  blendColors,
+} from "@/lib/utils";
 import { Footer } from "@/components/footer";
 import { RgbaColor } from "react-colorful";
 import { CopyColorButton } from "@/components/copy-color-button";
@@ -56,34 +59,31 @@ function calculateContrastRange(
   let minContrast, maxContrast;
 
   if (useAPCA) {
-    minContrast = calculateWCAGContrast(bg, fg, blackBg);
-    maxContrast = calculateWCAGContrast(bg, fg, whiteBg);
+    // minContrast = calculateWCAGContrast(bg, fg, blackBg);
+    // maxContrast = calculateWCAGContrast(bg, fg, whiteBg);
+    minContrast = calculateAPCAContrast(fg, blendColors(bg, blackBg));
+    maxContrast = calculateAPCAContrast(fg, blendColors(bg, whiteBg));
   } else {
     minContrast = calculateWCAGContrast(bg, fg, blackBg);
     maxContrast = calculateWCAGContrast(bg, fg, whiteBg);
+    // minContrast = calculateWCAGContrast(fg, blendColors(bg, blackBg));
+    // maxContrast = calculateWCAGContrast(fg, blendColors(bg, whiteBg));
   }
+
   return {
     min: Math.min(minContrast, maxContrast),
     max: Math.max(minContrast, maxContrast),
   };
 }
 
-// export function calculateWCAGContrast(bg: RgbColor, fg: RgbColor) {
-//   const bgLuminance = calculateRelativeLuminance(bg);
-//   const fgLuminance = calculateRelativeLuminance(fg);
-
-//   const lighter = Math.max(bgLuminance, fgLuminance);
-//   const darker = Math.min(bgLuminance, fgLuminance);
-
-//   return (lighter + 0.05) / (darker + 0.05);
-// }
-
-function calculateAPCAContrast(background: RgbColor, foreground: RgbColor) {
+function calculateAPCAContrast(background: RgbaColor, foreground: RgbaColor) {
   return Number(
-    calcAPCA(
-      [...Object.values(foreground), 1] as [number, number, number, number],
-      [...Object.values(background)] as [number, number, number]
-    )
+    Number(
+      calcAPCA(
+        [...Object.values(foreground)] as [number, number, number, number],
+        [...Object.values(background)] as [number, number, number]
+      )
+    ).toFixed(2)
   );
 }
 
@@ -260,8 +260,8 @@ export default function ContrastChecker() {
   const [useAPCA, setUseAPCA] = useState(
     searchParamsInitStandard
       ? searchParamsInitStandard === "wcag"
-        ? true
-        : false
+        ? false
+        : true
       : false
   );
   const [font, setFont] = useState(
@@ -285,11 +285,6 @@ export default function ContrastChecker() {
     "AA Normal": wcagContrast >= 4.5,
     "AAA Normal": wcagContrast >= 7,
   };
-
-  // const message = {
-  //   "This is enough contrast for any text.":
-
-  // }
 
   const debouncedColorChange = debounce(
     (colorType: "background" | "foreground", value: string) => {
@@ -410,7 +405,7 @@ export default function ContrastChecker() {
           </h1>
         </div>
 
-        {/* Contrast Info, Explanation, and Standards Compliance */}
+        {/* Contrast Info and Standards Compliance */}
         <section
           className="flex flex-col mb-8 items-start gap-y-4"
           style={{
@@ -418,7 +413,7 @@ export default function ContrastChecker() {
           }}
           id="contrast-info"
         >
-          {/* Contrast Ratio and Explanation */}
+          {/* Contrast Ratio */}
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex flex-col gap-y-2">
               <Label htmlFor="contrast-value" className="text-base md:text-lg">
@@ -437,7 +432,7 @@ export default function ContrastChecker() {
                 >
                   {useAPCA ? (
                     <>
-                      {apcaContrast.toFixed(2)} L
+                      {apcaContrast} L
                       <sup className="-ml-3 md:-ml-4 -top-3.5 md:-top-6">c</sup>
                     </>
                   ) : (
@@ -446,32 +441,25 @@ export default function ContrastChecker() {
                         <>
                           {useAPCA ? (
                             <>
-                              {contrastRange.min.toFixed(2)} to{" "}
-                              {contrastRange.max.toFixed(2)}
+                              {contrastRange.min} to {contrastRange.max}
                             </>
                           ) : (
                             <>
-                              {contrastRange.min.toFixed(2)} : 1 to{" "}
-                              {contrastRange.max.toFixed(2)} : 1
+                              {contrastRange.min} : 1 to {contrastRange.max} : 1
                             </>
                           )}
                         </>
                       ) : (
-                        <>{wcagContrast.toFixed(2)} : 1</>
+                        <>{wcagContrast} : 1</>
                       )}
                     </>
                   )}
                 </h2>
               </div>
             </div>
-
-            {/* Explanation */}
-            <span className="mt-auto" id="explanation">
-              This is enough contrast for any text.
-            </span>
           </div>
 
-          {/* Standards levels */}
+          {/* Standards Levels */}
           <div className="flex flex-col gap-y-2 ml-auto">
             {/* <Label
               htmlFor="contrast-value"
@@ -625,14 +613,14 @@ export default function ContrastChecker() {
             </Button>
           </div>
 
-          {/* Color controls */}
+          {/* Color Controls */}
           <div
             className="flex flex-col md:flex-row justify-between items-center gap-x-4 gap-y-2 "
             style={{
               color: getDisplayColor(background, foreground),
             }}
           >
-            {/* Text color */}
+            {/* Text Color */}
             <div className="flex flex-col gap-y-2 w-full">
               <Label className="text-base md:text-lg">text color</Label>
               <div className="relative">
@@ -673,7 +661,7 @@ export default function ContrastChecker() {
               </div>
             </div>
 
-            {/* Swap colors */}
+            {/* Swap Colors */}
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -699,7 +687,7 @@ export default function ContrastChecker() {
               </Tooltip>
             </TooltipProvider>
 
-            {/* Background color */}
+            {/* Background Color */}
             <div
               className="flex flex-col gap-y-2 w-full"
               style={{

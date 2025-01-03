@@ -41,13 +41,22 @@ export const ColorPicker = memo(
         <PopoverTrigger asChild>
           <Button
             variant="naked"
-            className={cn("size-6 rounded-sm border-3", className)}
+            className={cn(
+              "size-6 rounded-sm border-3 checkerboard-sm",
+              className
+            )}
             style={{
-              backgroundColor: `rgba(${internalColor.r}, ${internalColor.g}, ${internalColor.b}, ${internalColor.a})`,
               borderColor: externalColor,
             }}
             aria-label="Pick a color"
-          />
+          >
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundColor: `rgba(${internalColor.r}, ${internalColor.g}, ${internalColor.b}, ${internalColor.a})`,
+              }}
+            />
+          </Button>
         </PopoverTrigger>
         <PopoverContent
           collisionPadding={16}

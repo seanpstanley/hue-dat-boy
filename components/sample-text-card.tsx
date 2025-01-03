@@ -130,17 +130,56 @@ export function SampleTextCard({
             </SheetTrigger>
           </TooltipButton>
         </div>
+        {/* <div className="absolute inset-0 -z-10 " /> */}
+
+        <div className="p-0 h-full checkerboard-md">
+          <blockquote
+            cite="https://animechan.io/api/v1"
+            className={cn("p-4 h-full", { "text-2xl": textSize === "large" })}
+            style={{
+              color: rgbaToHex(
+                simulateColorBlindness(foreground, colorBlindnessType)
+              ),
+              backgroundColor: rgbaToHex(
+                simulateColorBlindness(background, colorBlindnessType)
+              ),
+              fontFamily: font,
+            }}
+          >
+            <p className="before:content-[open-quote] after:content-[close-quote] mb-2">
+              {error
+                ? "Failed to load resource."
+                : isLoading
+                ? "Loading..."
+                : data?.content}
+            </p>
+
+            <cite className="text-end block">
+              <span className="not-italic">
+                &mdash; {data?.character?.name},
+              </span>{" "}
+              {data?.anime?.name}
+            </cite>
+          </blockquote>
+        </div>
+      </Card>
+
+      <SheetContent className="h-full border-none p-0" side={"bottom"}>
+        <VisuallyHidden>
+          <SheetTitle>Full screen {textSize} text</SheetTitle>
+        </VisuallyHidden>
         <div
-          className="p-4 h-full"
+          className="h-full flex items-center justify-center"
           style={{
             backgroundColor: rgbaToHex(
               simulateColorBlindness(background, colorBlindnessType)
             ),
           }}
         >
+          <div className="absolute inset-0 -z-10 checkerboard-lg" />
           <blockquote
             cite="https://animechan.io/api/v1"
-            className={textSize === "large" ? "text-2xl" : "text-base"}
+            className={cn("max-w-2xl", { "text-2xl": textSize === "large" })}
             style={{
               color: rgbaToHex(
                 simulateColorBlindness(foreground, colorBlindnessType)
@@ -164,43 +203,6 @@ export function SampleTextCard({
             </cite>
           </blockquote>
         </div>
-      </Card>
-
-      <SheetContent
-        className="h-full flex flex-col justify-center items-center border-none"
-        style={{
-          backgroundColor: rgbaToHex(
-            simulateColorBlindness(background, colorBlindnessType)
-          ),
-        }}
-        side={"bottom"}
-      >
-        <VisuallyHidden>
-          <SheetTitle>Full screen {textSize} text</SheetTitle>
-        </VisuallyHidden>
-        <blockquote
-          cite="https://animechan.io/api/v1"
-          className={cn("max-w-2xl", { "text-2xl": textSize === "large" })}
-          style={{
-            color: rgbaToHex(
-              simulateColorBlindness(foreground, colorBlindnessType)
-            ),
-            fontFamily: font,
-          }}
-        >
-          <p className="before:content-[open-quote] after:content-[close-quote] mb-2">
-            {error
-              ? "Failed to load resource."
-              : isLoading
-              ? "Loading..."
-              : data?.content}
-          </p>
-
-          <cite className="text-end block">
-            <span className="not-italic">&mdash; {data?.character?.name},</span>{" "}
-            {data?.anime?.name}
-          </cite>
-        </blockquote>
       </SheetContent>
     </Sheet>
   );

@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-function blendColors(fg: RgbaColor, bg: RgbaColor): RgbaColor {
+export function blendColors(fg: RgbaColor, bg: RgbaColor): RgbaColor {
   const alpha = fg.a;
   return {
     r: Math.round(fg.r * alpha + bg.r * (1 - alpha)),
@@ -37,20 +37,25 @@ export function calculateWCAGContrast(
   const lighter = Math.max(bgLuminance, fgLuminance);
   const darker = Math.min(bgLuminance, fgLuminance);
 
-  return (lighter + 0.05) / (darker + 0.05);
+  const ratio = (lighter + 0.05) / (darker + 0.05);
+
+  if (ratio === 1) return Number(ratio.toPrecision(1));
+
+  return Number(ratio.toFixed(2));
 }
 
-// function calculateAPCAContrast(
-//   background: RgbaColor,
-//   foreground: RgbaColor,
-//   solidBg?: RgbaColor
-// ) {
-//   return Number(
-//     calcAPCA(
-//       [...Object.values(foreground), 1] as [number, number, number, number],
-//       [...Object.values(background)] as [number, number, number]
-//     )
-//   );
+// export function calculateWCAGContrast(bg: RgbaColor, fg: RgbaColor) {
+//   const bgLuminance = calculateRelativeLuminance(bg);
+//   const fgLuminance = calculateRelativeLuminance(fg);
+
+//   const lighter = Math.max(bgLuminance, fgLuminance);
+//   const darker = Math.min(bgLuminance, fgLuminance);
+
+//   const ratio = (lighter + 0.05) / (darker + 0.05);
+
+//   if (ratio === 1) return Number(ratio.toPrecision(1));
+
+//   return Number(ratio.toFixed(2));
 // }
 
 export function getDisplayColor(
