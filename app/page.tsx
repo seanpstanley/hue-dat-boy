@@ -47,6 +47,8 @@ import { Footer } from "@/components/footer";
 import { CopyColorButton } from "@/components/copy-color-button";
 import { SampleTextCard } from "@/components/sample-text-card";
 import FontPicker from "@/components/font-picker";
+import ApcaInfo from "@/components/apca-info";
+import { Separator } from "@/components/ui/separator";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -935,6 +937,16 @@ export default function ContrastChecker() {
               />
             </div>
           </section>
+
+          {useAPCA && (
+            <>
+              <Separator
+                className="my-8"
+                style={{ backgroundColor: fgDisplayColor }}
+              />
+              <ApcaInfo displayColor={fgDisplayColor} />
+            </>
+          )}
         </section>
       </main>
 
