@@ -198,7 +198,7 @@ export function SampleTextCard({
             <cite className="text-end block">
               <span className="not-italic">
                 &mdash; {data?.character?.name},
-              </span>{" "}
+              </span>
               {data?.anime?.name}
             </cite>
           </blockquote>

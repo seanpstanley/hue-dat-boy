@@ -39,8 +39,8 @@ body {
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
-    --checkerboard-color-light: #c0c0c0;
-    --checkerboard-color-dark: #404040;
+    --checkerboard-color-light: #fefefe;
+    --checkerboard-color-dark: #ebebeb;
     --checkerboard-size-sm: 1rem;
     --checkerboard-size-md: 3rem;
     --checkerboard-size-lg: 5rem;
@@ -103,4 +103,8 @@ body {
       var(--checkerboard-color-dark) 0 180deg
     )
     0 0 / var(--checkerboard-size-sm) var(--checkerboard-size-sm) round;
+}
+
+.border-radiusImportant {
+  border-radius: 5px !important;
 }

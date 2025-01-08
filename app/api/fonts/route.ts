@@ -1,14 +1,12 @@
-const BASE_URL = "https://animechan.io/api/v1";
+const GOOGLE_FONTS_API = "https://www.googleapis.com/webfonts/v1/webfonts";
 
 export async function GET() {
+  const apiKey = process.env.GOOGLE_FONTS_API_KEY;
+
   try {
-    const res = await fetch(`${BASE_URL}/quotes/random`, {
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization",
-      },
-    });
+    const res = await fetch(
+      `${GOOGLE_FONTS_API}?key=${apiKey}&subset=latin&capability=WOFF2&sort=popularity`
+    );
 
     const data = await res.json();
 

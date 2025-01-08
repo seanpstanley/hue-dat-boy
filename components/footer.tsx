@@ -3,11 +3,11 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { getDisplayColor } from "@/lib/utils";
-import { RgbColor } from "@/lib/types";
+import { RgbaColor } from "@/lib/types";
 
 interface FooterProps {
-  background: RgbColor;
-  foreground: RgbColor;
+  background: RgbaColor;
+  foreground: RgbaColor;
 }
 
 const getCurrentYear = () => new Date().getFullYear();

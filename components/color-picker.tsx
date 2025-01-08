@@ -1,5 +1,6 @@
 import { memo, useState, useEffect, useCallback } from "react";
 import { RgbaColorPicker } from "react-colorful";
+// import { ChromePicker } from "react-color";
 
 import {
   Popover,
@@ -7,13 +8,13 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { cn, rgbaToHex } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { RgbaColor } from "@/lib/types";
 
 interface ColorPickerProps {
-  color: RgbaColor; // Use RGBA object directly
+  color: RgbaColor;
   externalColor: string;
-  onChange: (color: RgbaColor) => void; // Pass back RGBA object
+  onChange: (color: RgbaColor) => void;
   className?: string;
 }
 
@@ -23,18 +24,21 @@ export const ColorPicker = memo(
 
     // Sync internal state when the color prop changes
     useEffect(() => {
-      console.log(`set internal color ${rgbaToHex(color)}`);
       setInternalColor(color);
     }, [color]);
 
-    // Handle changes from the color picker
     const handleChange = useCallback(
       (newColor: RgbaColor) => {
         setInternalColor(newColor);
-        onChange(newColor); // Pass back the RGBA object directly
+        onChange(newColor);
       },
       [onChange]
     );
+
+    // const handleChange = (color: any, event: any) => {
+    //   setInternalColor(color.hex);
+    //   onChange(color.rgb);
+    // };
 
     return (
       <Popover>
@@ -63,6 +67,12 @@ export const ColorPicker = memo(
           className="w-auto p-0 border-3 rounded-xl"
           style={{ borderColor: externalColor }}
         >
+          {/* <ChromePicker
+            color={internalColor}
+            onChange={handleChange}
+            // styles={{ borderRadius: "50px!important" }}
+            className="border-radiusImportant"
+          /> */}
           <RgbaColorPicker color={internalColor} onChange={handleChange} />
         </PopoverContent>
       </Popover>

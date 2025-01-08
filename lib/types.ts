@@ -38,3 +38,15 @@ export interface AnimechanQuote {
   };
   content: string;
 }
+
+export interface GoogleFont {
+  family: string;
+  variants: string[];
+  subets: string[];
+  version: string;
+  lastModified: string;
+  files: Record<string, string>;
+  category: string;
+  kind: string;
+  menu: string;
+}

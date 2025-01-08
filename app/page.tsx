@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Clipboard, ArrowLeftRight, Check, X } from "lucide-react";
 import { calcAPCA } from "apca-w3";
 import useSWR from "swr";
+import { AccessibleIcon } from "@radix-ui/react-accessible-icon";
 
 import {
   Tooltip,
@@ -45,6 +46,7 @@ import {
 import { Footer } from "@/components/footer";
 import { CopyColorButton } from "@/components/copy-color-button";
 import { SampleTextCard } from "@/components/sample-text-card";
+import FontPicker from "@/components/font-picker";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -57,6 +59,17 @@ function calculateContrastRange(
   const whiteBg: RgbaColor = { r: 255, g: 255, b: 255, a: 1 };
 
   let minContrast, maxContrast;
+
+  // set the font if it fails to be set by the url
+  // useEffect(() => {
+  //   if (!font) setFont("Inter"); // Ensure default font is set post-hydration
+  // }, []);
+
+  //  precompute / cache the list of fonts/ color blindness for refresh to avoid flicker
+  // const GOOGLE_FONTS = useMemo(() => ["Inter", "Roboto", "Open Sans"], []);
+
+  // use dynamic
+  // const Select = dynamic(() => import("@/components/ui/select"), { ssr: false });
 
   if (useAPCA) {
     // minContrast = calculateWCAGContrast(bg, fg, blackBg);
@@ -227,17 +240,6 @@ function enhanceContrast(
   return { background: newBackground, foreground: newForeground };
 }
 
-const GOOGLE_FONTS = [
-  "Inter",
-  "Roboto",
-  "Open Sans",
-  "Lato",
-  "Montserrat",
-  "Poppins",
-  "Source Sans Pro",
-  "Ubuntu",
-];
-
 export default function ContrastChecker() {
   const { replace } = useRouter();
 
@@ -257,6 +259,17 @@ export default function ContrastChecker() {
   );
   const [backgroundHex, setBackgroundHex] = useState(rgbToHex(background));
   const [foregroundHex, setForegroundHex] = useState(rgbToHex(foreground));
+
+  // Memoize the getDisplayColor calculations so it's not being constantly recalculated
+  const fgDisplayColor = useMemo(
+    () => getDisplayColor(background, foreground),
+    [background, foreground]
+  );
+  const bgDisplayColor = useMemo(
+    () => getDisplayColor(foreground, background),
+    [background, foreground]
+  );
+
   const [useAPCA, setUseAPCA] = useState(
     searchParamsInitStandard
       ? searchParamsInitStandard === "wcag"
@@ -286,6 +299,17 @@ export default function ContrastChecker() {
     "AA Normal":
       background.a < 1 ? contrastRange.min >= 4.5 : wcagContrast >= 4.5,
     "AAA Normal": background.a < 1 ? contrastRange.min >= 7 : wcagContrast >= 7,
+  };
+
+  const apcaResults = {
+    "normal body text":
+      background.a < 1
+        ? contrastRange.min >= 4.5
+        : Math.abs(apcaContrast) >= 75,
+    "medium-size (24px or more) or bold (16px) text":
+      background.a < 1 ? contrastRange.min >= 7 : Math.abs(wcagContrast) >= 60,
+    "large (36px or more) or bold (24px or more) or non-text elements":
+      background.a < 1 ? contrastRange.min >= 7 : Math.abs(wcagContrast) >= 45,
   };
 
   const debouncedColorChange = debounce(
@@ -376,6 +400,16 @@ export default function ContrastChecker() {
     revalidateOnReconnect: false,
   });
 
+  const {
+    data: fontData,
+    error: fontError,
+    isLoading: isFontLoading,
+  } = useSWR(`/api/fonts`, fetcher, {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
+
   return (
     <div
       className={`min-h-screen p-4 pt-8 transition-[background-color]`}
@@ -386,7 +420,7 @@ export default function ContrastChecker() {
         <span
           className="font-medium"
           style={{
-            color: getDisplayColor(background, foreground),
+            color: fgDisplayColor,
           }}
         >
           hue dat boy.
@@ -400,7 +434,7 @@ export default function ContrastChecker() {
           <h1
             className="font-bold text-2xl md:text-3xl"
             style={{
-              color: getDisplayColor(background, foreground),
+              color: fgDisplayColor,
             }}
           >
             color contrast checker (& more!)
@@ -411,7 +445,7 @@ export default function ContrastChecker() {
         <section
           className="flex flex-col mb-8 items-start gap-y-4"
           style={{
-            color: getDisplayColor(background, foreground),
+            color: fgDisplayColor,
           }}
           id="contrast-info"
         >
@@ -424,7 +458,7 @@ export default function ContrastChecker() {
             <div
               className="flex gap-10 items-center rounded-lg border-3 px-2.5 py-4"
               style={{
-                borderColor: getDisplayColor(background, foreground),
+                borderColor: fgDisplayColor,
               }}
             >
               <h2
@@ -468,34 +502,61 @@ export default function ContrastChecker() {
               standards
             </Label> */}
             <div className="grid grid-cols-1 ml-auto sm:grid-cols-2 lg:grid-cols-4 gap-2">
-              {Object.entries(wcagResults).map(([level, passes]) => (
-                <div
-                  key={level}
-                  className="inline-flex items-center justify-between gap-x-2 rounded-full font-semibold transition-colors text-base md:text-lg py-2 px-4 border-3 bg-transparent"
-                  style={{
-                    borderColor: getDisplayColor(background, foreground),
-                    backgroundColor: passes
-                      ? getDisplayColor(background, foreground)
-                      : rgbToHex(background),
-                    color: passes
-                      ? getDisplayColor(foreground, background)
-                      : getDisplayColor(background, foreground),
-                  }}
-                >
-                  {level}
-                  {passes ? (
-                    <>
-                      <span className="sr-only">Pass</span>
-                      <Check className="h-6 w-6" />
-                    </>
-                  ) : (
-                    <>
-                      <span className="sr-only">Fail</span>
-                      <X className="h-6 w-6" />
-                    </>
-                  )}
-                </div>
-              ))}
+              {useAPCA ? (
+                <>
+                  {Object.entries(apcaResults).map(([level, passes]) => (
+                    <div
+                      key={level}
+                      className="inline-flex items-center justify-between gap-x-2 rounded-full font-semibold transition-colors text-base md:text-lg py-2 px-4 border-3 bg-transparent"
+                      style={{
+                        borderColor: fgDisplayColor,
+                        backgroundColor: passes
+                          ? fgDisplayColor
+                          : rgbToHex(background),
+                        color: passes ? bgDisplayColor : fgDisplayColor,
+                      }}
+                    >
+                      {level}
+                      {passes ? (
+                        <AccessibleIcon label="Pass">
+                          <Check className="h-6 w-6" />
+                        </AccessibleIcon>
+                      ) : (
+                        <AccessibleIcon label="Fail">
+                          <X className="h-6 w-6" />
+                        </AccessibleIcon>
+                      )}
+                    </div>
+                  ))}
+                </>
+              ) : (
+                <>
+                  {Object.entries(wcagResults).map(([level, passes]) => (
+                    <div
+                      key={level}
+                      className="inline-flex items-center justify-between gap-x-2 rounded-full font-semibold transition-colors text-base md:text-lg py-2 px-4 border-3 bg-transparent"
+                      style={{
+                        borderColor: fgDisplayColor,
+                        backgroundColor: passes
+                          ? fgDisplayColor
+                          : rgbToHex(background),
+                        color: passes ? bgDisplayColor : fgDisplayColor,
+                      }}
+                    >
+                      {level}
+                      {passes ? (
+                        <AccessibleIcon label="Pass">
+                          <Check className="h-6 w-6" />
+                        </AccessibleIcon>
+                      ) : (
+                        <AccessibleIcon label="Fail">
+                          <X className="h-6 w-6" />
+                        </AccessibleIcon>
+                      )}
+                    </div>
+                  ))}
+                </>
+              )}
             </div>
           </div>
         </section>
@@ -509,7 +570,7 @@ export default function ContrastChecker() {
                 htmlFor="contrast-standard"
                 className="text-base md:text-lg"
                 style={{
-                  color: getDisplayColor(background, foreground),
+                  color: fgDisplayColor,
                 }}
               >
                 wcag 2.2
@@ -519,16 +580,16 @@ export default function ContrastChecker() {
                 checked={useAPCA}
                 onCheckedChange={setUseAPCA}
                 style={{
-                  borderColor: getDisplayColor(background, foreground),
+                  borderColor: fgDisplayColor,
                   backgroundColor: backgroundHex,
                 }}
-                color={getDisplayColor(background, foreground)}
+                color={fgDisplayColor}
               />
               <Label
                 htmlFor="contrast-standard"
                 className="text-base md:text-lg"
                 style={{
-                  color: getDisplayColor(background, foreground),
+                  color: fgDisplayColor,
                 }}
               >
                 apca
@@ -541,8 +602,8 @@ export default function ContrastChecker() {
                 <Button
                   variant="outline"
                   style={{
-                    color: getDisplayColor(background, foreground),
-                    borderColor: getDisplayColor(background, foreground),
+                    color: fgDisplayColor,
+                    borderColor: fgDisplayColor,
                   }}
                   size="xl"
                   disabled={
@@ -557,8 +618,8 @@ export default function ContrastChecker() {
               <PopoverContent
                 className="w-fit p-0 border-3"
                 style={{
-                  color: getDisplayColor(background, foreground),
-                  borderColor: getDisplayColor(background, foreground),
+                  color: fgDisplayColor,
+                  borderColor: fgDisplayColor,
                   backgroundColor: rgbToHex(background),
                 }}
               >
@@ -604,8 +665,8 @@ export default function ContrastChecker() {
               size="xl"
               className="gap-x-1 w-full sm:w-fit text-base"
               style={{
-                color: getDisplayColor(background, foreground),
-                borderColor: getDisplayColor(background, foreground),
+                color: fgDisplayColor,
+                borderColor: fgDisplayColor,
               }}
             >
               share these colors
@@ -617,7 +678,7 @@ export default function ContrastChecker() {
           <div
             className="flex flex-col md:flex-row justify-between items-center gap-x-4 gap-y-2 "
             style={{
-              color: getDisplayColor(background, foreground),
+              color: fgDisplayColor,
             }}
           >
             {/* Text Color */}
@@ -626,7 +687,7 @@ export default function ContrastChecker() {
               <div className="relative">
                 <ColorPicker
                   color={foreground}
-                  externalColor={getDisplayColor(background, foreground)}
+                  externalColor={fgDisplayColor}
                   onChange={(value) => handleColorChange("foreground", value)}
                   className="absolute size-9 md:size-12 left-2.5 md:left-4 top-1/2 -translate-y-1/2"
                 />
@@ -648,7 +709,7 @@ export default function ContrastChecker() {
                     setForegroundHex(value);
                   }}
                   style={{
-                    borderColor: getDisplayColor(background, foreground),
+                    borderColor: fgDisplayColor,
                   }}
                   spellCheck={false}
                   maxLength={7}
@@ -679,9 +740,9 @@ export default function ContrastChecker() {
                 </TooltipTrigger>
                 <TooltipContent
                   style={{
-                    borderColor: getDisplayColor(background, foreground),
+                    borderColor: fgDisplayColor,
                     backgroundColor: rgbToHex(background),
-                    color: getDisplayColor(background, foreground),
+                    color: fgDisplayColor,
                   }}
                 >
                   <span>swap colors</span>
@@ -693,7 +754,7 @@ export default function ContrastChecker() {
             <div
               className="flex flex-col gap-y-2 w-full"
               style={{
-                borderColor: getDisplayColor(background, foreground),
+                borderColor: fgDisplayColor,
               }}
             >
               <Label
@@ -705,13 +766,13 @@ export default function ContrastChecker() {
               <div className="relative">
                 <div
                   style={{
-                    borderColor: getDisplayColor(background, foreground),
+                    borderColor: fgDisplayColor,
                   }}
                 >
                   <ColorPicker
                     color={background}
                     onChange={(value) => handleColorChange("background", value)}
-                    externalColor={getDisplayColor(background, foreground)}
+                    externalColor={fgDisplayColor}
                     className="absolute size-9 md:size-12 left-2.5 md:left-4 top-1/2 -translate-y-1/2"
                   />
                 </div>
@@ -737,7 +798,7 @@ export default function ContrastChecker() {
                   spellCheck={false}
                   // maxLength={7}
                   style={{
-                    borderColor: getDisplayColor(background, foreground),
+                    borderColor: fgDisplayColor,
                   }}
                   className="font-medium w-full px-14 md:px-20 bg-transparent font-mono text-3xl h-fit py-2 leading-none md:text-4xl lg:text-5xl border-3"
                 />
@@ -756,50 +817,27 @@ export default function ContrastChecker() {
             <div
               className="flex flex-col gap-y-2 flex-1"
               style={{
-                color: getDisplayColor(background, foreground),
+                color: fgDisplayColor,
               }}
             >
               <Label htmlFor="typeface-select" className="text-base md:text-lg">
                 typeface
               </Label>
-              <Select
-                value={font}
-                onValueChange={setFont}
-                name="typeface-select"
-              >
-                <SelectTrigger
-                  className="bg-transparent border-3 h-fit py-2 text-lg md:text-2xl"
-                  style={{
-                    borderColor: getDisplayColor(background, foreground),
-                  }}
-                >
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent
-                  className="border-3 max-h-72 overflow-y-scroll"
-                  style={{
-                    borderColor: getDisplayColor(background, foreground),
-                    color: getDisplayColor(background, foreground),
-                    backgroundColor: rgbToHex(background),
-                  }}
-                >
-                  {GOOGLE_FONTS.map((font) => (
-                    <SelectItem
-                      key={font}
-                      value={font}
-                      className="text-lg md:text-2xl"
-                    >
-                      {font}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <FontPicker
+                defaultFont={font}
+                fonts={fontData?.items}
+                isLoading={isFontLoading}
+                error={fontError}
+                displayColor={fgDisplayColor}
+                background={background}
+                onChange={setFont}
+              />
             </div>
 
             <div
               className="flex flex-col gap-y-2 flex-1"
               style={{
-                color: getDisplayColor(background, foreground),
+                color: fgDisplayColor,
               }}
             >
               <Label
@@ -818,7 +856,7 @@ export default function ContrastChecker() {
                 <SelectTrigger
                   className="bg-transparent border-3 h-fit py-2 text-lg md:text-2xl"
                   style={{
-                    borderColor: getDisplayColor(background, foreground),
+                    borderColor: fgDisplayColor,
                   }}
                 >
                   <SelectValue />
@@ -826,8 +864,8 @@ export default function ContrastChecker() {
                 <SelectContent
                   className="border-3"
                   style={{
-                    borderColor: getDisplayColor(background, foreground),
-                    color: getDisplayColor(background, foreground),
+                    borderColor: fgDisplayColor,
+                    color: fgDisplayColor,
                     backgroundColor: rgbToHex(background),
                   }}
                 >
@@ -868,7 +906,7 @@ export default function ContrastChecker() {
             <h3
               className="font-bold text-xl md:text-2xl"
               style={{
-                color: getDisplayColor(background, foreground),
+                color: fgDisplayColor,
               }}
             >
               sample text
@@ -883,7 +921,7 @@ export default function ContrastChecker() {
                 textSize="normal"
                 isLoading={isLoading}
                 error={error}
-                data={data?.data?.data}
+                data={data?.data}
               />
               <SampleTextCard
                 foreground={foreground}
@@ -893,7 +931,7 @@ export default function ContrastChecker() {
                 textSize="large"
                 isLoading={isLoading}
                 error={error}
-                data={data?.data?.data}
+                data={data?.data}
               />
             </div>
           </section>
@@ -905,12 +943,17 @@ export default function ContrastChecker() {
       {/* Dynamic Selection Color */}
       <style jsx global>{`
         ::selection {
-          background-color: var(
-            --selection-color,
-            ${getDisplayColor(background, foreground)}
-          );
+          background-color: var(--selection-color, ${fgDisplayColor});
           color: var(--selection-text-color, ${rgbToHex(background)});
         }
+      `}</style>
+
+      {/* Dynamically load the selected font */}
+      <style jsx global>{`
+        @import url("https://fonts.googleapis.com/css2?family=${font.replace(
+          / /g,
+          "+"
+        )}&display=swap");
       `}</style>
     </div>
   );
