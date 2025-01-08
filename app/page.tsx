@@ -278,7 +278,7 @@ export default function ContrastChecker() {
       : false
   );
   const [font, setFont] = useState(
-    searchParamsInitFont ? searchParamsInitFont : "Inter"
+    searchParamsInitFont ? searchParamsInitFont : ""
   );
   const [colorBlindnessType, setColorBlindnessType] =
     useState<ColorBlindnessType>(
@@ -378,7 +378,7 @@ export default function ContrastChecker() {
     newParams.set("text", foregroundHex.replace("#", ""));
     newParams.set("background", backgroundHex.replace("#", ""));
     newParams.set("standard", useAPCA ? "apca" : "wcag");
-    newParams.set("font", font);
+    if (font !== "") newParams.set("font", font);
     newParams.set("simulation", colorBlindnessType);
     replace(`?${newParams.toString()}`, { scroll: false });
   }, [

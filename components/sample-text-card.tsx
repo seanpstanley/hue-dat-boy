@@ -179,7 +179,9 @@ export function SampleTextCard({
           <div className="absolute inset-0 -z-10 checkerboard-lg" />
           <blockquote
             cite="https://animechan.io/api/v1"
-            className={cn("max-w-2xl", { "text-2xl": textSize === "large" })}
+            className={cn("max-w-2xl p-4", {
+              "text-2xl": textSize === "large",
+            })}
             style={{
               color: rgbaToHex(
                 simulateColorBlindness(foreground, colorBlindnessType)
