@@ -49,6 +49,7 @@ import { SampleTextCard } from "@/components/sample-text-card";
 import FontPicker from "@/components/font-picker";
 import ApcaInfo from "@/components/apca-info";
 import { Separator } from "@/components/ui/separator";
+import WcagInfo from "@/components/wcag-info";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -396,7 +397,11 @@ export default function ContrastChecker() {
     updateUrl();
   }, [updateUrl]);
 
-  const { data, error, isLoading } = useSWR(`/api/quote`, fetcher, {
+  const {
+    data: quoteData,
+    error: quoteError,
+    isLoading: isQuoteLoading,
+  } = useSWR(`/api/quote`, fetcher, {
     revalidateIfStale: false,
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
@@ -921,9 +926,9 @@ export default function ContrastChecker() {
                 font={font}
                 colorBlindnessType={colorBlindnessType}
                 textSize="normal"
-                isLoading={isLoading}
-                error={error}
-                data={data?.data}
+                isLoading={isQuoteLoading}
+                error={quoteError}
+                data={quoteData?.data}
               />
               <SampleTextCard
                 foreground={foreground}
@@ -931,28 +936,29 @@ export default function ContrastChecker() {
                 font={font}
                 colorBlindnessType={colorBlindnessType}
                 textSize="large"
-                isLoading={isLoading}
-                error={error}
-                data={data?.data}
+                isLoading={isQuoteLoading}
+                error={quoteError}
+                data={quoteData?.data}
               />
             </div>
           </section>
 
-          {useAPCA && (
-            <>
-              <Separator
-                className="my-8"
-                style={{ backgroundColor: fgDisplayColor }}
-              />
-              <ApcaInfo displayColor={fgDisplayColor} />
-            </>
+          <Separator
+            className="my-8"
+            style={{ backgroundColor: fgDisplayColor }}
+          />
+
+          {useAPCA ? (
+            <ApcaInfo displayColor={fgDisplayColor} />
+          ) : (
+            <WcagInfo displayColor={fgDisplayColor} />
           )}
         </section>
       </main>
 
       <Footer background={background} foreground={foreground} />
 
-      {/* Dynamic Selection Color */}
+      {/* Dynamicly update selection and selected text colors based on foreground/background colors */}
       <style jsx global>{`
         ::selection {
           background-color: var(--selection-color, ${fgDisplayColor});

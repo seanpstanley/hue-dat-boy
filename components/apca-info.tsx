@@ -14,7 +14,7 @@ export default function ApcaInfo({ displayColor }: { displayColor: string }) {
       </h3>
 
       <div className="flex flex-col gap-y-2">
-        <h4 className="font-medium text-lg md:text-xl ">What is APCA?</h4>
+        <h4 className="font-medium text-lg md:text-xl">What is APCA?</h4>
 
         <p>
           The Advanced Perceptual Contrast Algorithm (APCA) is a modern standard
@@ -42,10 +42,8 @@ export default function ApcaInfo({ displayColor }: { displayColor: string }) {
         </p>
       </div>
 
-      {/* <Separator className="my-2" style={{ backgroundColor: displayColor }} /> */}
-
       <div className="flex flex-col gap-y-2">
-        <h4 className="font-medium text-lg md:text-xl mb-2">
+        <h4 className="font-medium text-lg md:text-xl">
           How APCA Calculates Contrast
         </h4>
 
@@ -89,10 +87,8 @@ export default function ApcaInfo({ displayColor }: { displayColor: string }) {
         </p>
       </div>
 
-      {/* <Separator className="my-2" style={{ backgroundColor: "#000" }} /> */}
-
       <div className="flex flex-col gap-y-2">
-        <h4 className="font-medium text-lg md:text-xl mb-2">APCA Levels</h4>
+        <h4 className="font-medium text-lg md:text-xl">APCA Levels</h4>
 
         <p>
           APCA does not use fixed &quot;pass/fail&quot; thresholds but instead
@@ -114,10 +110,8 @@ export default function ApcaInfo({ displayColor }: { displayColor: string }) {
         </ul>
       </div>
 
-      {/* <Separator className="my-2" style={{ backgroundColor: "#000" }} /> */}
-
       <div className="flex flex-col gap-y-2">
-        <h4 className="font-medium text-lg md:text-xl mb-2">Attributions</h4>
+        <h4 className="font-medium text-lg md:text-xl">Attributions</h4>
 
         <p>
           The APCA algorithm was developed by Andrew Somers at Myndex
@@ -182,10 +176,8 @@ export default function ApcaInfo({ displayColor }: { displayColor: string }) {
         </ul>
       </div>
 
-      {/* <Separator className="my-2" style={{ backgroundColor: "#000" }} /> */}
-
       <div className="flex flex-col gap-y-2">
-        <h4 className="font-medium text-lg md:text-xl mb-2">Disclaimer</h4>
+        <h4 className="font-medium text-lg md:text-xl">Disclaimer</h4>
         <p>
           This website is beta testing the APCA guidelines for determining text
           and non-text contrast. It is well known that WCAG 2 contrast maths are
@@ -235,10 +227,8 @@ export default function ApcaInfo({ displayColor }: { displayColor: string }) {
         </ul>
       </div>
 
-      {/* <Separator className="my-2" style={{ backgroundColor: "#000" }} /> */}
-
       <div className="flex flex-col gap-y-2">
-        <h4 className="font-medium text-lg md:text-xl mb-2">Further Reading</h4>
+        <h4 className="font-medium text-lg md:text-xl">Further Reading</h4>
 
         <p>Explore more about color contrast and its role in accessibility:</p>
 
