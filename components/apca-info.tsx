@@ -120,12 +120,11 @@ export default function ApcaInfo({ displayColor }: { displayColor: string }) {
         <h4 className="font-medium text-lg md:text-xl mb-2">Attributions</h4>
 
         <p>
-          APCA was developed by the Myndex Research team, led by Andrew Somers.
-          The algorithm is part of the evolving WCAG 3.0 guidelines and
-          represents a scientific leap in accessibility standards.
+          The APCA algorithm was developed by Andrew Somers at Myndex
+          Technologies.
         </p>
 
-        <p>For detailed insights, visit:</p>
+        <p>For more information, visit:</p>
 
         <ul className="list-disc list-inside">
           <li>
@@ -137,7 +136,7 @@ export default function ApcaInfo({ displayColor }: { displayColor: string }) {
               style={{ color: displayColor }}
             >
               <Link href="https://www.myndex.com/APCA/">
-                Myndex APCA Overview
+                APCA Contrast Calculator
               </Link>
             </Button>
           </li>
@@ -149,8 +148,8 @@ export default function ApcaInfo({ displayColor }: { displayColor: string }) {
               className="text-base"
               style={{ color: displayColor }}
             >
-              <Link href="https://www.myndex.com/APCA/">
-                APCA Technical Details
+              <Link href="https://readtech.org/ARC/">
+                APCA Readability Criterion
               </Link>
             </Button>
           </li>
@@ -162,8 +161,21 @@ export default function ApcaInfo({ displayColor }: { displayColor: string }) {
               className="text-base"
               style={{ color: displayColor }}
             >
-              <Link href="https://www.w3.org/WAI/GL/WCAG3/">
-                W3C WCAG Draft
+              <Link href="https://github.com/Myndex/apca-w3/?tab=readme-ov-file">
+                APCA for W3C & WCAG3 GitHub
+              </Link>
+            </Button>
+          </li>
+          <li>
+            <Button
+              asChild
+              variant="link"
+              size="auto"
+              className="text-base"
+              style={{ color: displayColor }}
+            >
+              <Link href="https://www.w3.org/TR/wcag-3.0/">
+                W3C Working Draft
               </Link>
             </Button>
           </li>
@@ -174,21 +186,51 @@ export default function ApcaInfo({ displayColor }: { displayColor: string }) {
 
       <div className="flex flex-col gap-y-2">
         <h4 className="font-medium text-lg md:text-xl mb-2">Disclaimer</h4>
+        <p>
+          This website is beta testing the APCA guidelines for determining text
+          and non-text contrast. It is well known that WCAG 2 contrast maths are
+          not accurate regarding human perception, and automated testing using
+          WCAG 2 math may incorrectly indicate errors in some color pairs on
+          this site. The APCA guidelines are a substantial improvement in
+          accessibility over WCAG 2 contrast criterions, and therefore compliant
+          with the ADA, and also 508 rules under the alternative methods
+          section. Any automated or manual testing done to determine conformance
+          of this site needs to be conducted using a perceptually accurate
+          method such as APCA.
+        </p>
 
         <p>
-          The APCA implementation on huedatboy.com aims to provide accurate and
+          The APCA implementation of this tool aims to provide accurate and
           reliable contrast results. However:
         </p>
 
         <ul className="list-decimal list-inside">
           <li>
             The displayed values and thresholds may differ slightly depending on
-            the color precision and calculation methods used.
+            the color precision and calculation methods used. This tool uses the
+            algorithm provided in the{" "}
+            <Button
+              asChild
+              variant="link"
+              size="auto"
+              className="text-base"
+              style={{ color: displayColor }}
+            >
+              <Link href="https://www.w3.org/WAI/fundamentals/accessibility-principles/">
+                apca-w3
+              </Link>
+            </Button>{" "}
+            package.
           </li>
           <li>
             This tool is designed for educational and reference purposes and
             should not replace a full accessibility audit by a qualified
             professional.
+          </li>
+          <li>
+            APCA has not yes been integrated into any current standard, so it
+            should not be used as the single source of truth for production
+            work.
           </li>
         </ul>
       </div>
@@ -210,7 +252,7 @@ export default function ApcaInfo({ displayColor }: { displayColor: string }) {
               style={{ color: displayColor }}
             >
               <Link href="https://www.w3.org/WAI/fundamentals/accessibility-principles/">
-                Why Contrast Matters
+                Accessibility Principles
               </Link>
             </Button>
           </li>
@@ -223,10 +265,10 @@ export default function ApcaInfo({ displayColor }: { displayColor: string }) {
               style={{ color: displayColor }}
             >
               <Link
-                href="https://www.nature.com/articles/s41598-019-49505-y"
+                href="https://developer.mozilla.org/en-US/docs/Web/Accessibility/Understanding_Colors_and_Luminance"
                 style={{ color: displayColor }}
               >
-                Understanding Color Perception
+                Web Accessibility: Understanding Colors and Luminance
               </Link>
             </Button>
           </li>

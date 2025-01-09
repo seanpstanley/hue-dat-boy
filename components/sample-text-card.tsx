@@ -146,20 +146,24 @@ export function SampleTextCard({
               fontFamily: font,
             }}
           >
-            <p className="before:content-[open-quote] after:content-[close-quote] mb-2">
-              {error
-                ? "Failed to load resource."
-                : isLoading
-                ? "Loading..."
-                : data?.content}
-            </p>
+            {error ? (
+              <span>failed to load resource.</span>
+            ) : isLoading ? (
+              <span>loading...</span>
+            ) : (
+              <>
+                <p className="before:content-[open-quote] after:content-[close-quote] mb-2">
+                  {data?.content}
+                </p>
 
-            <cite className="text-end block">
-              <span className="not-italic">
-                &mdash; {data?.character?.name},
-              </span>{" "}
-              {data?.anime?.name}
-            </cite>
+                <cite className="text-end block">
+                  <span className="not-italic">
+                    &mdash; {data?.character?.name},{" "}
+                  </span>
+                  {data?.anime?.name}
+                </cite>
+              </>
+            )}
           </blockquote>
         </div>
       </Card>
@@ -189,20 +193,24 @@ export function SampleTextCard({
               fontFamily: font,
             }}
           >
-            <p className="before:content-[open-quote] after:content-[close-quote] mb-2">
-              {error
-                ? "Failed to load resource."
-                : isLoading
-                ? "Loading..."
-                : data?.content}
-            </p>
+            {error ? (
+              <span>failed to load resource.</span>
+            ) : isLoading ? (
+              <span>loading...</span>
+            ) : (
+              <>
+                <p className="before:content-[open-quote] after:content-[close-quote] mb-2">
+                  {data?.content}
+                </p>
 
-            <cite className="text-end block">
-              <span className="not-italic">
-                &mdash; {data?.character?.name},
-              </span>
-              {data?.anime?.name}
-            </cite>
+                <cite className="text-end block">
+                  <span className="not-italic">
+                    &mdash; {data?.character?.name},{" "}
+                  </span>
+                  {data?.anime?.name}
+                </cite>
+              </>
+            )}
           </blockquote>
         </div>
       </SheetContent>
