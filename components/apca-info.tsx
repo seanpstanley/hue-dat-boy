@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 
 export default function ApcaInfo({ displayColor }: { displayColor: string }) {
