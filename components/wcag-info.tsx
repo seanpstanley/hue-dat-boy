@@ -67,19 +67,25 @@ export default function WcagInfo({ displayColor }: { displayColor: string }) {
           <MathJax>
             <p>
               <i>Contrast Ratio</i> =
-              {`\\(\\frac{L_{1} + 0.05}{L_{2} + 0.05}\\)`}
+              <span
+                suppressHydrationWarning
+              >{`\\(\\frac{L_{1} + 0.05}{L_{2} + 0.05}\\)`}</span>
             </p>
           </MathJax>
 
           <p>Where:</p>
-          <ul className="list-disc list-inside">
+          <ul className="list-disc list-inside" suppressHydrationWarning>
             <li>
-              <MathJax inline>{"\\({L_{1}}\\)"}</MathJax>​ is the relative
-              luminance of the lighter color.
+              <MathJax inline suppressHydrationWarning>
+                {"\\({L_{1}}\\)"}
+              </MathJax>
+              ​ is the relative luminance of the lighter color.
             </li>
             <li>
-              <MathJax inline>{"\\({L_{2}}\\)"}</MathJax>​ is the relative
-              luminance of the darker color.
+              <MathJax inline suppressHydrationWarning>
+                {"\\({L_{2}}\\)"}
+              </MathJax>
+              ​ is the relative luminance of the darker color.
             </li>
           </ul>
 

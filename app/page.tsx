@@ -47,19 +47,9 @@ import { Footer } from "@/components/footer";
 import { CopyColorButton } from "@/components/copy-color-button";
 import { SampleTextCard } from "@/components/sample-text-card";
 import FontPicker from "@/components/font-picker";
-// import ApcaInfo from "@/components/apca-info";
+import ApcaInfo from "@/components/apca-info";
 import { Separator } from "@/components/ui/separator";
-// import WcagInfo from "@/components/wcag-info";
-import dynamic from "next/dynamic";
-
-//  Avoid hydration errors due to MathJax, and "optimize" for conditional rendering
-const WcagInfo = dynamic(() => import("@/components/wcag-info"), {
-  ssr: false,
-});
-
-const ApcaInfo = dynamic(() => import("@/components/apca-info"), {
-  ssr: false,
-});
+import WcagInfo from "@/components/wcag-info";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
