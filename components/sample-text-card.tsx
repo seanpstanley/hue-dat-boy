@@ -8,7 +8,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { rgbToHex, rgbaToHex, cn, getDisplayColor } from "@/lib/utils";
+import { rgbToHex, rgbaToHex, cn } from "@/lib/utils";
 import { RgbaColor, ColorBlindnessType, AnimechanQuote } from "@/lib/types";
 import { TooltipButton } from "@/components/tooltip-button";
 import { Maximize2 } from "lucide-react";
@@ -23,7 +23,7 @@ function simulateColorBlindness(
   color: RgbaColor,
   type: ColorBlindnessType
 ): RgbaColor {
-  if (type === "normal") return color;
+  if (type === "normal vision") return color;
 
   const { r, g, b, a } = color;
   let simulatedColor: RgbaColor;
@@ -72,8 +72,9 @@ function simulateColorBlindness(
 interface SampleTextCardProps {
   foreground: RgbaColor;
   background: RgbaColor;
+  displayColor: string;
   font: string;
-  colorBlindnessType: any;
+  colorBlindnessSimulation: any;
   textSize: "normal" | "large";
   isLoading: boolean;
   error: any;
@@ -83,8 +84,9 @@ interface SampleTextCardProps {
 const SampleTextCard = ({
   foreground,
   background,
+  displayColor,
   font,
-  colorBlindnessType,
+  colorBlindnessSimulation,
   textSize,
   isLoading,
   error,
@@ -96,24 +98,24 @@ const SampleTextCard = ({
         className="overflow-hidden bg-transparent border-3"
         style={{
           borderColor: rgbToHex(
-            simulateColorBlindness(foreground, colorBlindnessType)
+            simulateColorBlindness(foreground, colorBlindnessSimulation)
           ),
           backgroundColor: rgbToHex(
-            simulateColorBlindness(foreground, colorBlindnessType)
+            simulateColorBlindness(foreground, colorBlindnessSimulation)
           ),
         }}
       >
         <div className="pt-2 pb-2.5 px-4 relative">
           <h4
             className="text-base md:text-lg font-medium leading-none"
-            style={{ color: getDisplayColor(foreground, background) }}
+            style={{ color: displayColor }}
           >
             {textSize} text
           </h4>
 
           <TooltipButton
-            foreground={foreground}
             background={background}
+            displayColor={displayColor}
             tooltip="view fullscreen"
           >
             <SheetTrigger asChild>
@@ -121,7 +123,7 @@ const SampleTextCard = ({
                 variant="ghost"
                 size="icon"
                 className="absolute top-1/2 p-2 size-8 md:size-9 -translate-y-1/2 right-0.5"
-                style={{ color: getDisplayColor(foreground, background) }}
+                style={{ color: displayColor }}
               >
                 <AccessibleIcon label="Fullscreen view">
                   <Maximize2 className="!size-full" />
@@ -138,10 +140,10 @@ const SampleTextCard = ({
             className={cn("p-4 h-full", { "text-2xl": textSize === "large" })}
             style={{
               color: rgbaToHex(
-                simulateColorBlindness(foreground, colorBlindnessType)
+                simulateColorBlindness(foreground, colorBlindnessSimulation)
               ),
               backgroundColor: rgbaToHex(
-                simulateColorBlindness(background, colorBlindnessType)
+                simulateColorBlindness(background, colorBlindnessSimulation)
               ),
               fontFamily: font,
             }}
@@ -176,7 +178,7 @@ const SampleTextCard = ({
           className="h-full flex items-center justify-center"
           style={{
             backgroundColor: rgbaToHex(
-              simulateColorBlindness(background, colorBlindnessType)
+              simulateColorBlindness(background, colorBlindnessSimulation)
             ),
           }}
         >
@@ -188,7 +190,7 @@ const SampleTextCard = ({
             })}
             style={{
               color: rgbaToHex(
-                simulateColorBlindness(foreground, colorBlindnessType)
+                simulateColorBlindness(foreground, colorBlindnessSimulation)
               ),
               fontFamily: font,
             }}

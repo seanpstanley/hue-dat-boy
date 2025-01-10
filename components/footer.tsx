@@ -2,22 +2,16 @@ import { Github, Linkedin } from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
-import { getDisplayColor } from "@/lib/utils";
-import { RgbaColor } from "@/lib/types";
-
-interface FooterProps {
-  background: RgbaColor;
-  foreground: RgbaColor;
-}
+import { AccessibleIcon } from "@radix-ui/react-accessible-icon";
 
 const getCurrentYear = () => new Date().getFullYear();
 
-const Footer = ({ background, foreground }: FooterProps) => {
+const Footer = ({ displayColor }: { displayColor: string }) => {
   return (
     <footer
       className="mt-12 py-6 container mx-auto"
       style={{
-        color: getDisplayColor(background, foreground),
+        color: displayColor,
       }}
     >
       <div className="flex flex-col items-center sm:flex-row-reverse justify-between gap-4">
@@ -33,8 +27,9 @@ const Footer = ({ background, foreground }: FooterProps) => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Github className="!size-full" />
-              <span className="sr-only">GitHub</span>
+              <AccessibleIcon label="GitHub">
+                <Github className="!size-full" />
+              </AccessibleIcon>
             </Link>
           </Button>
           <Button
@@ -48,8 +43,9 @@ const Footer = ({ background, foreground }: FooterProps) => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Linkedin className="!size-full" />
-              <span className="sr-only">Twitter</span>
+              <AccessibleIcon label="Twitter">
+                <Linkedin className="!size-full" />
+              </AccessibleIcon>
             </Link>
           </Button>
         </div>

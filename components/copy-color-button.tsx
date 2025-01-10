@@ -10,19 +10,21 @@ import { RgbaColor } from "react-colorful";
 type ColorType = "text" | "background";
 
 interface CopyColorButtonProps {
-  color: ColorType;
+  copyColor: ColorType;
+  displayColor: string;
   foreground: RgbaColor;
   background: RgbaColor;
 }
 
 const CopyColorButton = ({
-  color,
+  copyColor,
+  displayColor,
   foreground,
   background,
 }: CopyColorButtonProps) => {
   return (
     <TooltipButton
-      foreground={foreground}
+      displayColor={displayColor}
       background={background}
       tooltip="copy color"
     >
@@ -32,7 +34,7 @@ const CopyColorButton = ({
         className="absolute size-9 md:size-12 right-2.5 md:right-4 top-1/2 -translate-y-1/2 p-2"
         onClick={() =>
           navigator.clipboard.writeText(
-            rgbaToHex(color === "text" ? foreground : background)
+            rgbaToHex(copyColor === "text" ? foreground : background)
           )
         }
       >

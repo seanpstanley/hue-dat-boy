@@ -63,17 +63,6 @@ function calculateContrastRange(
 
   let minContrast, maxContrast;
 
-  // set the font if it fails to be set by the url
-  // useEffect(() => {
-  //   if (!font) setFont("Inter"); // Ensure default font is set post-hydration
-  // }, []);
-
-  //  precompute / cache the list of fonts/ color blindness for refresh to avoid flicker
-  // const GOOGLE_FONTS = useMemo(() => ["Inter", "Roboto", "Open Sans"], []);
-
-  // use dynamic
-  // const Select = dynamic(() => import("@/components/ui/select"), { ssr: false });
-
   if (useAPCA) {
     // minContrast = calculateWCAGContrast(bg, fg, blackBg);
     // maxContrast = calculateWCAGContrast(bg, fg, whiteBg);
@@ -255,13 +244,15 @@ export default function ContrastChecker() {
   const searchParamsInitSimulation = searchParams.get("simulation") as string;
 
   const [background, setBackground] = useState<RgbaColor>(
-    searchParamsInitBg ? hexToRgb(searchParamsInitBg) : hexToRgb("#f5b4c5")
+    searchParamsInitBg ? hexToRgba(searchParamsInitBg) : hexToRgba("#f5b4c5")
   );
   const [foreground, setForeground] = useState<RgbaColor>(
-    searchParamsInitText ? hexToRgb(searchParamsInitText) : hexToRgb("#322e2b")
+    searchParamsInitText
+      ? hexToRgba(searchParamsInitText)
+      : hexToRgba("#322e2b")
   );
-  const [backgroundHex, setBackgroundHex] = useState(rgbToHex(background));
-  const [foregroundHex, setForegroundHex] = useState(rgbToHex(foreground));
+  const [backgroundHex, setBackgroundHex] = useState(rgbaToHex(background));
+  const [foregroundHex, setForegroundHex] = useState(rgbaToHex(foreground));
 
   // Memoize the getDisplayColor calculations so it's not being constantly recalculated
   const fgDisplayColor = useMemo(
@@ -283,12 +274,13 @@ export default function ContrastChecker() {
   const [font, setFont] = useState(
     searchParamsInitFont ? searchParamsInitFont : ""
   );
-  const [colorBlindnessType, setColorBlindnessType] =
+  const [colorBlindnessSimulation, setColorBlindnessSimulation] =
     useState<ColorBlindnessType>(
       searchParamsInitSimulation
         ? (searchParamsInitSimulation as ColorBlindnessType)
-        : "normal"
+        : "normal vision"
     );
+
   const [enhanceMenuOpen, setEnhanceMenuOpen] = useState(false);
 
   const wcagContrast = calculateWCAGContrast(background, foreground);
@@ -329,6 +321,26 @@ export default function ContrastChecker() {
         : Math.abs(wcagContrast) >= 45,
   };
 
+  //  precompute / cache the list of fonts/ color blindness for refresh to avoid flicker
+  const COLORBLINDNESS_TYPES = useMemo(
+    () => [
+      "normal vision",
+      "protanopia",
+      "deuteranopia",
+      "tritanopia",
+      "achromatopsia",
+    ],
+    []
+  );
+
+  // use dynamic
+  // const Select = dynamic(() => import("@/components/ui/select"), { ssr: false });
+
+  //  set the simulation if it fails to be set by the url
+  // useEffect(() => {
+  //   if (!colorBlindnessType) setColorBlindnessType("normal vision"); // Ensure default font is set post-hydration
+  // }, []);
+
   const debouncedColorChange = debounce(
     (colorType: "background" | "foreground", value: string) => {
       if (/^#?[0-9A-Fa-f]{6,8}$/.test(value)) {
@@ -336,10 +348,8 @@ export default function ContrastChecker() {
         const newColor = hexToRgb(colorValue);
         if (colorType === "background") {
           setBackground(newColor);
-          setBackgroundHex(colorValue);
         } else {
           setForeground(newColor);
-          setForegroundHex(colorValue);
         }
       } else if (/^(\d{1,3},){3}(\d*\.?\d+)$/.test(value)) {
         const [r, g, b, a] = value.split(",").map(Number);
@@ -347,10 +357,8 @@ export default function ContrastChecker() {
           const newRgb = { r, g, b, a };
           if (colorType === "background") {
             setBackground(newRgb);
-            setBackgroundHex(rgbToHex(newRgb));
           } else {
             setForeground(newRgb);
-            setForegroundHex(rgbToHex(newRgb));
           }
         }
       }
@@ -370,8 +378,6 @@ export default function ContrastChecker() {
     const newForeground = background;
     setBackground(newBackground);
     setForeground(newForeground);
-    setBackgroundHex(rgbaToHex(newBackground));
-    setForegroundHex(rgbaToHex(newForeground));
   };
 
   const handleCopyUrl = () => {
@@ -382,11 +388,8 @@ export default function ContrastChecker() {
     const { background: newBackground, foreground: newForeground } =
       enhanceContrast(background, foreground, type, useAPCA);
 
-    console.log("background inside handler: " + newBackground.a);
     setBackground(newBackground);
-    setBackgroundHex(rgbToHex(newBackground));
     setForeground(newForeground);
-    setForegroundHex(rgbToHex(newForeground));
   };
 
   const updateUrl = useCallback(() => {
@@ -396,7 +399,7 @@ export default function ContrastChecker() {
     newParams.set("background", backgroundHex.replace("#", ""));
     newParams.set("standard", useAPCA ? "apca" : "wcag");
     if (font !== "") newParams.set("font", font);
-    newParams.set("simulation", colorBlindnessType);
+    newParams.set("simulation", colorBlindnessSimulation);
     replace(`?${newParams.toString()}`, { scroll: false });
   }, [
     replace,
@@ -404,12 +407,18 @@ export default function ContrastChecker() {
     backgroundHex,
     useAPCA,
     font,
-    colorBlindnessType,
+    colorBlindnessSimulation,
   ]);
 
   useEffect(() => {
     updateUrl();
   }, [updateUrl]);
+
+  // Keep the hex conversion of the fg/bg colors up to date
+  useEffect(() => {
+    setForegroundHex(rgbaToHex(foreground));
+    setBackgroundHex(rgbaToHex(background));
+  }, [foreground, background]);
 
   const {
     data: quoteData,
@@ -679,7 +688,7 @@ export default function ContrastChecker() {
               </PopoverContent>
             </Popover>
 
-            {/* Copy Colors Button */}
+            {/* Copy URL Button */}
             <Button
               variant="outline"
               onClick={handleCopyUrl}
@@ -727,7 +736,7 @@ export default function ContrastChecker() {
                     //   }
                     // }
                     setForeground(hexToRgba(value));
-                    setForegroundHex(value);
+                    // setForegroundHex(value);
                   }}
                   style={{
                     borderColor: fgDisplayColor,
@@ -738,7 +747,8 @@ export default function ContrastChecker() {
                 />
 
                 <CopyColorButton
-                  color="text"
+                  copyColor="text"
+                  displayColor={fgDisplayColor}
                   foreground={foreground}
                   background={background}
                 />
@@ -814,7 +824,7 @@ export default function ContrastChecker() {
                     //   }
                     // }
                     setBackground(hexToRgba(value));
-                    setBackgroundHex(value);
+                    // setBackgroundHex(value);
                   }}
                   spellCheck={false}
                   // maxLength={7}
@@ -825,7 +835,8 @@ export default function ContrastChecker() {
                 />
 
                 <CopyColorButton
-                  color="background"
+                  copyColor="background"
+                  displayColor={fgDisplayColor}
                   foreground={foreground}
                   background={background}
                 />
@@ -868,9 +879,9 @@ export default function ContrastChecker() {
                 simulate colorblindness
               </Label>
               <Select
-                value={colorBlindnessType}
+                value={colorBlindnessSimulation}
                 onValueChange={(value: ColorBlindnessType) =>
-                  setColorBlindnessType(value)
+                  setColorBlindnessSimulation(value)
                 }
                 name="colorblind-select"
               >
@@ -887,36 +898,18 @@ export default function ContrastChecker() {
                   style={{
                     borderColor: fgDisplayColor,
                     color: fgDisplayColor,
-                    backgroundColor: rgbToHex(background),
+                    backgroundColor: `rgba(${background.r}, ${background.g}, ${background.b}, ${background.a})`,
                   }}
                 >
-                  <SelectItem value="normal" className="text-lg md:text-2xl">
-                    normal vision
-                  </SelectItem>
-                  <SelectItem
-                    value="protanopia"
-                    className="text-lg md:text-2xl"
-                  >
-                    protanopia
-                  </SelectItem>
-                  <SelectItem
-                    value="deuteranopia"
-                    className="text-lg md:text-2xl"
-                  >
-                    deuteranopia
-                  </SelectItem>
-                  <SelectItem
-                    value="tritanopia"
-                    className="text-lg md:text-2xl"
-                  >
-                    tritanopia
-                  </SelectItem>
-                  <SelectItem
-                    value="achromatopsia"
-                    className="text-lg md:text-2xl"
-                  >
-                    achromatopsia
-                  </SelectItem>
+                  {COLORBLINDNESS_TYPES.map((simulation) => (
+                    <SelectItem
+                      key={simulation}
+                      value={simulation}
+                      className="text-lg md:text-2xl"
+                    >
+                      {simulation}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -937,8 +930,9 @@ export default function ContrastChecker() {
               <SampleTextCard
                 foreground={foreground}
                 background={background}
+                displayColor={fgDisplayColor}
                 font={font}
-                colorBlindnessType={colorBlindnessType}
+                colorBlindnessSimulation={colorBlindnessSimulation}
                 textSize="normal"
                 isLoading={isQuoteLoading}
                 error={quoteError}
@@ -947,8 +941,9 @@ export default function ContrastChecker() {
               <SampleTextCard
                 foreground={foreground}
                 background={background}
+                displayColor={fgDisplayColor}
                 font={font}
-                colorBlindnessType={colorBlindnessType}
+                colorBlindnessSimulation={colorBlindnessSimulation}
                 textSize="large"
                 isLoading={isQuoteLoading}
                 error={quoteError}
@@ -970,13 +965,13 @@ export default function ContrastChecker() {
         </section>
       </main>
 
-      <Footer background={background} foreground={foreground} />
+      <Footer displayColor={fgDisplayColor} />
 
       {/* Dynamicly update selection and selected text colors based on foreground/background colors */}
       <style jsx global>{`
         ::selection {
           background-color: var(--selection-color, ${fgDisplayColor});
-          color: var(--selection-text-color, ${rgbToHex(background)});
+          color: var(--selection-text-color, ${backgroundHex});
         }
       `}</style>
 

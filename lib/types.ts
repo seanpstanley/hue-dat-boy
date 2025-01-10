@@ -21,7 +21,7 @@ export interface HslaColor {
 }
 
 export type ColorBlindnessType =
-  | "normal"
+  | "normal vision"
   | "protanopia"
   | "deuteranopia"
   | "tritanopia"

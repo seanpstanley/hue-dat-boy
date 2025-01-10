@@ -8,19 +8,18 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { rgbaToHex, getDisplayColor } from "@/lib/utils";
 import { RgbaColor } from "@/lib/types";
 
 interface TooltipButtonProps {
-  foreground: RgbaColor;
   background: RgbaColor;
+  displayColor: string;
   tooltip: string;
   children: ReactElement;
 }
 
 const TooltipButton = ({
-  foreground,
   background,
+  displayColor,
   tooltip,
   children,
 }: TooltipButtonProps) => {
@@ -30,9 +29,9 @@ const TooltipButton = ({
         <TooltipTrigger asChild>{children}</TooltipTrigger>
         <TooltipContent
           style={{
-            borderColor: getDisplayColor(background, foreground),
-            backgroundColor: rgbaToHex(background),
-            color: getDisplayColor(background, foreground),
+            borderColor: displayColor,
+            backgroundColor: `rgba(${background.r}, ${background.g}, ${background.b}, ${background.a})`,
+            color: displayColor,
           }}
         >
           <span>{tooltip}</span>
