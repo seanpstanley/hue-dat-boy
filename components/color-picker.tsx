@@ -1,5 +1,10 @@
-import { memo, useState, useEffect, useCallback } from "react";
-import { RgbaColorPicker } from "react-colorful";
+import {
+  memo,
+  useState,
+  useEffect,
+  //  useCallback
+} from "react";
+// import { RgbaColorPicker } from "react-colorful";
 import { ChromePicker } from "react-color";
 
 import {
@@ -35,7 +40,7 @@ const ColorPicker = memo(
     //   [onChange]
     // );
 
-    const handleChange = (color: any, event: any) => {
+    const handleChange = (color: any) => {
       setInternalColor(color.hex);
       onChange(color.rgb);
     };
