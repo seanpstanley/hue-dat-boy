@@ -134,4 +134,6 @@ const FontPicker = ({
   );
 };
 
-export default FontPicker;
+FontPicker.displayName = "FontPicker";
+
+export { FontPicker };

@@ -80,7 +80,7 @@ interface SampleTextCardProps {
   data: AnimechanQuote;
 }
 
-export function SampleTextCard({
+const SampleTextCard = ({
   foreground,
   background,
   font,
@@ -89,7 +89,7 @@ export function SampleTextCard({
   isLoading,
   error,
   data,
-}: SampleTextCardProps) {
+}: SampleTextCardProps) => {
   return (
     <Sheet>
       <Card
@@ -216,4 +216,8 @@ export function SampleTextCard({
       </SheetContent>
     </Sheet>
   );
-}
+};
+
+SampleTextCard.displayName = "SampleTextCard";
+
+export { SampleTextCard };

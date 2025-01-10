@@ -3,7 +3,7 @@ import { MathJax, MathJaxContext } from "better-react-mathjax";
 
 import { Button } from "@/components/ui/button";
 
-export default function WcagInfo({ displayColor }: { displayColor: string }) {
+const WcagInfo = ({ displayColor }: { displayColor: string }) => {
   return (
     <MathJaxContext>
       <section
@@ -234,4 +234,8 @@ export default function WcagInfo({ displayColor }: { displayColor: string }) {
       </section>
     </MathJaxContext>
   );
-}
+};
+
+WcagInfo.displayName = "WcagInfo";
+
+export { WcagInfo };

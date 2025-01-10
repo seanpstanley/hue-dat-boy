@@ -29,7 +29,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import ColorPicker from "@/components/color-picker";
+import { ColorPicker } from "@/components/color-picker";
 import { ColorBlindnessType, RgbaColor } from "@/lib/types";
 import {
   rgbToHex,
@@ -46,10 +46,10 @@ import {
 import { Footer } from "@/components/footer";
 import { CopyColorButton } from "@/components/copy-color-button";
 import { SampleTextCard } from "@/components/sample-text-card";
-import FontPicker from "@/components/font-picker";
-import ApcaInfo from "@/components/apca-info";
+import { FontPicker } from "@/components/font-picker";
+import { ApcaInfo } from "@/components/apca-info";
 import { Separator } from "@/components/ui/separator";
-import WcagInfo from "@/components/wcag-info";
+import { WcagInfo } from "@/components/wcag-info";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 

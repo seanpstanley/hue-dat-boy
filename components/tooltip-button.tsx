@@ -18,7 +18,7 @@ interface TooltipButtonProps {
   children: ReactElement;
 }
 
-export const TooltipButton = ({
+const TooltipButton = ({
   foreground,
   background,
   tooltip,
@@ -41,3 +41,7 @@ export const TooltipButton = ({
     </TooltipProvider>
   );
 };
+
+TooltipButton.displayName = "TooltipButton";
+
+export { TooltipButton };

@@ -12,7 +12,7 @@ interface FooterProps {
 
 const getCurrentYear = () => new Date().getFullYear();
 
-export function Footer({ background, foreground }: FooterProps) {
+const Footer = ({ background, foreground }: FooterProps) => {
   return (
     <footer
       className="mt-12 py-6 container mx-auto"
@@ -59,4 +59,8 @@ export function Footer({ background, foreground }: FooterProps) {
       </div>
     </footer>
   );
-}
+};
+
+Footer.displayName = "Footer";
+
+export { Footer };

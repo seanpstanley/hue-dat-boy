@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 
-export default function ApcaInfo({ displayColor }: { displayColor: string }) {
+const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
   return (
     <section
       id="apca-info"
@@ -266,4 +266,8 @@ export default function ApcaInfo({ displayColor }: { displayColor: string }) {
       </div>
     </section>
   );
-}
+};
+
+ApcaInfo.displayName = "ApcaInfo";
+
+export { ApcaInfo };

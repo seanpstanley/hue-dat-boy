@@ -15,7 +15,7 @@ interface CopyColorButtonProps {
   background: RgbaColor;
 }
 
-export const CopyColorButton = ({
+const CopyColorButton = ({
   color,
   foreground,
   background,
@@ -41,3 +41,7 @@ export const CopyColorButton = ({
     </TooltipButton>
   );
 };
+
+CopyColorButton.displayName = "CopyColorButton";
+
+export { CopyColorButton };

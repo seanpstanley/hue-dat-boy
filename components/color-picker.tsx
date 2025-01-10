@@ -1,6 +1,6 @@
 import { memo, useState, useEffect, useCallback } from "react";
 import { RgbaColorPicker } from "react-colorful";
-// import { ChromePicker } from "react-color";
+import { ChromePicker } from "react-color";
 
 import {
   Popover,
@@ -18,7 +18,7 @@ interface ColorPickerProps {
   className?: string;
 }
 
-export const ColorPicker = memo(
+const ColorPicker = memo(
   ({ color, externalColor, onChange, className }: ColorPickerProps) => {
     const [internalColor, setInternalColor] = useState<RgbaColor>(color);
 
@@ -27,18 +27,18 @@ export const ColorPicker = memo(
       setInternalColor(color);
     }, [color]);
 
-    const handleChange = useCallback(
-      (newColor: RgbaColor) => {
-        setInternalColor(newColor);
-        onChange(newColor);
-      },
-      [onChange]
-    );
+    // const handleChange = useCallback(
+    //   (newColor: RgbaColor) => {
+    //     setInternalColor(newColor);
+    //     onChange(newColor);
+    //   },
+    //   [onChange]
+    // );
 
-    // const handleChange = (color: any, event: any) => {
-    //   setInternalColor(color.hex);
-    //   onChange(color.rgb);
-    // };
+    const handleChange = (color: any, event: any) => {
+      setInternalColor(color.hex);
+      onChange(color.rgb);
+    };
 
     return (
       <Popover>
@@ -67,13 +67,13 @@ export const ColorPicker = memo(
           className="w-auto p-0 border-3 rounded-xl"
           style={{ borderColor: externalColor }}
         >
-          {/* <ChromePicker
+          <ChromePicker
             color={internalColor}
             onChange={handleChange}
             // styles={{ borderRadius: "50px!important" }}
             className="border-radiusImportant"
-          /> */}
-          <RgbaColorPicker color={internalColor} onChange={handleChange} />
+          />
+          {/* <RgbaColorPicker color={internalColor} onChange={handleChange} /> */}
         </PopoverContent>
       </Popover>
     );
@@ -82,4 +82,4 @@ export const ColorPicker = memo(
 
 ColorPicker.displayName = "ColorPicker";
 
-export default ColorPicker;
+export { ColorPicker };
