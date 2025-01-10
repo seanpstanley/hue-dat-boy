@@ -1,11 +1,4 @@
-import {
-  memo,
-  useState,
-  useEffect,
-  useCallback,
-  Dispatch,
-  SetStateAction,
-} from "react";
+import { memo, useState, useEffect, useCallback } from "react";
 import { RgbaColorPicker } from "react-colorful";
 
 import {
@@ -20,7 +13,7 @@ import { RgbaColor } from "@/lib/types";
 interface ColorPickerProps {
   color: RgbaColor;
   displayColor: string;
-  onChange: Dispatch<SetStateAction<RgbaColor>>;
+  onChange: (color: RgbaColor) => void;
   className?: string;
 }
 

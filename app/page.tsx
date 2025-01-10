@@ -708,7 +708,7 @@ export default function ContrastChecker() {
               <div className="relative">
                 <ColorPicker
                   color={foreground}
-                  externalColor={fgDisplayColor}
+                  displayColor={fgDisplayColor}
                   onChange={(value) => handleColorChange("foreground", value)}
                   className="absolute size-9 md:size-12 left-2.5 md:left-4 top-1/2 -translate-y-1/2"
                 />
