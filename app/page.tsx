@@ -296,23 +296,37 @@ export default function ContrastChecker() {
   const apcaContrast = calculateAPCAContrast(background, foreground);
 
   const wcagResults = {
-    "AA Large": background.a < 1 ? contrastRange.min >= 3 : wcagContrast >= 3,
+    "AA Large":
+      background.a && background.a < 1
+        ? contrastRange.min >= 3
+        : wcagContrast >= 3,
     "AAA Large":
-      background.a < 1 ? contrastRange.min >= 4.5 : wcagContrast >= 4.5,
+      background.a && background.a < 1
+        ? contrastRange.min >= 4.5
+        : wcagContrast >= 4.5,
     "AA Normal":
-      background.a < 1 ? contrastRange.min >= 4.5 : wcagContrast >= 4.5,
-    "AAA Normal": background.a < 1 ? contrastRange.min >= 7 : wcagContrast >= 7,
+      background.a && background.a < 1
+        ? contrastRange.min >= 4.5
+        : wcagContrast >= 4.5,
+    "AAA Normal":
+      background.a && background.a < 1
+        ? contrastRange.min >= 7
+        : wcagContrast >= 7,
   };
 
   const apcaResults = {
     "normal body text":
-      background.a < 1
+      background.a && background.a < 1
         ? contrastRange.min >= 4.5
         : Math.abs(apcaContrast) >= 75,
     "medium-size (24px or more) or bold (16px) text":
-      background.a < 1 ? contrastRange.min >= 7 : Math.abs(wcagContrast) >= 60,
+      background.a && background.a < 1
+        ? contrastRange.min >= 7
+        : Math.abs(wcagContrast) >= 60,
     "large (36px or more) or bold (24px or more) or non-text elements":
-      background.a < 1 ? contrastRange.min >= 7 : Math.abs(wcagContrast) >= 45,
+      background.a && background.a < 1
+        ? contrastRange.min >= 7
+        : Math.abs(wcagContrast) >= 45,
   };
 
   const debouncedColorChange = debounce(
@@ -479,7 +493,7 @@ export default function ContrastChecker() {
                   </>
                 ) : (
                   <>
-                    {background.a < 1 ? (
+                    {background.a && background.a < 1 ? (
                       <>
                         {useAPCA ? (
                           <>
@@ -779,7 +793,7 @@ export default function ContrastChecker() {
                   <ColorPicker
                     color={background}
                     onChange={(value) => handleColorChange("background", value)}
-                    externalColor={fgDisplayColor}
+                    displayColor={fgDisplayColor}
                     className="absolute size-9 md:size-12 left-2.5 md:left-4 top-1/2 -translate-y-1/2"
                   />
                 </div>

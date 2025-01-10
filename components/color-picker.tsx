@@ -2,10 +2,11 @@ import {
   memo,
   useState,
   useEffect,
-  //  useCallback
+  useCallback,
+  Dispatch,
+  SetStateAction,
 } from "react";
-// import { RgbaColorPicker } from "react-colorful";
-import { ChromePicker } from "react-color";
+import { RgbaColorPicker } from "react-colorful";
 
 import {
   Popover,
@@ -18,13 +19,13 @@ import { RgbaColor } from "@/lib/types";
 
 interface ColorPickerProps {
   color: RgbaColor;
-  externalColor: string;
-  onChange: (color: RgbaColor) => void;
+  displayColor: string;
+  onChange: Dispatch<SetStateAction<RgbaColor>>;
   className?: string;
 }
 
 const ColorPicker = memo(
-  ({ color, externalColor, onChange, className }: ColorPickerProps) => {
+  ({ color, displayColor, onChange, className }: ColorPickerProps) => {
     const [internalColor, setInternalColor] = useState<RgbaColor>(color);
 
     // Sync internal state when the color prop changes
@@ -32,18 +33,13 @@ const ColorPicker = memo(
       setInternalColor(color);
     }, [color]);
 
-    // const handleChange = useCallback(
-    //   (newColor: RgbaColor) => {
-    //     setInternalColor(newColor);
-    //     onChange(newColor);
-    //   },
-    //   [onChange]
-    // );
-
-    const handleChange = (color: any) => {
-      setInternalColor(color.hex);
-      onChange(color.rgb);
-    };
+    const handleChange = useCallback(
+      (newColor: RgbaColor) => {
+        setInternalColor(newColor);
+        onChange(newColor);
+      },
+      [onChange]
+    );
 
     return (
       <Popover>
@@ -55,7 +51,7 @@ const ColorPicker = memo(
               className
             )}
             style={{
-              borderColor: externalColor,
+              borderColor: displayColor,
             }}
             aria-label="Pick a color"
           >
@@ -70,15 +66,9 @@ const ColorPicker = memo(
         <PopoverContent
           collisionPadding={16}
           className="w-auto p-0 border-3 rounded-xl"
-          style={{ borderColor: externalColor }}
+          style={{ borderColor: displayColor }}
         >
-          <ChromePicker
-            color={internalColor}
-            onChange={handleChange}
-            // styles={{ borderRadius: "50px!important" }}
-            className="border-radiusImportant"
-          />
-          {/* <RgbaColorPicker color={internalColor} onChange={handleChange} /> */}
+          <RgbaColorPicker color={internalColor} onChange={handleChange} />
         </PopoverContent>
       </Popover>
     );

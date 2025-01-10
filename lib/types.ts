@@ -10,6 +10,7 @@ export interface RgbaColor {
   g: number;
   b: number;
   a: number;
+  // a?: number | undefined;
 }
 
 export interface HslaColor {
