@@ -64,12 +64,12 @@ export default function WcagInfo({ displayColor }: { displayColor: string }) {
           </p>
 
           <h5 className="font-bold">Calculation Formula:</h5>
-          <p>
-            <MathJax hideUntilTypeset={"first"}>
+          <MathJax>
+            <p>
               <i>Contrast Ratio</i> =
               {`\\(\\frac{L_{1} + 0.05}{L_{2} + 0.05}\\)`}
-            </MathJax>
-          </p>
+            </p>
+          </MathJax>
 
           <p>Where:</p>
           <ul className="list-disc list-inside">
