@@ -8,20 +8,21 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { rgbToHex, rgbaToHex, cn } from "@/lib/utils";
+import { rgbToHex, rgbaToHex } from "@/lib/utils/color";
+import { cn } from "@/lib/utils/cn";
 import { RgbaColor, ColorBlindnessType, AnimechanQuote } from "@/lib/types";
 import { TooltipButton } from "@/components/tooltip-button";
 import { Maximize2 } from "lucide-react";
 
 /**
  * Simulates color blindness by transforming RGB colors.
- * @param color - Input color as an object with properties {r, g, b}, where each value is between 0 and 255.
- * @param type - The type of color blindness to simulate.
+ * @param {RgbaColor} color - Input color as an RGBA color object to be transformed based on type selection.
+ * @param {ColorBlindnessType} type - The type of color blindness to simulate.
  * @returns The transformed color as an object with properties {r, g, b}.
  */
 function simulateColorBlindness(
   color: RgbaColor,
-  type: ColorBlindnessType
+  type: ColorBlindnessType,
 ): RgbaColor {
   if (type === "normal vision") return color;
 
@@ -95,19 +96,19 @@ const SampleTextCard = ({
   return (
     <Sheet>
       <Card
-        className="overflow-hidden bg-transparent border-3"
+        className="overflow-hidden border-3 bg-transparent"
         style={{
           borderColor: rgbToHex(
-            simulateColorBlindness(foreground, colorBlindnessSimulation)
+            simulateColorBlindness(foreground, colorBlindnessSimulation),
           ),
           backgroundColor: rgbToHex(
-            simulateColorBlindness(foreground, colorBlindnessSimulation)
+            simulateColorBlindness(foreground, colorBlindnessSimulation),
           ),
         }}
       >
-        <div className="pt-2 pb-2.5 px-4 relative">
+        <div className="relative px-4 pb-2.5 pt-2">
           <h4
-            className="text-base md:text-lg font-medium leading-none"
+            className="text-base font-medium leading-none md:text-lg"
             style={{ color: displayColor }}
           >
             {textSize} text
@@ -122,7 +123,7 @@ const SampleTextCard = ({
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute top-1/2 p-2 size-8 md:size-9 -translate-y-1/2 right-0.5"
+                className="absolute right-0.5 top-1/2 size-8 -translate-y-1/2 p-2 md:size-9"
                 style={{ color: displayColor }}
               >
                 <AccessibleIcon label="Fullscreen view">
@@ -134,16 +135,16 @@ const SampleTextCard = ({
         </div>
         {/* <div className="absolute inset-0 -z-10 " /> */}
 
-        <div className="p-0 h-full checkerboard-md">
+        <div className="checkerboard-md h-full p-0">
           <blockquote
             cite="https://animechan.io/api/v1"
-            className={cn("p-4 h-full", { "text-2xl": textSize === "large" })}
+            className={cn("h-full p-4", { "text-2xl": textSize === "large" })}
             style={{
               color: rgbaToHex(
-                simulateColorBlindness(foreground, colorBlindnessSimulation)
+                simulateColorBlindness(foreground, colorBlindnessSimulation),
               ),
               backgroundColor: rgbaToHex(
-                simulateColorBlindness(background, colorBlindnessSimulation)
+                simulateColorBlindness(background, colorBlindnessSimulation),
               ),
               fontFamily: font,
             }}
@@ -154,11 +155,11 @@ const SampleTextCard = ({
               <span>loading...</span>
             ) : (
               <>
-                <p className="before:content-[open-quote] after:content-[close-quote] mb-2">
+                <p className="mb-2 before:content-[open-quote] after:content-[close-quote]">
                   {data?.content}
                 </p>
 
-                <cite className="text-end block">
+                <cite className="block text-end">
                   <span className="not-italic">
                     &mdash; {data?.character?.name},{" "}
                   </span>
@@ -175,14 +176,14 @@ const SampleTextCard = ({
           <SheetTitle>Full screen {textSize} text</SheetTitle>
         </VisuallyHidden>
         <div
-          className="h-full flex items-center justify-center"
+          className="flex h-full items-center justify-center"
           style={{
             backgroundColor: rgbaToHex(
-              simulateColorBlindness(background, colorBlindnessSimulation)
+              simulateColorBlindness(background, colorBlindnessSimulation),
             ),
           }}
         >
-          <div className="absolute inset-0 -z-10 checkerboard-lg" />
+          <div className="checkerboard-lg absolute inset-0 -z-10" />
           <blockquote
             cite="https://animechan.io/api/v1"
             className={cn("max-w-2xl p-4", {
@@ -190,7 +191,7 @@ const SampleTextCard = ({
             })}
             style={{
               color: rgbaToHex(
-                simulateColorBlindness(foreground, colorBlindnessSimulation)
+                simulateColorBlindness(foreground, colorBlindnessSimulation),
               ),
               fontFamily: font,
             }}
@@ -201,11 +202,11 @@ const SampleTextCard = ({
               <span>loading...</span>
             ) : (
               <>
-                <p className="before:content-[open-quote] after:content-[close-quote] mb-2">
+                <p className="mb-2 before:content-[open-quote] after:content-[close-quote]">
                   {data?.content}
                 </p>
 
-                <cite className="text-end block">
+                <cite className="block text-end">
                   <span className="not-italic">
                     &mdash; {data?.character?.name},{" "}
                   </span>

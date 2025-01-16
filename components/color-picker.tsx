@@ -7,7 +7,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/cn";
 import { RgbaColor } from "@/lib/types";
 
 interface ColorPickerProps {
@@ -31,7 +31,7 @@ const ColorPicker = memo(
         setInternalColor(newColor);
         onChange(newColor);
       },
-      [onChange]
+      [onChange],
     );
 
     return (
@@ -40,8 +40,8 @@ const ColorPicker = memo(
           <Button
             variant="naked"
             className={cn(
-              "size-6 rounded-sm border-3 checkerboard-sm",
-              className
+              "checkerboard-sm size-6 rounded-sm border-3",
+              className,
             )}
             style={{
               borderColor: displayColor,
@@ -58,14 +58,14 @@ const ColorPicker = memo(
         </PopoverTrigger>
         <PopoverContent
           collisionPadding={16}
-          className="w-auto p-0 border-3 rounded-xl"
+          className="w-auto rounded-xl border-3 p-0"
           style={{ borderColor: displayColor }}
         >
           <RgbaColorPicker color={internalColor} onChange={handleChange} />
         </PopoverContent>
       </Popover>
     );
-  }
+  },
 );
 
 ColorPicker.displayName = "ColorPicker";

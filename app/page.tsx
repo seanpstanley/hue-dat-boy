@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+
 import { Clipboard, ArrowLeftRight, Check, X } from "lucide-react";
 import { calcAPCA } from "apca-w3";
-import useSWR from "swr";
 import { AccessibleIcon } from "@radix-ui/react-accessible-icon";
 
 import {
@@ -36,15 +36,13 @@ import {
   hexToRgb,
   hslaToRgba,
   rgbaToHsla,
-  debounce,
   getDisplayColor,
   rgbaToHex,
-  hslToRgb,
-  rgbToHsl,
   calculateWCAGContrast,
   blendColors,
   hexToRgba,
-} from "@/lib/utils";
+} from "@/lib/utils/color";
+import { debounce } from "@/lib/utils/debounce";
 import { Footer } from "@/components/footer";
 import { CopyColorButton } from "@/components/copy-color-button";
 import { SampleTextCard } from "@/components/sample-text-card";
@@ -52,8 +50,8 @@ import { FontPicker } from "@/components/font-picker";
 import { ApcaInfo } from "@/components/apca-info";
 import { Separator } from "@/components/ui/separator";
 import { WcagInfo } from "@/components/wcag-info";
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+import { useAnimeQuote } from "@/app/hooks/use-anime-quote";
+import { useGoogleFonts } from "./hooks/use-google-fonts";
 
 /**
  * Calculates the contrast range (minimum and maximum) between two colors
@@ -150,8 +148,8 @@ function enhanceContrast(
   let newBackground = { ...background };
   let newForeground = { ...foreground };
 
-  const adjustColor = (color: RgbColor, isBackground: boolean): RgbColor => {
-    const hsl = rgbToHsl(color);
+  const adjustColor = (color: RgbaColor, isBackground: boolean): RgbColor => {
+    const hsl = rgbaToHsla(color);
     const step = 1;
     let bestContrast = isBackground
       ? initialContrast
@@ -165,8 +163,8 @@ function enhanceContrast(
       const lighterHSL = { ...hsl, l: Math.min(100, hsl.l + i) };
       const darkerHSL = { ...hsl, l: Math.max(0, hsl.l - i) };
 
-      const lighterRGB = hslToRgb(lighterHSL);
-      const darkerRGB = hslToRgb(darkerHSL);
+      const lighterRGB = hslaToRgba(lighterHSL);
+      const darkerRGB = hslaToRgba(darkerHSL);
 
       const lighterContrast = isBackground
         ? useAPCA
@@ -198,7 +196,7 @@ function enhanceContrast(
 
     // If we still haven't reached the desired level, try adjusting saturation
     if (useAPCA ? Math.abs(bestContrast) < 60 : bestContrast < 4.5) {
-      const currentHSL = rgbToHsl(bestColor);
+      const currentHSL = rgbaToHsla(bestColor);
       for (let i = 0; i <= 100; i += step) {
         const lessSaturatedHSL = {
           ...currentHSL,
@@ -209,8 +207,8 @@ function enhanceContrast(
           s: Math.min(100, currentHSL.s + i),
         };
 
-        const lessSaturatedRGB = hslToRgb(lessSaturatedHSL);
-        const moreSaturatedRGB = hslToRgb(moreSaturatedHSL);
+        const lessSaturatedRGB = hslaToRgba(lessSaturatedHSL);
+        const moreSaturatedRGB = hslaToRgba(moreSaturatedHSL);
 
         const lessSaturatedContrast = isBackground
           ? useAPCA
@@ -462,25 +460,28 @@ export default function ContrastChecker() {
     setBackgroundHex(rgbaToHex(background));
   }, [foreground, background]);
 
-  const {
-    data: quoteData,
-    error: quoteError,
-    isLoading: isQuoteLoading,
-  } = useSWR(`/api/quote`, fetcher, {
-    revalidateIfStale: false,
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-  });
+  // const {
+  //   data: quoteData,
+  //   error: quoteError,
+  //   isLoading: isQuoteLoading,
+  // } = useSWR(`/api/quote`, fetcher, {
+  //   revalidateIfStale: false,
+  //   revalidateOnFocus: false,
+  //   revalidateOnReconnect: false,
+  // });
 
-  const {
-    data: fontData,
-    error: fontError,
-    isLoading: isFontLoading,
-  } = useSWR(`/api/fonts`, fetcher, {
-    revalidateIfStale: false,
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-  });
+  const { quoteData, quoteError, isQuoteLoading } = useAnimeQuote();
+  const { fontData, fontError, isFontLoading } = useGoogleFonts();
+
+  // const {
+  //   data: fontData,
+  //   error: fontError,
+  //   isLoading: isFontLoading,
+  // } = useSWR(`/api/fonts`, fetcher, {
+  //   revalidateIfStale: false,
+  //   revalidateOnFocus: false,
+  //   revalidateOnReconnect: false,
+  // });
 
   return (
     <div

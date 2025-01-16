@@ -4,8 +4,8 @@ import { Clipboard } from "lucide-react";
 
 import { TooltipButton } from "@/components/tooltip-button";
 import { Button } from "@/components/ui/button";
-import { rgbaToHex } from "@/lib/utils";
-import { RgbaColor } from "react-colorful";
+import { rgbaToHex } from "@/lib/utils/color";
+import { RgbaColor } from "@/lib/types";
 
 type ColorType = "text" | "background";
 
@@ -19,11 +19,11 @@ interface CopyColorButtonProps {
 /**
  * A button component with a tooltip for copying a color value (foreground or background) to the clipboard.
  *
- * @param copyColor - Specifies whether to copy the "text" (foreground) or "background" color.
- * @param displayColor - The display color calculated by getDisplayColor, necessary for styling
+ * @param {string} copyColor - Specifies whether to copy the "text" (foreground) or "background" color.
+ * @param {string} displayColor - The display color calculated by getDisplayColor, necessary for styling
  * the tooltip's border and text color.
- * @param foreground - The RGBA color object representing the foreground color.
- * @param background - The RGBA color object representing the background color.
+ * @param {RgbaColor} foreground - The RGBA color object representing the foreground color.
+ * @param {RgbaColor} background - The RGBA color object representing the background color.
  *
  * @returns A button wrapped with a tooltip that, when clicked, copies the specified color to the clipboard.
  *

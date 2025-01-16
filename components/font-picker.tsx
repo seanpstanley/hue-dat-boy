@@ -3,7 +3,8 @@ import { useState, Dispatch, SetStateAction } from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
 
 import { RgbaColor, GoogleFont } from "@/lib/types";
-import { rgbToHex, cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/cn";
+import { rgbToHex } from "@/lib/utils/color";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -49,7 +50,7 @@ const FontPicker = ({
           variant="naked"
           role="combobox"
           aria-expanded={open}
-          className="px-3 bg-transparent font-normal border-3 h-fit py-2 text-lg md:text-2xl justify-between"
+          className="h-fit justify-between border-3 bg-transparent px-3 py-2 text-lg font-normal md:text-2xl"
           style={{
             borderColor: displayColor,
             color: displayColor,
@@ -71,7 +72,7 @@ const FontPicker = ({
               )}
             </>
           )}
-          <ChevronsUpDown className="ml-2 !size-6 shrink-0 " />
+          <ChevronsUpDown className="ml-2 !size-6 shrink-0" />
         </Button>
       </PopoverTrigger>
       <PopoverContent
@@ -82,9 +83,9 @@ const FontPicker = ({
           backgroundColor: rgbToHex(background),
         }}
       >
-        <Command className="bg-transparent ">
+        <Command className="bg-transparent">
           <CommandInput
-            className="text-lg md:text-xl placeholder:text-white/60 py-2"
+            className="py-2 text-lg placeholder:text-white/60 md:text-xl"
             style={{
               color: displayColor,
               borderColor: displayColor,
@@ -96,7 +97,7 @@ const FontPicker = ({
               style={{
                 color: displayColor,
               }}
-              className="text-lg md:text-2xl p-3"
+              className="p-3 text-lg md:text-2xl"
             >
               no font found.
             </CommandEmpty>
@@ -120,7 +121,9 @@ const FontPicker = ({
                   <Check
                     className={cn(
                       "mr-2 !size-6",
-                      selectedFont === font.family ? "opacity-100" : "opacity-0"
+                      selectedFont === font.family
+                        ? "opacity-100"
+                        : "opacity-0",
                     )}
                   />
                   {font.family}

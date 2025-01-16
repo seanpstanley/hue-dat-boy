@@ -1,15 +1,4 @@
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
-import { RgbaColor, HslaColor } from "@/lib/types";
-
-/**
- * Merges class names conditionally and handles Tailwind merging.
- * @param inputs - The class names or conditions.
- * @returns A single merged class name string.
- */
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
+import { RgbaColor, RgbColor, HslaColor } from "@/lib/types";
 
 /**
  * Blends two colors using alpha compositing.
@@ -242,22 +231,5 @@ export function hslaToRgba({ h, s, l, a }: HslaColor): RgbaColor {
     g: Math.round(255 * f(8)),
     b: Math.round(255 * f(4)),
     a,
-  };
-}
-
-/**
- * Creates a debounced version of a function that delays its execution.
- * @param func - The function to debounce.
- * @param wait - The delay in milliseconds.
- * @returns A debounced function.
- */
-export function debounce<T extends (...args: any[]) => any>(
-  func: T,
-  wait: number,
-): (...args: Parameters<T>) => void {
-  let timeout: NodeJS.Timeout | null = null;
-  return (...args: Parameters<T>) => {
-    if (timeout) clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
   };
 }
