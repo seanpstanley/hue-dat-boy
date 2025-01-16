@@ -16,6 +16,33 @@ interface CopyColorButtonProps {
   background: RgbaColor;
 }
 
+/**
+ * A button component with a tooltip for copying a color value (foreground or background) to the clipboard.
+ *
+ * @param copyColor - Specifies whether to copy the "text" (foreground) or "background" color.
+ * @param displayColor - The display color calculated by getDisplayColor, necessary for styling
+ * the tooltip's border and text color.
+ * @param foreground - The RGBA color object representing the foreground color.
+ * @param background - The RGBA color object representing the background color.
+ *
+ * @returns A button wrapped with a tooltip that, when clicked, copies the specified color to the clipboard.
+ *
+ * @example
+ * ```tsx
+ * import { CopyColorButton } from "@/components/copy-color-button";
+ *
+ * const displayColor = "#000000";
+ * const foreground = { r: 255, g: 255, b: 255, a: 1 };
+ * const background = { r: 255, g: 255, b: 255, a: 1 };
+ *
+ * <CopyColorButton
+ *   copyColor="text"
+ *   displayColor={displayColor}
+ *   foreground={foreground}
+ *   background={background}
+ * />
+ * ```
+ */
 const CopyColorButton = ({
   copyColor,
   displayColor,
@@ -31,10 +58,10 @@ const CopyColorButton = ({
       <Button
         size="auto"
         variant="ghost"
-        className="absolute size-9 md:size-12 right-2.5 md:right-4 top-1/2 -translate-y-1/2 p-2"
+        className="absolute right-2.5 top-1/2 size-9 -translate-y-1/2 p-2 md:right-4 md:size-12"
         onClick={() =>
           navigator.clipboard.writeText(
-            rgbaToHex(copyColor === "text" ? foreground : background)
+            rgbaToHex(copyColor === "text" ? foreground : background),
           )
         }
       >

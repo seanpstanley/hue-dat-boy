@@ -1,4 +1,4 @@
-/* Color interface */
+/* Color interfaces */
 export interface RgbColor {
   r: number;
   g: number;
@@ -20,6 +20,7 @@ export interface HslaColor {
   a: number;
 }
 
+/* Color blindness type */
 export type ColorBlindnessType =
   | "normal vision"
   | "protanopia"
@@ -27,6 +28,7 @@ export type ColorBlindnessType =
   | "tritanopia"
   | "achromatopsia";
 
+/* Anime quote API interface */
 export interface AnimechanQuote {
   anime: {
     id: number;
@@ -40,6 +42,7 @@ export interface AnimechanQuote {
   content: string;
 }
 
+/* Google Font API interface */
 export interface GoogleFont {
   family: string;
   variants: string[];

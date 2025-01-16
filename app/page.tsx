@@ -30,7 +30,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ColorPicker } from "@/components/color-picker";
-import { ColorBlindnessType, RgbaColor } from "@/lib/types";
+import { ColorBlindnessType, RgbaColor, RgbColor } from "@/lib/types";
 import {
   rgbToHex,
   hexToRgb,
@@ -39,6 +39,8 @@ import {
   debounce,
   getDisplayColor,
   rgbaToHex,
+  hslToRgb,
+  rgbToHsl,
   calculateWCAGContrast,
   blendColors,
   hexToRgba,
@@ -53,10 +55,25 @@ import { WcagInfo } from "@/components/wcag-info";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
+/**
+ * Calculates the contrast range (minimum and maximum) between two colors
+ * using either the WCAG or APCA contrast algorithms.
+ *
+ * @param bg - The RGBA color object representing the background color.
+ * @param fg - The RGBA color object representing the foreground color.
+ * @param useAPCA - A boolean indicating whether to use WCAG or APCA contrast calculation.
+ * @returns An object with the minimum and maximum contrast values as numbers with two decimal points of precision.
+ *
+ * @example
+ * const bg = { r: 255, g: 255, b: 255, a: 0.5 };
+ * const fg = { r: 0, g: 0, b: 0, a: 1 };
+ * const result = calculateContrastRange(bg, fg, false);
+ * // result: { min: 1, max: 21 }
+ */
 function calculateContrastRange(
   bg: RgbaColor,
   fg: RgbaColor,
-  useAPCA: boolean
+  useAPCA: boolean,
 ): { min: number; max: number } {
   const blackBg: RgbaColor = { r: 0, g: 0, b: 0, a: 1 };
   const whiteBg: RgbaColor = { r: 255, g: 255, b: 255, a: 1 };
@@ -81,22 +98,51 @@ function calculateContrastRange(
   };
 }
 
+/**
+ * Calculates the APCA (Advanced Perceptual Contrast Algorithm) contrast between two colors.
+ *
+ * @param background - The RGBA color object representing the background color.
+ * @param foreground - The RGBA color object representing the foreground color.
+ * @returns The calculated APCA contrast as a number with two decimal places of precision.
+ *
+ * @example
+ * const bg = { r: 255, g: 255, b: 255, a: 1 };
+ * const fg = { r: 0, g: 0, b: 0, a: 1 };
+ * const contrast = calculateAPCAContrast(bg, fg);
+ * // contrast: -90.5 (example value)
+ */
 function calculateAPCAContrast(background: RgbaColor, foreground: RgbaColor) {
   return Number(
     Number(
       calcAPCA(
         [...Object.values(foreground)] as [number, number, number, number],
-        [...Object.values(background)] as [number, number, number]
-      )
-    ).toFixed(2)
+        [...Object.values(background)] as [number, number, number],
+      ),
+    ).toFixed(2),
   );
 }
 
+/**
+ * Enhances the contrast between a background and a foreground color
+ * by adjusting lightness or saturation, or by switching to black/white.
+ *
+ * @param background - The RGBA color object representing the background color.
+ * @param foreground - The RGBA color object representing the foreground color.
+ * @param type - Specifies which color(s) to adjust: "text", "background", or "both".
+ * @param useAPCA - A boolean indicating whether to use WCAG or APCA contrast calculation.
+ * @returns An object containing the adjusted background and foreground colors as RGBA objects.
+ *
+ * @example
+ * const bg = { r: 255, g: 255, b: 255, a: 1 };
+ * const fg = { r: 128, g: 128, b: 128, a: 1 };
+ * const result = enhanceContrast(bg, fg, "text", false);
+ * // result: { background: { r: 255, g: 255, b: 255, a: 1 }, foreground: { r: 0, g: 0, b: 0, a: 1 } }
+ */
 function enhanceContrast(
   background: RgbaColor,
   foreground: RgbaColor,
   type: "text" | "background" | "both",
-  useAPCA: boolean
+  useAPCA: boolean,
 ): { background: RgbaColor; foreground: RgbaColor } {
   const initialContrast = useAPCA
     ? calculateAPCAContrast(background, foreground)
@@ -104,14 +150,14 @@ function enhanceContrast(
   let newBackground = { ...background };
   let newForeground = { ...foreground };
 
-  const adjustColor = (color: RgbaColor, isBackground: boolean): RgbaColor => {
-    const hsl = rgbaToHsla(color);
+  const adjustColor = (color: RgbColor, isBackground: boolean): RgbColor => {
+    const hsl = rgbToHsl(color);
     const step = 1;
     let bestContrast = isBackground
       ? initialContrast
       : useAPCA
-      ? calculateAPCAContrast(background, color)
-      : calculateWCAGContrast(background, color);
+        ? calculateAPCAContrast(background, color)
+        : calculateWCAGContrast(background, color);
     let bestColor = color;
 
     // Try adjusting lightness
@@ -119,23 +165,23 @@ function enhanceContrast(
       const lighterHSL = { ...hsl, l: Math.min(100, hsl.l + i) };
       const darkerHSL = { ...hsl, l: Math.max(0, hsl.l - i) };
 
-      const lighterRGB = hslaToRgba(lighterHSL);
-      const darkerRGB = hslaToRgba(darkerHSL);
+      const lighterRGB = hslToRgb(lighterHSL);
+      const darkerRGB = hslToRgb(darkerHSL);
 
       const lighterContrast = isBackground
         ? useAPCA
           ? calculateAPCAContrast(lighterRGB, newForeground)
           : calculateWCAGContrast(lighterRGB, newForeground)
         : useAPCA
-        ? calculateAPCAContrast(background, lighterRGB)
-        : calculateWCAGContrast(background, lighterRGB);
+          ? calculateAPCAContrast(background, lighterRGB)
+          : calculateWCAGContrast(background, lighterRGB);
       const darkerContrast = isBackground
         ? useAPCA
           ? calculateAPCAContrast(darkerRGB, newForeground)
           : calculateWCAGContrast(darkerRGB, newForeground)
         : useAPCA
-        ? calculateAPCAContrast(background, darkerRGB)
-        : calculateWCAGContrast(background, darkerRGB);
+          ? calculateAPCAContrast(background, darkerRGB)
+          : calculateWCAGContrast(background, darkerRGB);
 
       if (lighterContrast > bestContrast) {
         bestContrast = lighterContrast;
@@ -152,7 +198,7 @@ function enhanceContrast(
 
     // If we still haven't reached the desired level, try adjusting saturation
     if (useAPCA ? Math.abs(bestContrast) < 60 : bestContrast < 4.5) {
-      const currentHSL = rgbaToHsla(bestColor);
+      const currentHSL = rgbToHsl(bestColor);
       for (let i = 0; i <= 100; i += step) {
         const lessSaturatedHSL = {
           ...currentHSL,
@@ -163,23 +209,23 @@ function enhanceContrast(
           s: Math.min(100, currentHSL.s + i),
         };
 
-        const lessSaturatedRGB = hslaToRgba(lessSaturatedHSL);
-        const moreSaturatedRGB = hslaToRgba(moreSaturatedHSL);
+        const lessSaturatedRGB = hslToRgb(lessSaturatedHSL);
+        const moreSaturatedRGB = hslToRgb(moreSaturatedHSL);
 
         const lessSaturatedContrast = isBackground
           ? useAPCA
             ? calculateAPCAContrast(lessSaturatedRGB, newForeground)
             : calculateWCAGContrast(lessSaturatedRGB, newForeground)
           : useAPCA
-          ? calculateAPCAContrast(background, lessSaturatedRGB)
-          : calculateWCAGContrast(background, lessSaturatedRGB);
+            ? calculateAPCAContrast(background, lessSaturatedRGB)
+            : calculateWCAGContrast(background, lessSaturatedRGB);
         const moreSaturatedContrast = isBackground
           ? useAPCA
             ? calculateAPCAContrast(moreSaturatedRGB, newForeground)
             : calculateWCAGContrast(moreSaturatedRGB, newForeground)
           : useAPCA
-          ? calculateAPCAContrast(background, moreSaturatedRGB)
-          : calculateWCAGContrast(background, moreSaturatedRGB);
+            ? calculateAPCAContrast(background, moreSaturatedRGB)
+            : calculateWCAGContrast(background, moreSaturatedRGB);
 
         if (lessSaturatedContrast > bestContrast) {
           bestContrast = lessSaturatedContrast;
@@ -194,7 +240,7 @@ function enhanceContrast(
         if (useAPCA ? Math.abs(bestContrast) >= 75 : bestContrast >= 7) break;
       }
     }
-    console.log(bestColor);
+
     return bestColor;
   };
 
@@ -225,10 +271,6 @@ function enhanceContrast(
         : { r: 255, g: 255, b: 255, a: 1 };
   }
 
-  console.log("enhance contrast function:");
-  console.log(background.a);
-  console.log(newBackground);
-  console.log(newForeground);
   return { background: newBackground, foreground: newForeground };
 }
 
@@ -244,12 +286,12 @@ export default function ContrastChecker() {
   const searchParamsInitSimulation = searchParams.get("simulation") as string;
 
   const [background, setBackground] = useState<RgbaColor>(
-    searchParamsInitBg ? hexToRgba(searchParamsInitBg) : hexToRgba("#f5b4c5")
+    searchParamsInitBg ? hexToRgba(searchParamsInitBg) : hexToRgba("#f5b4c5"),
   );
   const [foreground, setForeground] = useState<RgbaColor>(
     searchParamsInitText
       ? hexToRgba(searchParamsInitText)
-      : hexToRgba("#322e2b")
+      : hexToRgba("#322e2b"),
   );
   const [backgroundHex, setBackgroundHex] = useState(rgbaToHex(background));
   const [foregroundHex, setForegroundHex] = useState(rgbaToHex(foreground));
@@ -257,11 +299,11 @@ export default function ContrastChecker() {
   // Memoize the getDisplayColor calculations so it's not being constantly recalculated
   const fgDisplayColor = useMemo(
     () => getDisplayColor(background, foreground),
-    [background, foreground]
+    [background, foreground],
   );
   const bgDisplayColor = useMemo(
     () => getDisplayColor(foreground, background),
-    [background, foreground]
+    [background, foreground],
   );
 
   const [useAPCA, setUseAPCA] = useState(
@@ -269,16 +311,16 @@ export default function ContrastChecker() {
       ? searchParamsInitStandard === "wcag"
         ? false
         : true
-      : false
+      : false,
   );
   const [font, setFont] = useState(
-    searchParamsInitFont ? searchParamsInitFont : ""
+    searchParamsInitFont ? searchParamsInitFont : "",
   );
   const [colorBlindnessSimulation, setColorBlindnessSimulation] =
     useState<ColorBlindnessType>(
       searchParamsInitSimulation
         ? (searchParamsInitSimulation as ColorBlindnessType)
-        : "normal vision"
+        : "normal vision",
     );
 
   const [enhanceMenuOpen, setEnhanceMenuOpen] = useState(false);
@@ -330,7 +372,7 @@ export default function ContrastChecker() {
       "tritanopia",
       "achromatopsia",
     ],
-    []
+    [],
   );
 
   // use dynamic
@@ -363,14 +405,14 @@ export default function ContrastChecker() {
         }
       }
     },
-    50
+    50,
   );
 
   const handleColorChange = useCallback(
     (colorType: "background" | "foreground", value: RgbaColor) => {
       debouncedColorChange(colorType, rgbaToHex(value));
     },
-    [debouncedColorChange]
+    [debouncedColorChange],
   );
 
   const handleReverseColors = () => {
@@ -446,7 +488,7 @@ export default function ContrastChecker() {
       style={{ backgroundColor: rgbToHex(background) }}
     >
       {/* Website Title */}
-      <header className="mb-12 md:mb-16 text-center">
+      <header className="mb-12 text-center md:mb-16">
         <span
           className="font-medium"
           style={{
@@ -458,11 +500,11 @@ export default function ContrastChecker() {
       </header>
 
       {/* Main Content Area */}
-      <main className="mx-auto container">
+      <main className="container mx-auto">
         {/* Page Title */}
         <div className="mb-8">
           <h1
-            className="font-bold text-2xl md:text-3xl"
+            className="text-2xl font-bold md:text-3xl"
             style={{
               color: fgDisplayColor,
             }}
@@ -473,7 +515,7 @@ export default function ContrastChecker() {
 
         {/* Contrast Info and Standards Compliance */}
         <section
-          className="flex flex-col mb-8 items-start gap-y-4"
+          className="mb-8 flex flex-col items-start gap-y-4"
           style={{
             color: fgDisplayColor,
           }}
@@ -486,19 +528,19 @@ export default function ContrastChecker() {
             </Label>
 
             <div
-              className="flex gap-10 items-center rounded-lg border-3 px-2.5 py-4"
+              className="flex items-center gap-10 rounded-lg border-3 px-2.5 py-4"
               style={{
                 borderColor: fgDisplayColor,
               }}
             >
               <h2
                 id="contrast-value"
-                className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold"
+                className="text-5xl font-bold sm:text-6xl md:text-7xl lg:text-8xl"
               >
                 {useAPCA ? (
                   <>
                     {apcaContrast} L
-                    <sup className="-ml-3 md:-ml-4 -top-3.5 md:-top-6">c</sup>
+                    <sup className="-top-3.5 -ml-3 md:-top-6 md:-ml-4">c</sup>
                   </>
                 ) : (
                   <>
@@ -524,20 +566,20 @@ export default function ContrastChecker() {
           </div>
 
           {/* Standards Levels */}
-          <div className="flex flex-col gap-y-2 ml-auto">
+          <div className="ml-auto flex flex-col gap-y-2">
             {/* <Label
               htmlFor="contrast-value"
               className="text-base md:text-lg ml-auto"
             >
               standards
             </Label> */}
-            <div className="grid grid-cols-1 ml-auto sm:grid-cols-2 lg:grid-cols-4 gap-2">
+            <div className="ml-auto grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
               {useAPCA ? (
                 <>
                   {Object.entries(apcaResults).map(([level, passes]) => (
                     <div
                       key={level}
-                      className="inline-flex items-center justify-between gap-x-2 rounded-full font-semibold transition-colors text-base md:text-lg py-2 px-4 border-3 bg-transparent"
+                      className="inline-flex items-center justify-between gap-x-2 rounded-full border-3 bg-transparent px-4 py-2 text-base font-semibold transition-colors md:text-lg"
                       style={{
                         borderColor: fgDisplayColor,
                         backgroundColor: passes
@@ -564,7 +606,7 @@ export default function ContrastChecker() {
                   {Object.entries(wcagResults).map(([level, passes]) => (
                     <div
                       key={level}
-                      className="inline-flex items-center justify-between gap-x-2 rounded-full font-semibold transition-colors text-base md:text-lg py-2 px-4 border-3 bg-transparent"
+                      className="inline-flex items-center justify-between gap-x-2 rounded-full border-3 bg-transparent px-4 py-2 text-base font-semibold transition-colors md:text-lg"
                       style={{
                         borderColor: fgDisplayColor,
                         backgroundColor: passes
@@ -593,7 +635,7 @@ export default function ContrastChecker() {
 
         {/* User Controls */}
         <section className="flex flex-col gap-y-8" id="controls">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-x-4 gap-y-4">
+          <div className="flex flex-col items-center justify-between gap-x-4 gap-y-4 sm:flex-row">
             {/* Standards Toggle */}
             <div className="flex items-center gap-x-2">
               <Label
@@ -638,15 +680,17 @@ export default function ContrastChecker() {
                   size="xl"
                   disabled={
                     (!useAPCA && wcagContrast >= 4.5) ||
-                    (useAPCA && Math.abs(apcaContrast) >= 75)
+                    (useAPCA && Math.abs(apcaContrast) >= 75) ||
+                    foreground.a < 1 ||
+                    background.a < 1 // only usable on fully opaque colors
                   }
-                  className="sm:ml-auto w-full sm:w-fit text-base"
+                  className="w-full text-base sm:ml-auto sm:w-fit"
                 >
                   enhance contrast
                 </Button>
               </PopoverTrigger>
               <PopoverContent
-                className="w-fit p-0 border-3"
+                className="w-fit border-3 p-0"
                 style={{
                   color: fgDisplayColor,
                   borderColor: fgDisplayColor,
@@ -693,7 +737,7 @@ export default function ContrastChecker() {
               variant="outline"
               onClick={handleCopyUrl}
               size="xl"
-              className="gap-x-1 w-full sm:w-fit text-base"
+              className="w-full gap-x-1 text-base sm:w-fit"
               style={{
                 color: fgDisplayColor,
                 borderColor: fgDisplayColor,
@@ -706,20 +750,20 @@ export default function ContrastChecker() {
 
           {/* Color Controls */}
           <div
-            className="flex flex-col md:flex-row justify-between items-center gap-x-4 gap-y-2 "
+            className="flex flex-col items-center justify-between gap-x-4 gap-y-2 md:flex-row"
             style={{
               color: fgDisplayColor,
             }}
           >
             {/* Text Color */}
-            <div className="flex flex-col gap-y-2 w-full">
+            <div className="flex w-full flex-col gap-y-2">
               <Label className="text-base md:text-lg">text color</Label>
               <div className="relative">
                 <ColorPicker
                   color={foreground}
                   displayColor={fgDisplayColor}
                   onChange={(value) => handleColorChange("foreground", value)}
-                  className="absolute size-9 md:size-12 left-2.5 md:left-4 top-1/2 -translate-y-1/2"
+                  className="absolute left-2.5 top-1/2 size-9 -translate-y-1/2 md:left-4 md:size-12"
                 />
                 <Input
                   value={foregroundHex}
@@ -743,7 +787,7 @@ export default function ContrastChecker() {
                   }}
                   spellCheck={false}
                   maxLength={7}
-                  className="font-medium px-14 md:px-20 bg-transparent font-mono text-3xl h-fit py-2 leading-none md:text-4xl lg:text-5xl border-3"
+                  className="h-fit border-3 bg-transparent px-14 py-2 font-mono text-3xl font-medium leading-none md:px-20 md:text-4xl lg:text-5xl"
                 />
 
                 <CopyColorButton
@@ -762,11 +806,11 @@ export default function ContrastChecker() {
                   <Button
                     variant="ghost"
                     size="auto"
-                    className="size-12 p-2 shrink-0"
+                    className="size-12 shrink-0 p-2"
                     onClick={handleReverseColors}
                   >
                     <span className="sr-only">Swap colors</span>
-                    <ArrowLeftRight className="-rotate-90 md:rotate-0 transition-transform !size-full" />
+                    <ArrowLeftRight className="!size-full -rotate-90 transition-transform md:rotate-0" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent
@@ -783,7 +827,7 @@ export default function ContrastChecker() {
 
             {/* Background Color */}
             <div
-              className="flex flex-col gap-y-2 w-full"
+              className="flex w-full flex-col gap-y-2"
               style={{
                 borderColor: fgDisplayColor,
               }}
@@ -804,7 +848,7 @@ export default function ContrastChecker() {
                     color={background}
                     onChange={(value) => handleColorChange("background", value)}
                     displayColor={fgDisplayColor}
-                    className="absolute size-9 md:size-12 left-2.5 md:left-4 top-1/2 -translate-y-1/2"
+                    className="absolute left-2.5 top-1/2 size-9 -translate-y-1/2 md:left-4 md:size-12"
                   />
                 </div>
 
@@ -831,7 +875,7 @@ export default function ContrastChecker() {
                   style={{
                     borderColor: fgDisplayColor,
                   }}
-                  className="font-medium w-full px-14 md:px-20 bg-transparent font-mono text-3xl h-fit py-2 leading-none md:text-4xl lg:text-5xl border-3"
+                  className="h-fit w-full border-3 bg-transparent px-14 py-2 font-mono text-3xl font-medium leading-none md:px-20 md:text-4xl lg:text-5xl"
                 />
 
                 <CopyColorButton
@@ -845,9 +889,9 @@ export default function ContrastChecker() {
           </div>
 
           {/* Font and Color Blindness Dropdowns */}
-          <div className="flex flex-col md:flex-row gap-x-8 gap-y-4">
+          <div className="flex flex-col gap-x-8 gap-y-4 md:flex-row">
             <div
-              className="flex flex-col gap-y-2 flex-1"
+              className="flex flex-1 flex-col gap-y-2"
               style={{
                 color: fgDisplayColor,
               }}
@@ -867,7 +911,7 @@ export default function ContrastChecker() {
             </div>
 
             <div
-              className="flex flex-col gap-y-2 flex-1"
+              className="flex flex-1 flex-col gap-y-2"
               style={{
                 color: fgDisplayColor,
               }}
@@ -886,7 +930,7 @@ export default function ContrastChecker() {
                 name="colorblind-select"
               >
                 <SelectTrigger
-                  className="bg-transparent border-3 h-fit py-2 text-lg md:text-2xl"
+                  className="h-fit border-3 bg-transparent py-2 text-lg md:text-2xl"
                   style={{
                     borderColor: fgDisplayColor,
                   }}
@@ -918,7 +962,7 @@ export default function ContrastChecker() {
           {/* Sample Text Section */}
           <section className="flex flex-col gap-y-4" id="sample-text">
             <h3
-              className="font-bold text-xl md:text-2xl"
+              className="text-xl font-bold md:text-2xl"
               style={{
                 color: fgDisplayColor,
               }}
@@ -926,7 +970,7 @@ export default function ContrastChecker() {
               sample text
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+            <div className="grid grid-cols-1 gap-x-8 gap-y-4 md:grid-cols-2">
               <SampleTextCard
                 foreground={foreground}
                 background={background}
@@ -979,7 +1023,7 @@ export default function ContrastChecker() {
       <style jsx global>{`
         @import url("https://fonts.googleapis.com/css2?family=${font.replace(
           / /g,
-          "+"
+          "+",
         )}&display=swap");
       `}</style>
     </div>

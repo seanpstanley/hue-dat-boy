@@ -17,6 +17,33 @@ interface TooltipButtonProps {
   children: ReactElement;
 }
 
+/**
+ * A component that wraps its child element with a tooltip.
+ * The tooltip displays a custom message and supports customizable background and text colors.
+ *
+ * @param background - The background color of the tooltip as an RGBA object.
+ * @param displayColor - The text color and border color of the tooltip.
+ * @param tooltip - The message to display inside the tooltip.
+ * @param children - The child ReactElement that triggers the tooltip.
+ *
+ * @returns The 'TooltipButton' component.
+ *
+ * @example
+ * ```tsx
+ * import { TooltipButton } from "@/components/tooltip-button";
+ *
+ * const background = { r: 255, g: 255, b: 255, a: 0.9 };
+ * const displayColor = "#000000";
+ * const tooltip = "Copy to clipboard";
+ *
+ * <TooltipButton
+ *   background={background}
+ *   displayColor={displayColor}
+ *   tooltip={tooltip}
+ * >
+ *   <button>Click me</button>
+ * </TooltipButton>
+ */
 const TooltipButton = ({
   background,
   displayColor,

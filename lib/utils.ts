@@ -2,10 +2,21 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { RgbaColor, HslaColor } from "@/lib/types";
 
+/**
+ * Merges class names conditionally and handles Tailwind merging.
+ * @param inputs - The class names or conditions.
+ * @returns A single merged class name string.
+ */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+/**
+ * Blends two colors using alpha compositing.
+ * @param fg - The RGBA color object representing the foreground color.
+ * @param bg - The RGBA color object representing the background color.
+ * @returns The blended RGBA color object.
+ */
 export function blendColors(fg: RgbaColor, bg: RgbaColor): RgbaColor {
   const alpha = fg.a;
   return {
@@ -18,15 +29,22 @@ export function blendColors(fg: RgbaColor, bg: RgbaColor): RgbaColor {
 
 function calculateRelativeLuminance({ r, g, b }: RgbaColor) {
   const [rs, gs, bs] = [r / 255, g / 255, b / 255].map((c) =>
-    c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
+    c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4),
   );
   return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
 }
 
+/**
+ * Calculates the WCAG contrast ratio between two colors.
+ * @param bg - The RGBA color object representing the background color
+ * @param fg - The RGBA color object representing the foreground color.
+ * @param solidBg - Optional solid background RGBA color for blending.
+ * @returns The contrast ratio as a number.
+ */
 export function calculateWCAGContrast(
   bg: RgbaColor,
   fg: RgbaColor,
-  solidBg?: RgbaColor
+  solidBg?: RgbaColor,
 ): number {
   const blendedFg = blendColors(fg, solidBg || bg);
   const blendedBg = solidBg || bg;
@@ -58,6 +76,13 @@ export function calculateWCAGContrast(
 //   return Number(ratio.toFixed(2));
 // }
 
+/**
+ * Determines the display color (foreground) for a given background color.
+ * Will return black (#000) or white (#fff) if the WCAG contrast ratio is less than 3, depending on which color creates a higher contrast.
+ * @param bg - The RGBA color object representing the backround color
+ * @param fg - The RGBA color object representing the foreground color.
+ * @returns The HEX color string for the foreground color.
+ */
 export function getDisplayColor(bg: RgbaColor, fg: RgbaColor): string {
   const displayFg: RgbaColor = { r: fg.r, g: fg.g, b: fg.b, a: 1 };
   const displayBg: RgbaColor = { r: bg.r, g: bg.g, b: bg.b, a: 1 };
@@ -83,18 +108,13 @@ export function getDisplayColor(bg: RgbaColor, fg: RgbaColor): string {
   return blackContrast > whiteContrast ? "#000000" : "#ffffff";
 }
 
-export function debounce<T extends (...args: any[]) => any>(
-  func: T,
-  wait: number
-): (...args: Parameters<T>) => void {
-  let timeout: NodeJS.Timeout | null = null;
-  return (...args: Parameters<T>) => {
-    if (timeout) clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
-  };
-}
-
 /*  Color Conversion Functions */
+
+/**
+ * Converts a HEX color string to an RGBA color object.
+ * @param hex - The HEX color string (e.g., "#RRGGBB").
+ * @returns The RGBA color object with properties {r, g, b, a}.
+ */
 export function hexToRgba(hex: string): RgbaColor {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
@@ -107,6 +127,11 @@ export function hexToRgba(hex: string): RgbaColor {
     : { r: 0, g: 0, b: 0, a: 1 };
 }
 
+/**
+ * Converts an RGBA color object to a HEX color string.
+ * @param rgba - The RGBA color object with properties {r, g, b, a}.
+ * @returns The HEX color string.
+ */
 export function rgbaToHex({ r, g, b, a }: RgbaColor): string {
   const toHex = (value: number) =>
     Math.round(value).toString(16).padStart(2, "0");
@@ -115,6 +140,11 @@ export function rgbaToHex({ r, g, b, a }: RgbaColor): string {
   }`;
 }
 
+/**
+ * Converts an RGB color object to a HEX color string.
+ * @param rgb - The RGB color object with properties {r, g, b}.
+ * @returns The HEX color string.
+ */
 export function rgbToHex({ r, g, b }: RgbaColor): string {
   return `#${[r, g, b].map((x) => x.toString(16).padStart(2, "0")).join("")}`;
 }
@@ -131,6 +161,12 @@ export function rgbToHex({ r, g, b }: RgbaColor): string {
 //     : { r: 0, g: 0, b: 0, a: 1 };
 // }
 
+/**
+ * Converts a HEX color string to an RGBA color object.
+ * @param hex - The HEX color string (e.g., "#RRGGBB" or "#RRGGBBAA").
+ * @returns The RGBA color object with properties {r, g, b, a}.
+ * @throws Will throw an error if the HEX color format is invalid.
+ */
 export function hexToRgb(hex: string): RgbaColor {
   const parsedHex = hex.replace("#", "");
   let r, g, b, a;
@@ -154,6 +190,11 @@ export function hexToRgb(hex: string): RgbaColor {
   return { r, g, b, a };
 }
 
+/**
+ * Converts an RGBA color object to an HSLA color object.
+ * @param rgba - The RGBA color object with properties {r, g, b, a}.
+ * @returns The HSLA color object with properties {h, s, l, a}.
+ */
 export function rgbaToHsla({ r, g, b, a }: RgbaColor): HslaColor {
   r /= 255;
   g /= 255;
@@ -185,6 +226,11 @@ export function rgbaToHsla({ r, g, b, a }: RgbaColor): HslaColor {
   return { h: h * 360, s: s * 100, l: l * 100, a };
 }
 
+/**
+ * Converts an HSLA color object to an RGBA color object.
+ * @param hsla - The HSLA color object with properties {h, s, l, a}.
+ * @returns The RGBA color object with properties {r, g, b, a}.
+ */
 export function hslaToRgba({ h, s, l, a }: HslaColor): RgbaColor {
   s /= 100;
   l /= 100;
@@ -196,5 +242,22 @@ export function hslaToRgba({ h, s, l, a }: HslaColor): RgbaColor {
     g: Math.round(255 * f(8)),
     b: Math.round(255 * f(4)),
     a,
+  };
+}
+
+/**
+ * Creates a debounced version of a function that delays its execution.
+ * @param func - The function to debounce.
+ * @param wait - The delay in milliseconds.
+ * @returns A debounced function.
+ */
+export function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  wait: number,
+): (...args: Parameters<T>) => void {
+  let timeout: NodeJS.Timeout | null = null;
+  return (...args: Parameters<T>) => {
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
   };
 }
