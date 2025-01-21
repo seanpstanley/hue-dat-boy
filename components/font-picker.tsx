@@ -83,7 +83,7 @@ const FontPicker = ({
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="border-3 p-0 md:w-[369px] lg:w-[625px]"
+          className="border-3 p-0 md:w-[368px] lg:w-[624px]"
           style={{
             borderColor: displayColor,
             color: displayColor,
@@ -135,8 +135,21 @@ const FontPicker = ({
           <ChevronsUpDown className="ml-2 !size-6 shrink-0" />
         </Button>
       </DrawerTrigger>
-      <DrawerContent>
-        <div className="mt-4 border-t">
+      <DrawerContent
+        style={{
+          borderColor: displayColor,
+          color: displayColor,
+          backgroundColor: rgbToHex(background),
+        }}
+      >
+        <div
+          className="mt-4 border-t-2"
+          style={{
+            borderColor: displayColor,
+            color: displayColor,
+            backgroundColor: rgbToHex(background),
+          }}
+        >
           <FontList
             setOpen={setOpen}
             setSelectedFont={setSelectedFont}
