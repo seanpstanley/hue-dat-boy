@@ -9,8 +9,8 @@ export const useAnimeQuote = () => {
   });
 
   return {
-    quoteData: data || [],
-    quoteError: error || [],
-    isQuoteLoading: isLoading,
+    data,
+    error,
+    isLoading,
   };
 };

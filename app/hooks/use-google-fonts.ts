@@ -9,8 +9,8 @@ export const useGoogleFonts = () => {
   });
 
   return {
-    fontData: data || [],
-    fontError: error || [],
-    isFontLoading: isLoading,
+    data,
+    error,
+    isLoading,
   };
 };

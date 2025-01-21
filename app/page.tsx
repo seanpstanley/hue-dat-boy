@@ -50,10 +50,8 @@ import { FontPicker } from "@/components/font-picker";
 import { ApcaInfo } from "@/components/apca-info";
 import { Separator } from "@/components/ui/separator";
 import { WcagInfo } from "@/components/wcag-info";
-import useSWR from "swr";
-// import { useAnimeQuote } from "@/app/hooks/use-anime-quote";
-// import { useGoogleFonts } from "./hooks/use-google-fonts";
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+import { useAnimeQuote } from "@/app/hooks/use-anime-quote";
+import { useGoogleFonts } from "./hooks/use-google-fonts";
 
 /**
  * Calculates the contrast range (minimum and maximum) between two colors
@@ -364,24 +362,13 @@ export default function ContrastChecker() {
   };
 
   //  precompute / cache the list of fonts/ color blindness for refresh to avoid flicker
-  const COLORBLINDNESS_TYPES = useMemo(
-    () => [
-      "normal vision",
-      "protanopia",
-      "deuteranopia",
-      "tritanopia",
-      "achromatopsia",
-    ],
-    [],
-  );
-
-  // use dynamic
-  // const Select = dynamic(() => import("@/components/ui/select"), { ssr: false });
-
-  //  set the simulation if it fails to be set by the url
-  // useEffect(() => {
-  //   if (!colorBlindnessType) setColorBlindnessType("normal vision"); // Ensure default font is set post-hydration
-  // }, []);
+  const COLOR_BLINDNESS_TYPES = [
+    "normal vision",
+    "protanopia",
+    "deuteranopia",
+    "tritanopia",
+    "achromatopsia",
+  ];
 
   const debouncedColorChange = debounce(
     (colorType: "background" | "foreground", value: string) => {
@@ -466,24 +453,12 @@ export default function ContrastChecker() {
     data: quoteData,
     error: quoteError,
     isLoading: isQuoteLoading,
-  } = useSWR(`/api/quote`, fetcher, {
-    revalidateIfStale: false,
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-  });
-
-  // const { quoteData, quoteError, isQuoteLoading } = useAnimeQuote();
-  // const { fontData, fontError, isFontLoading } = useGoogleFonts();
-
+  } = useAnimeQuote();
   const {
     data: fontData,
     error: fontError,
     isLoading: isFontLoading,
-  } = useSWR(`/api/fonts`, fetcher, {
-    revalidateIfStale: false,
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-  });
+  } = useGoogleFonts();
 
   return (
     <div
@@ -938,7 +913,8 @@ export default function ContrastChecker() {
                     borderColor: fgDisplayColor,
                   }}
                 >
-                  <SelectValue />
+                  {colorBlindnessSimulation}
+                  {/* <SelectValue /> */}
                 </SelectTrigger>
                 <SelectContent
                   className="border-3"
@@ -948,7 +924,7 @@ export default function ContrastChecker() {
                     backgroundColor: `rgba(${background.r}, ${background.g}, ${background.b}, ${background.a})`,
                   }}
                 >
-                  {COLORBLINDNESS_TYPES.map((simulation) => (
+                  {COLOR_BLINDNESS_TYPES.map((simulation) => (
                     <SelectItem
                       key={simulation}
                       value={simulation}
