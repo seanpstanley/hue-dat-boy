@@ -51,8 +51,8 @@ import { ApcaInfo } from "@/components/apca-info";
 import { Separator } from "@/components/ui/separator";
 import { WcagInfo } from "@/components/wcag-info";
 import useSWR from "swr";
-import { useAnimeQuote } from "@/app/hooks/use-anime-quote";
-import { useGoogleFonts } from "./hooks/use-google-fonts";
+// import { useAnimeQuote } from "@/app/hooks/use-anime-quote";
+// import { useGoogleFonts } from "./hooks/use-google-fonts";
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 /**
