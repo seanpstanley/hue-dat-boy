@@ -50,8 +50,10 @@ import { FontPicker } from "@/components/font-picker";
 import { ApcaInfo } from "@/components/apca-info";
 import { Separator } from "@/components/ui/separator";
 import { WcagInfo } from "@/components/wcag-info";
+import useSWR from "swr";
 import { useAnimeQuote } from "@/app/hooks/use-anime-quote";
 import { useGoogleFonts } from "./hooks/use-google-fonts";
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 /**
  * Calculates the contrast range (minimum and maximum) between two colors
@@ -460,28 +462,28 @@ export default function ContrastChecker() {
     setBackgroundHex(rgbaToHex(background));
   }, [foreground, background]);
 
-  // const {
-  //   data: quoteData,
-  //   error: quoteError,
-  //   isLoading: isQuoteLoading,
-  // } = useSWR(`/api/quote`, fetcher, {
-  //   revalidateIfStale: false,
-  //   revalidateOnFocus: false,
-  //   revalidateOnReconnect: false,
-  // });
+  const {
+    data: quoteData,
+    error: quoteError,
+    isLoading: isQuoteLoading,
+  } = useSWR(`/api/quote`, fetcher, {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
 
-  const { quoteData, quoteError, isQuoteLoading } = useAnimeQuote();
-  const { fontData, fontError, isFontLoading } = useGoogleFonts();
+  // const { quoteData, quoteError, isQuoteLoading } = useAnimeQuote();
+  // const { fontData, fontError, isFontLoading } = useGoogleFonts();
 
-  // const {
-  //   data: fontData,
-  //   error: fontError,
-  //   isLoading: isFontLoading,
-  // } = useSWR(`/api/fonts`, fetcher, {
-  //   revalidateIfStale: false,
-  //   revalidateOnFocus: false,
-  //   revalidateOnReconnect: false,
-  // });
+  const {
+    data: fontData,
+    error: fontError,
+    isLoading: isFontLoading,
+  } = useSWR(`/api/fonts`, fetcher, {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
 
   return (
     <div
@@ -975,7 +977,8 @@ export default function ContrastChecker() {
               <SampleTextCard
                 foreground={foreground}
                 background={background}
-                displayColor={fgDisplayColor}
+                fgDisplayColor={fgDisplayColor}
+                bgDisplayColor={bgDisplayColor}
                 font={font}
                 colorBlindnessSimulation={colorBlindnessSimulation}
                 textSize="normal"
@@ -986,7 +989,8 @@ export default function ContrastChecker() {
               <SampleTextCard
                 foreground={foreground}
                 background={background}
-                displayColor={fgDisplayColor}
+                fgDisplayColor={fgDisplayColor}
+                bgDisplayColor={bgDisplayColor}
                 font={font}
                 colorBlindnessSimulation={colorBlindnessSimulation}
                 textSize="large"

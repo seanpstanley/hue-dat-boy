@@ -1,4 +1,4 @@
-import { RgbaColor, RgbColor, HslaColor } from "@/lib/types";
+import { RgbaColor, HslaColor } from "@/lib/types";
 
 /**
  * Blends two colors using alpha compositing.

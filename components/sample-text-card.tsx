@@ -73,7 +73,8 @@ function simulateColorBlindness(
 interface SampleTextCardProps {
   foreground: RgbaColor;
   background: RgbaColor;
-  displayColor: string;
+  bgDisplayColor: string;
+  fgDisplayColor: string;
   font: string;
   colorBlindnessSimulation: any;
   textSize: "normal" | "large";
@@ -85,7 +86,8 @@ interface SampleTextCardProps {
 const SampleTextCard = ({
   foreground,
   background,
-  displayColor,
+  bgDisplayColor,
+  fgDisplayColor,
   font,
   colorBlindnessSimulation,
   textSize,
@@ -109,14 +111,14 @@ const SampleTextCard = ({
         <div className="relative px-4 pb-2.5 pt-2">
           <h4
             className="text-base font-medium leading-none md:text-lg"
-            style={{ color: displayColor }}
+            style={{ color: bgDisplayColor }}
           >
             {textSize} text
           </h4>
 
           <TooltipButton
             background={background}
-            displayColor={displayColor}
+            displayColor={fgDisplayColor}
             tooltip="view fullscreen"
           >
             <SheetTrigger asChild>
@@ -124,7 +126,7 @@ const SampleTextCard = ({
                 variant="ghost"
                 size="icon"
                 className="absolute right-0.5 top-1/2 size-8 -translate-y-1/2 p-2 md:size-9"
-                style={{ color: displayColor }}
+                style={{ color: bgDisplayColor }}
               >
                 <AccessibleIcon label="Fullscreen view">
                   <Maximize2 className="!size-full" />
