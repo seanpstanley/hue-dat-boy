@@ -30,7 +30,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ColorPicker } from "@/components/color-picker";
-import { ColorBlindnessType, RgbaColor, RgbColor } from "@/lib/types";
+import { ColorBlindnessType, RgbaColor } from "@/lib/types";
 import {
   rgbToHex,
   hexToRgb,
