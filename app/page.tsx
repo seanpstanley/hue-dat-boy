@@ -150,7 +150,7 @@ function enhanceContrast(
   let newBackground = { ...background };
   let newForeground = { ...foreground };
 
-  const adjustColor = (color: RgbaColor, isBackground: boolean): RgbColor => {
+  const adjustColor = (color: RgbaColor, isBackground: boolean): RgbaColor => {
     const hsl = rgbaToHsla(color);
     const step = 1;
     let bestContrast = isBackground
