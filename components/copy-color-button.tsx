@@ -58,7 +58,7 @@ const CopyColorButton = ({
       <Button
         size="auto"
         variant="ghost"
-        className="absolute right-2.5 top-1/2 size-9 -translate-y-1/2 p-2 md:right-4 md:size-12"
+        className="absolute right-2.5 top-1/2 size-9 -translate-y-1/2 p-2 md:right-3 md:size-10 lg:right-4 lg:size-16"
         onClick={() =>
           navigator.clipboard.writeText(
             rgbaToHex(copyColor === "text" ? foreground : background),

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, ChangeEvent } from "react";
 
 import { AccessibleIcon } from "@radix-ui/react-accessible-icon";
 import { calcAPCA } from "apca-w3";
@@ -293,6 +293,12 @@ export default function ContrastChecker() {
   );
   const [backgroundHex, setBackgroundHex] = useState(rgbaToHex(background));
   const [foregroundHex, setForegroundHex] = useState(rgbaToHex(foreground));
+  const [backgroundInputValue, setBackgroundInputValue] = useState(
+    rgbaToHex(background),
+  );
+  const [foregroundInputValue, setForegroundInputValue] = useState(
+    rgbaToHex(foreground),
+  );
 
   // Memoize the getDisplayColor calculations so it's not being constantly recalculated
   const fgDisplayColor = useMemo(
@@ -439,14 +445,49 @@ export default function ContrastChecker() {
     colorBlindnessSimulation,
   ]);
 
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement>,
+    color: "foreground" | "background",
+  ) => {
+    let value = e.target.value;
+
+    // Add "#" to the beginning if missing and input matches valid hex length
+    if (!value.startsWith("#") && (value.length === 6 || value.length === 8)) {
+      value = "#" + value;
+    }
+
+    // Regex for 6 or 8 character hex codes (with or without alpha)
+    const hexRegex = /^#([a-fA-F0-9]{6}|[a-fA-F0-9]{8})$/;
+
+    if (color === "foreground") {
+      setForegroundInputValue(value); // Update input field regardless of validity
+
+      // Only update background color if valid hex string
+      if (hexRegex.test(value)) {
+        setForeground(hexToRgba(value));
+      }
+    } else {
+      setBackgroundInputValue(value); // Update input field regardless of validity
+
+      // Only update background color if valid hex string
+      if (hexRegex.test(value)) {
+        setBackground(hexToRgba(value));
+      }
+    }
+  };
+
   useEffect(() => {
     updateUrl();
   }, [updateUrl]);
 
-  // Keep the hex conversion of the fg/bg colors up to date
+  // Keep the hex conversion of the fg/bg colors and inputs up to date
   useEffect(() => {
-    setForegroundHex(rgbaToHex(foreground));
-    setBackgroundHex(rgbaToHex(background));
+    const newForegroundHex = rgbaToHex(foreground);
+    const newBackgroundHex = rgbaToHex(background);
+    setForegroundHex(newForegroundHex);
+    setBackgroundHex(newBackgroundHex);
+    setForegroundInputValue(newForegroundHex);
+    setBackgroundInputValue(newBackgroundHex);
   }, [foreground, background]);
 
   const {
@@ -482,7 +523,7 @@ export default function ContrastChecker() {
         {/* Page Title */}
         <div className="mb-8">
           <h1
-            className="text-2xl font-bold md:text-3xl"
+            className="text-2xl font-bold md:text-4xl"
             style={{
               color: fgDisplayColor,
             }}
@@ -499,114 +540,114 @@ export default function ContrastChecker() {
           }}
           id="contrast-info"
         >
-          {/* Contrast Ratio */}
-          <div className="flex flex-col gap-y-2">
-            <Label htmlFor="contrast-value" className="text-base md:text-lg">
-              contrast value
-            </Label>
+          {/* Contrast Ratio and Standards Levels */}
+          <div className="flex w-full flex-col justify-between gap-y-4 md:flex-row md:items-end">
+            {/* Contrast Ratio  */}
+            <div className="flex w-fit flex-col gap-y-2">
+              <Label htmlFor="contrast-value" className="text-base md:text-lg">
+                contrast value
+              </Label>
 
-            <div
-              className="flex items-center gap-10 rounded-lg border-3 px-2.5 py-4"
-              style={{
-                borderColor: fgDisplayColor,
-              }}
-            >
-              <h2
-                id="contrast-value"
-                className="text-5xl font-bold sm:text-6xl md:text-7xl lg:text-8xl"
+              <div
+                className="flex items-center gap-10 rounded-lg border-3 px-2.5 py-4"
+                style={{
+                  borderColor: fgDisplayColor,
+                }}
               >
+                <h2
+                  id="contrast-value"
+                  className="text-5xl font-bold sm:text-6xl md:text-7xl lg:text-8xl"
+                >
+                  {useAPCA ? (
+                    <>
+                      {apcaContrast} L
+                      <sup className="-top-3.5 -ml-3 md:-top-6 md:-ml-4">c</sup>
+                    </>
+                  ) : (
+                    <>
+                      {background.a && background.a < 1 ? (
+                        <>
+                          {useAPCA ? (
+                            <>
+                              {contrastRange.min} to {contrastRange.max}
+                            </>
+                          ) : (
+                            <>
+                              {contrastRange.min} : 1 to {contrastRange.max} : 1
+                            </>
+                          )}
+                        </>
+                      ) : (
+                        <>{wcagContrast} : 1</>
+                      )}
+                    </>
+                  )}
+                </h2>
+              </div>
+            </div>
+
+            {/* Standards Levels */}
+            <div className="ml-auto flex flex-col gap-y-2">
+              <Label htmlFor="contrast-value" className="text-base md:text-lg">
+                {useAPCA ? "apca" : "wcag"} levels
+              </Label>
+              <div className="flex flex-wrap justify-end gap-2 md:grid md:grid-cols-2 lg:grid-cols-4">
                 {useAPCA ? (
                   <>
-                    {apcaContrast} L
-                    <sup className="-top-3.5 -ml-3 md:-top-6 md:-ml-4">c</sup>
+                    {Object.entries(apcaResults).map(([level, passes]) => (
+                      <div
+                        key={level}
+                        className="inline-flex items-center justify-between gap-x-2 rounded-full border-3 bg-transparent px-4 py-2 text-base font-semibold transition-colors md:text-lg"
+                        style={{
+                          borderColor: fgDisplayColor,
+                          backgroundColor: passes
+                            ? fgDisplayColor
+                            : rgbToHex(background),
+                          color: passes ? bgDisplayColor : fgDisplayColor,
+                        }}
+                      >
+                        {level}
+                        {passes ? (
+                          <AccessibleIcon label="Pass">
+                            <Check className="h-6 w-6" />
+                          </AccessibleIcon>
+                        ) : (
+                          <AccessibleIcon label="Fail">
+                            <X className="h-6 w-6" />
+                          </AccessibleIcon>
+                        )}
+                      </div>
+                    ))}
                   </>
                 ) : (
                   <>
-                    {background.a && background.a < 1 ? (
-                      <>
-                        {useAPCA ? (
-                          <>
-                            {contrastRange.min} to {contrastRange.max}
-                          </>
+                    {Object.entries(wcagResults).map(([level, passes]) => (
+                      <div
+                        key={level}
+                        className="inline-flex items-center justify-between gap-x-2 rounded-full border-3 bg-transparent px-4 py-2 text-base font-semibold transition-colors md:text-lg"
+                        style={{
+                          borderColor: fgDisplayColor,
+                          backgroundColor: passes
+                            ? fgDisplayColor
+                            : rgbToHex(background),
+                          color: passes ? bgDisplayColor : fgDisplayColor,
+                        }}
+                      >
+                        {level}
+                        {passes ? (
+                          <AccessibleIcon label="Pass">
+                            <Check className="h-6 w-6" />
+                          </AccessibleIcon>
                         ) : (
-                          <>
-                            {contrastRange.min} : 1 to {contrastRange.max} : 1
-                          </>
+                          <AccessibleIcon label="Fail">
+                            <X className="h-6 w-6" />
+                          </AccessibleIcon>
                         )}
-                      </>
-                    ) : (
-                      <>{wcagContrast} : 1</>
-                    )}
+                      </div>
+                    ))}
                   </>
                 )}
-              </h2>
-            </div>
-          </div>
-
-          {/* Standards Levels */}
-          <div className="ml-auto flex flex-col gap-y-2">
-            {/* <Label
-              htmlFor="contrast-value"
-              className="text-base md:text-lg ml-auto"
-            >
-              standards
-            </Label> */}
-            <div className="ml-auto flex flex-wrap justify-end gap-2">
-              {useAPCA ? (
-                <>
-                  {Object.entries(apcaResults).map(([level, passes]) => (
-                    <div
-                      key={level}
-                      className="inline-flex items-center justify-between gap-x-2 rounded-full border-3 bg-transparent px-4 py-2 text-base font-semibold transition-colors md:text-lg"
-                      style={{
-                        borderColor: fgDisplayColor,
-                        backgroundColor: passes
-                          ? fgDisplayColor
-                          : rgbToHex(background),
-                        color: passes ? bgDisplayColor : fgDisplayColor,
-                      }}
-                    >
-                      {level}
-                      {passes ? (
-                        <AccessibleIcon label="Pass">
-                          <Check className="h-6 w-6" />
-                        </AccessibleIcon>
-                      ) : (
-                        <AccessibleIcon label="Fail">
-                          <X className="h-6 w-6" />
-                        </AccessibleIcon>
-                      )}
-                    </div>
-                  ))}
-                </>
-              ) : (
-                <>
-                  {Object.entries(wcagResults).map(([level, passes]) => (
-                    <div
-                      key={level}
-                      className="inline-flex items-center justify-between gap-x-2 rounded-full border-3 bg-transparent px-4 py-2 text-base font-semibold transition-colors md:text-lg"
-                      style={{
-                        borderColor: fgDisplayColor,
-                        backgroundColor: passes
-                          ? fgDisplayColor
-                          : rgbToHex(background),
-                        color: passes ? bgDisplayColor : fgDisplayColor,
-                      }}
-                    >
-                      {level}
-                      {passes ? (
-                        <AccessibleIcon label="Pass">
-                          <Check className="h-6 w-6" />
-                        </AccessibleIcon>
-                      ) : (
-                        <AccessibleIcon label="Fail">
-                          <X className="h-6 w-6" />
-                        </AccessibleIcon>
-                      )}
-                    </div>
-                  ))}
-                </>
-              )}
+              </div>
             </div>
           </div>
         </section>
@@ -741,31 +782,21 @@ export default function ContrastChecker() {
                   color={foreground}
                   displayColor={fgDisplayColor}
                   onChange={(value) => handleColorChange("foreground", value)}
-                  className="absolute left-2.5 top-1/2 size-9 -translate-y-1/2 md:left-4 md:size-12"
+                  className="absolute left-2.5 top-1/2 size-9 -translate-y-1/2 md:left-3.5 md:size-10 lg:left-4 lg:size-14"
                 />
                 <Input
-                  value={foregroundHex}
+                  id="foreground-color"
+                  name="foreground-color"
+                  value={foregroundInputValue}
                   onChange={(e) => {
-                    const value = e.target.value;
-                    // if (value.length <= 7) {
-                    //   setForegroundHex(value);
-                    //   if (/^#?[0-9A-Fa-f]{6}$/.test(value)) {
-                    //     const colorValue = value.startsWith("#")
-                    //       ? value
-                    //       : `#${value}`;
-                    //     setForeground(hexToRgb(colorValue));
-                    //     setForegroundHex(colorValue);
-                    //   }
-                    // }
-                    setForeground(hexToRgba(value));
-                    // setForegroundHex(value);
+                    handleInputChange(e, "foreground");
                   }}
                   style={{
                     borderColor: fgDisplayColor,
                   }}
                   spellCheck={false}
-                  maxLength={7}
-                  className="h-fit border-3 bg-transparent px-14 py-2 font-mono text-3xl font-medium leading-none md:px-20 md:text-4xl lg:text-5xl"
+                  maxLength={9} // Allow for "#" + 8 characters
+                  className="h-fit border-3 bg-transparent px-14 py-2 font-mono text-3xl font-medium leading-none md:px-16 md:text-4xl lg:px-20 lg:text-6xl"
                 />
 
                 <CopyColorButton
@@ -826,34 +857,23 @@ export default function ContrastChecker() {
                     color={background}
                     onChange={(value) => handleColorChange("background", value)}
                     displayColor={fgDisplayColor}
-                    className="absolute left-2.5 top-1/2 size-9 -translate-y-1/2 md:left-4 md:size-12"
+                    className="absolute left-2.5 top-1/2 size-9 -translate-y-1/2 md:left-3.5 md:size-10 lg:left-4 lg:size-14"
                   />
                 </div>
 
                 <Input
                   id="background-color"
-                  value={backgroundHex}
+                  name="background-color"
+                  value={backgroundInputValue}
                   onChange={(e) => {
-                    const value = e.target.value;
-                    // if (value.length <= 7) {
-                    //   setBackgroundHex(value);
-                    //   if (/^#?[0-9A-Fa-f]{6}$/.test(value)) {
-                    //     const colorValue = value.startsWith("#")
-                    //       ? value
-                    //       : `#${value}`;
-                    //     setBackground(hexToRgb(colorValue));
-                    //     setBackgroundHex(colorValue);
-                    //   }
-                    // }
-                    setBackground(hexToRgba(value));
-                    // setBackgroundHex(value);
+                    handleInputChange(e, "background");
                   }}
                   spellCheck={false}
-                  // maxLength={7}
+                  maxLength={9} // Allow for "#" + 8 characters
                   style={{
                     borderColor: fgDisplayColor,
                   }}
-                  className="h-fit w-full border-3 bg-transparent px-14 py-2 font-mono text-3xl font-medium leading-none md:px-20 md:text-4xl lg:text-5xl"
+                  className="h-fit border-3 bg-transparent px-14 py-2 font-mono text-3xl font-medium leading-none md:px-16 md:text-4xl lg:px-20 lg:text-6xl"
                 />
 
                 <CopyColorButton
