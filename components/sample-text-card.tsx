@@ -15,7 +15,6 @@ import { RgbaColor, ColorBlindnessType, AnimechanQuote } from "@/lib/types";
 import { cn } from "@/lib/utils/cn";
 import { rgbToHex, rgbaToHex } from "@/lib/utils/color";
 
-
 /**
  * Simulates color blindness by transforming RGB colors.
  * @param {RgbaColor} color - Input color as an RGBA color object to be transformed based on type selection.
@@ -175,7 +174,13 @@ const SampleTextCard = ({
         </div>
       </Card>
 
-      <SheetContent className="h-full border-none p-0" side={"bottom"}>
+      <SheetContent
+        className="h-full border-none p-0"
+        side={"bottom"}
+        style={{
+          color: fgDisplayColor,
+        }}
+      >
         <VisuallyHidden>
           <SheetTitle>Full screen {textSize} text</SheetTitle>
         </VisuallyHidden>

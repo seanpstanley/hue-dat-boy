@@ -72,8 +72,9 @@ const SheetContent = React.forwardRef<
           size="auto"
           variant="ghost"
           className="absolute right-4 top-4 p-1 md:size-9"
+          style={props.style}
         >
-          <X className="!size-full" />
+          <X className="!size-full" style={props.style} />
           <span className="sr-only">Close</span>
         </Button>
       </SheetPrimitive.Close>

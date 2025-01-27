@@ -541,9 +541,9 @@ export default function ContrastChecker() {
           id="contrast-info"
         >
           {/* Contrast Ratio and Standards Levels */}
-          <div className="flex w-full flex-col justify-between gap-y-4 md:flex-row md:items-end">
+          <div className="flex w-full flex-col flex-wrap justify-between gap-y-4 md:flex-row md:items-end">
             {/* Contrast Ratio  */}
-            <div className="flex w-fit flex-col gap-y-2">
+            <div className="flex w-fit flex-col gap-y-2 text-nowrap">
               <Label htmlFor="contrast-value" className="text-base md:text-lg">
                 contrast value
               </Label>
@@ -587,11 +587,11 @@ export default function ContrastChecker() {
             </div>
 
             {/* Standards Levels */}
-            <div className="ml-auto flex flex-col gap-y-2">
+            <div className="flex flex-col gap-y-2">
               <Label htmlFor="contrast-value" className="text-base md:text-lg">
                 {useAPCA ? "apca" : "wcag"} levels
               </Label>
-              <div className="flex flex-wrap justify-end gap-2 md:grid md:grid-cols-2 lg:grid-cols-4">
+              <div className="flex flex-wrap gap-2 md:grid md:grid-cols-2 lg:grid-cols-4">
                 {useAPCA ? (
                   <>
                     {Object.entries(apcaResults).map(([level, passes]) => (
