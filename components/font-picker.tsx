@@ -143,6 +143,13 @@ const FontPicker = ({
         }}
       >
         <div
+          className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-white/50"
+          style={{
+            backgroundColor: displayColor,
+          }}
+        />
+
+        <div
           className="mt-4 border-t-2"
           style={{
             borderColor: displayColor,

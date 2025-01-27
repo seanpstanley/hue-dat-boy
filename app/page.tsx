@@ -551,7 +551,7 @@ export default function ContrastChecker() {
             >
               standards
             </Label> */}
-            <div className="ml-auto grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="ml-auto flex flex-wrap justify-end gap-2">
               {useAPCA ? (
                 <>
                   {Object.entries(apcaResults).map(([level, passes]) => (
@@ -788,7 +788,7 @@ export default function ContrastChecker() {
                     onClick={handleReverseColors}
                   >
                     <span className="sr-only">Swap colors</span>
-                    <ArrowLeftRight className="!size-full -rotate-90 transition-transform md:rotate-0" />
+                    <ArrowLeftRight className="!size-full rotate-90 transition-transform md:rotate-0" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent
