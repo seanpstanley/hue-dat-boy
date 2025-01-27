@@ -1,22 +1,28 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
+
+import { AccessibleIcon } from "@radix-ui/react-accessible-icon";
+import { calcAPCA } from "apca-w3";
+import { Clipboard, ArrowLeftRight, Check, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { Clipboard, ArrowLeftRight, Check, X } from "lucide-react";
-import { calcAPCA } from "apca-w3";
-import { AccessibleIcon } from "@radix-ui/react-accessible-icon";
-
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Switch } from "@/components/ui/switch";
+import { useAnimeQuote } from "@/app/hooks/use-anime-quote";
+import { useGoogleFonts } from "@/app/hooks/use-google-fonts";
+import { ApcaInfo } from "@/components/apca-info";
+import { ColorPicker } from "@/components/color-picker";
+import { CopyColorButton } from "@/components/copy-color-button";
+import { FontPicker } from "@/components/font-picker";
+import { Footer } from "@/components/footer";
+import { SampleTextCard } from "@/components/sample-text-card";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -24,12 +30,15 @@ import {
   SelectTrigger,
   // SelectValue,
 } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { ColorPicker } from "@/components/color-picker";
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { WcagInfo } from "@/components/wcag-info";
 import { ColorBlindnessType, RgbaColor } from "@/lib/types";
 import {
   rgbToHex,
@@ -43,15 +52,6 @@ import {
   hexToRgba,
 } from "@/lib/utils/color";
 import { debounce } from "@/lib/utils/debounce";
-import { Footer } from "@/components/footer";
-import { CopyColorButton } from "@/components/copy-color-button";
-import { SampleTextCard } from "@/components/sample-text-card";
-import { FontPicker } from "@/components/font-picker";
-import { ApcaInfo } from "@/components/apca-info";
-import { Separator } from "@/components/ui/separator";
-import { WcagInfo } from "@/components/wcag-info";
-import { useAnimeQuote } from "@/app/hooks/use-anime-quote";
-import { useGoogleFonts } from "./hooks/use-google-fonts";
 
 /**
  * Calculates the contrast range (minimum and maximum) between two colors

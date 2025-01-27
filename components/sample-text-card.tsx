@@ -1,18 +1,20 @@
+import { AccessibleIcon } from "@radix-ui/react-accessible-icon";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { Maximize2 } from "lucide-react";
+
+import { TooltipButton } from "@/components/tooltip-button";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { AccessibleIcon } from "@radix-ui/react-accessible-icon";
 import {
   Sheet,
   SheetContent,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { rgbToHex, rgbaToHex } from "@/lib/utils/color";
-import { cn } from "@/lib/utils/cn";
 import { RgbaColor, ColorBlindnessType, AnimechanQuote } from "@/lib/types";
-import { TooltipButton } from "@/components/tooltip-button";
-import { Maximize2 } from "lucide-react";
+import { cn } from "@/lib/utils/cn";
+import { rgbToHex, rgbaToHex } from "@/lib/utils/color";
+
 
 /**
  * Simulates color blindness by transforming RGB colors.

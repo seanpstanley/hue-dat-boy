@@ -1,14 +1,15 @@
 import { memo, useState, useEffect, useCallback } from "react";
+
 import { RgbaColorPicker } from "react-colorful";
 
+import { Button } from "@/components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils/cn";
 import { RgbaColor } from "@/lib/types";
+import { cn } from "@/lib/utils/cn";
 
 interface ColorPickerProps {
   color: RgbaColor;

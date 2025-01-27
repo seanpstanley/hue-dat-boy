@@ -4,8 +4,8 @@ import { Clipboard } from "lucide-react";
 
 import { TooltipButton } from "@/components/tooltip-button";
 import { Button } from "@/components/ui/button";
-import { rgbaToHex } from "@/lib/utils/color";
 import { RgbaColor } from "@/lib/types";
+import { rgbaToHex } from "@/lib/utils/color";
 
 type ColorType = "text" | "background";
 

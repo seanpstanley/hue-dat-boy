@@ -1,4 +1,5 @@
 import useSWR from "swr";
+
 import { fetcher } from "@/lib/utils/api";
 
 export const useGoogleFonts = () => {

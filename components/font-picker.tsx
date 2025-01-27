@@ -2,9 +2,7 @@ import { useState, Dispatch, SetStateAction } from "react";
 
 import { Check, ChevronsUpDown } from "lucide-react";
 
-import { RgbaColor, GoogleFont } from "@/lib/types";
-import { cn } from "@/lib/utils/cn";
-import { rgbToHex } from "@/lib/utils/color";
+import { useMediaQuery } from "@/app/hooks/use-media-query";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -20,8 +18,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-
-import { useMediaQuery } from "@/app/hooks/use-media-query";
+import { RgbaColor, GoogleFont } from "@/lib/types";
+import { cn } from "@/lib/utils/cn";
+import { rgbToHex } from "@/lib/utils/color";
 
 interface FontPickerProps {
   displayColor: string;

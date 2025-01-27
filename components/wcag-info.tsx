@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { MathJax, MathJaxContext } from "better-react-mathjax";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 
