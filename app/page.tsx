@@ -1053,10 +1053,10 @@ export default function ContrastChecker() {
 
       {/* Dynamically load the selected font */}
       <style jsx global>{`
-        @import url("https://fonts.googleapis.com/css2?family=${font.replace(
+        @import url("https://fonts.googleapis.com/css2?family=${font?.replace(
           / /g,
           "+",
-        )}&display=swap");
+        ) || "Inter"}&display=swap");
       `}</style>
     </div>
   );
