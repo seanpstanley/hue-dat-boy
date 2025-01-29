@@ -925,7 +925,7 @@ export default function ContrastChecker() {
                 color: fgDisplayColor,
               }}
             >
-              <Label htmlFor="typeface-select" className="text-base md:text-lg">
+              <Label id="typeface-select" className="text-base md:text-lg">
                 typeface
               </Label>
               <FontPicker
