@@ -6,12 +6,12 @@ import { Clipboard } from "lucide-react";
 
 import { TooltipButton } from "@/components/tooltip-button";
 import { Button } from "@/components/ui/button";
-import { RgbaColor } from "@/lib/types";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { RgbaColor } from "@/lib/types";
 import { rgbaToHex } from "@/lib/utils/color";
 
 type ColorType = "text" | "background";
@@ -82,7 +82,7 @@ const CopyColorButton = ({
           <Button
             size="auto"
             variant="ghost-outline"
-            className={`absolute right-2.5 top-1/2 size-9 -translate-y-1/2 border-black border-opacity-0 p-2 hover:border-black/100 hover:border-opacity-100 md:right-3 md:size-10 lg:right-4 lg:size-16`}
+            className={`absolute right-2.5 top-1/2 size-9 -translate-y-1/2 border-[${borderColor}] border-opacity-0 p-2 hover:border-black/100 hover:border-opacity-100 md:right-3 md:size-10 lg:right-4 lg:size-16`}
             onClick={handleCopy}
           >
             <Clipboard className="!size-full" />

@@ -2,9 +2,9 @@ import { RgbaColor, HslaColor } from "@/lib/types";
 
 /**
  * Blends two colors using alpha compositing.
- * @param {RgbaColor} fg The RGBA color object representing the foreground color.
- * @param {RgbaColor} bg The RGBA color object representing the background color.
- * @returns {RgbaColor} The blended RGBA color object.
+ * @param     {RgbaColor}   fg    The RGBA color object representing the foreground color.
+ * @param     {RgbaColor}   bg    The RGBA color object representing the background color.
+ * @returns   {RgbaColor}         The blended RGBA color object.
  */
 export function blendColors(fg: RgbaColor, bg: RgbaColor): RgbaColor {
   const alpha = fg.a;
@@ -25,10 +25,10 @@ function calculateRelativeLuminance({ r, g, b }: RgbaColor) {
 
 /**
  * Calculates the WCAG contrast ratio between two colors.
- * @param {RgbaColor} bg  The RGBA color object representing the background color
- * @param {RgbaColor} fg  The RGBA color object representing the foreground color.
- * @param {RgbaColor} solidBg  Optional solid background RGBA color for blending.
- * @returns {number} The contrast ratio as a number.
+ * @param     {RgbaColor}   bg        The RGBA color object representing the background color
+ * @param     {RgbaColor}   fg        The RGBA color object representing the foreground color.
+ * @param     {RgbaColor}   solidBg   Optional solid background RGBA color for blending.
+ * @returns   {number}                The contrast ratio as a number.
  */
 export function calculateWCAGContrast(
   bg: RgbaColor,
@@ -68,9 +68,9 @@ export function calculateWCAGContrast(
 /**
  * Determines the display color (foreground) for a given background color.
  * Will return black (#000) or white (#fff) if the WCAG contrast ratio is less than 3, depending on which color creates a higher contrast.
- * @param {RgbaColor} bg The RGBA color object representing the backround color
- * @param {RgbaColor} fg The RGBA color object representing the foreground color.
- * @returns {string} The HEX color string for the foreground color.
+ * @param     {RgbaColor}   bg    The RGBA color object representing the backround color
+ * @param     {RgbaColor}   fg    The RGBA color object representing the foreground color.
+ * @returns   {string}            The HEX color string for the foreground color.
  */
 export function getDisplayColor(bg: RgbaColor, fg: RgbaColor): string {
   const displayFg: RgbaColor = { r: fg.r, g: fg.g, b: fg.b, a: 1 };
@@ -101,8 +101,8 @@ export function getDisplayColor(bg: RgbaColor, fg: RgbaColor): string {
 
 /**
  * Converts a HEX color string to an RGBA color object.
- * @param {string} hex The HEX color string (e.g., "#RRGGBB").
- * @returns {RgbaColor} The RGBA color object with properties {r, g, b, a}.
+ * @param     {string}      hex   The HEX color string (e.g., "#RRGGBB").
+ * @returns   {RgbaColor}         The RGBA color object with properties {r, g, b, a}.
  */
 export function hexToRgba(hex: string): RgbaColor {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -131,8 +131,8 @@ export function rgbaToHex({ r, g, b, a }: RgbaColor): string {
 
 /**
  * Converts an RGB color object to a HEX color string.
- * @param {RgbColor} rgb The RGB color object with properties {r, g, b}.
- * @returns {string} The HEX color string.
+ * @param     {RgbColor}    rgb   The RGB color object with properties {r, g, b}.
+ * @returns   {string}            The HEX color string.
  */
 export function rgbToHex({ r, g, b }: RgbaColor): string {
   return `#${[r, g, b].map((x) => x.toString(16).padStart(2, "0")).join("")}`;
@@ -152,9 +152,9 @@ export function rgbToHex({ r, g, b }: RgbaColor): string {
 
 /**
  * Converts a HEX color string to an RGBA color object.
- * @param {string} hex The HEX color string (e.g., "#RRGGBB" or "#RRGGBBAA").
- * @returns {RgbaColor} The RGBA color object with properties {r, g, b, a}.
- * @throws Will throw an error if the HEX color format is invalid.
+ * @param     {string}      hex   The HEX color string (e.g., "#RRGGBB" or "#RRGGBBAA").
+ * @returns   {RgbaColor}         The RGBA color object with properties {r, g, b, a}.
+ * @throws                        Will throw an error if the HEX color format is invalid.
  */
 export function hexToRgb(hex: string): RgbaColor {
   const parsedHex = hex.replace("#", "");
@@ -221,11 +221,12 @@ export function rgbaToHsla({ r, g, b, a }: RgbaColor): HslaColor {
  * Assumes h, s, and l are contained in the set [0, 1] and
  * returns r, g, and b in the set [0, 255].
  *
- * @param   {HslaColor}   hsla    The HSLA color object with properties {h, s, l, a}.
- * @return  {RgbaColor}           The RGBA color object with properties {r, g, b, a}.
+ * @param    {HslaColor}   hsla    The HSLA color object with properties {h, s, l, a}.
+ * @returns  {RgbaColor}           The RGBA color object with properties {r, g, b, a}.
  */
 export function hslaToRgba({ h, s, l, a }: HslaColor): RgbaColor {
-  var r, g, b;
+  let r, g, b;
+  console.log(a);
 
   s /= 100;
   l /= 100;
@@ -233,7 +234,7 @@ export function hslaToRgba({ h, s, l, a }: HslaColor): RgbaColor {
   if (s == 0) {
     r = g = b = l; // achromatic
   } else {
-    var hue2rgb = function hue2rgb(p: number, q: number, t: number) {
+    const hue2rgb = function hue2rgb(p: number, q: number, t: number) {
       if (t < 0) t += 1;
       if (t > 1) t -= 1;
       if (t < 1 / 6) return p + (q - p) * 6 * t;
@@ -242,8 +243,8 @@ export function hslaToRgba({ h, s, l, a }: HslaColor): RgbaColor {
       return p;
     };
 
-    var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-    var p = 2 * l - q;
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    const p = 2 * l - q;
     r = hue2rgb(p, q, h + 1 / 3);
     g = hue2rgb(p, q, h);
     b = hue2rgb(p, q, h - 1 / 3);

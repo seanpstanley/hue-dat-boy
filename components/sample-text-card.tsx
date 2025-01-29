@@ -78,13 +78,59 @@ interface SampleTextCardProps {
   bgDisplayColor: string;
   fgDisplayColor: string;
   font: string;
-  colorBlindnessSimulation: any;
+  colorBlindnessSimulation: ColorBlindnessType;
   textSize: "normal" | "large";
   isLoading: boolean;
   error: any;
   data: AnimechanQuote;
 }
 
+/**
+ * A card component that displays a random Anime Quote. Styling is affected by foreground and background colors, in
+ * addition to color blindness simulation selection.
+ *
+ * @param   {RgbaColor}             foreground                  The RGBA color object representing the foreground color.
+ * @param   {RgbaColor}             background                  The RGBA color object representing the background color.
+ * @param   {string}                bgDisplayColor              The background display color calculated by getDisplayColor.
+ * @param   {string}                fgDisplayColor              The foreground display color calculated by getDisplayColor.
+ * @param   {string}                font                        The current active font, selected by the "typeface" Drawer/Popover.
+ * @param   {ColorBlindnessType}    colorBlindnessSimulation    The display color calculated by getDisplayColor, necessary for styling.
+ * @param   {boolean}               textSize                    The display color calculated by getDisplayColor, necessary for styling.
+ * @param   {boolean}               isLoading                   Loading state provided by SWR.
+ * @param   {any}                   error                       Error object provided by SWR.
+ * @param   {AnimechanQuote}        data                        The RGBA color object representing the background color.
+ *
+ * @returns                                                     A SampleTextCard component that displays a random Anime Quote.
+ *
+ * @example
+ * ```tsx
+ * import { SampleTextCard } from "@/components/sample-text-card";
+ *
+ * const foreground = { r: 255, g: 255, b: 255, a: 1 };
+ * const background = { r: 255, g: 255, b: 255, a: 1 };
+ * const bgDisplayColor = "#000000";
+ * const fgDisplayColor = "#ffffff";
+ * const font = "Inter";
+ * const colorBlindnessSimulation = "protanopia";
+ * const {
+ *   data: quoteData,
+ *   error: quoteError,
+ *   isLoading: isQuoteLoading,
+ * } = useAnimeQuote();
+ *
+ * <SampleTextCard
+ *   copyColor="text"
+ *   displayColor={displayColor}
+ *   foreground={foreground}
+ *   background={background}
+ *   colorBlindnessSimulation={colorBlindnessSimulation}
+ *   textSize="normal"
+ *   isLoading={isQuoteLoading}
+ *   error={quoteError}
+ *   data={quoteData?.data}
+ * />
+ * ```
+ */
 const SampleTextCard = ({
   foreground,
   background,

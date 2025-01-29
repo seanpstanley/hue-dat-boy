@@ -54,13 +54,21 @@ import {
 import { debounce } from "@/lib/utils/debounce";
 
 /**
+ * An object with the minimum and maximum contrast values as numbers with two decimal points of precision.
+ * @typedef   {Object}    ContrastRange
+ * @property  {number}    min     The minimum possible contrast value based on the semi-transparent background color.
+ * @property  {number}    max   The maximum possible contrast value based on the semi-transparent background color.
+ */
+
+/**
  * Calculates the contrast range (minimum and maximum) between two colors
  * using either the WCAG or APCA contrast algorithms.
  *
- * @param bg - The RGBA color object representing the background color.
- * @param fg - The RGBA color object representing the foreground color.
- * @param useAPCA - A boolean indicating whether to use WCAG or APCA contrast calculation.
- * @returns An object with the minimum and maximum contrast values as numbers with two decimal points of precision.
+ * @param     {RgbaColor}       bg        The RGBA color object representing the background color.
+ * @param     {RgbaColor}       fg        The RGBA color object representing the foreground color.
+ * @param     {boolean}         useAPCA   A boolean indicating whether to use WCAG or APCA contrast calculation.
+ * @returns   {ContrastRange}             An object with the minimum and maximum contrast values as numbers with two decimal points of
+ *                                        precision.
  *
  * @example
  * const bg = { r: 255, g: 255, b: 255, a: 0.5 };
@@ -99,9 +107,9 @@ function calculateContrastRange(
 /**
  * Calculates the APCA (Advanced Perceptual Contrast Algorithm) contrast between two colors.
  *
- * @param background - The RGBA color object representing the background color.
- * @param foreground - The RGBA color object representing the foreground color.
- * @returns The calculated APCA contrast as a number with two decimal places of precision.
+ * @param     {RgbaColor}   background    The RGBA color object representing the background color.
+ * @param     {RgbaColor}   foreground    The RGBA color object representing the foreground color.
+ * @returns   {number}                    The calculated APCA contrast as a number with two decimal places of precision.
  *
  * @example
  * const bg = { r: 255, g: 255, b: 255, a: 1 };
@@ -544,7 +552,7 @@ export default function ContrastChecker() {
           id="contrast-info"
         >
           {/* Contrast Ratio and Standards Levels */}
-          <div className="flex w-full flex-col flex-wrap justify-between gap-y-4 md:flex-row md:items-end">
+          <div className="flex w-full flex-col flex-wrap justify-between gap-x-8 gap-y-4 md:flex-row md:items-end">
             {/* Contrast Ratio  */}
             <div className="flex w-fit flex-col gap-y-2 text-nowrap">
               <Label htmlFor="contrast-value" className="text-base md:text-lg">
@@ -780,7 +788,7 @@ export default function ContrastChecker() {
                   borderColor: fgDisplayColor,
                 }}
               >
-                copied!
+                copied url!
               </PopoverContent>
             </Popover>
           </div>

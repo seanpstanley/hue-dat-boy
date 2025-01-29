@@ -32,6 +32,43 @@ interface FontPickerProps {
   onChange: Dispatch<SetStateAction<string>>;
 }
 
+/**
+ * A font picker component. Uses Popover on mobile and Drawer on larger screens.
+ *
+ * @param   {string}                              displayColor    The display color calculated by getDisplayColor, necessary for styling
+ *                                                                the Popover and Drawer's border and text colors.
+ * @param   {RgbaColor}                           background      The RGBA color object representing the background color.
+ * @param   {GoogleFont[]}                        fonts           The array of GoogleFont objects received from the Google Fonts API.
+ * @param   {boolean}                             isLoading       Loading state provided by SWR.
+ * @param   {any}                                 error           Error object provided by SWR.
+ * @param   {Dispatch<SetStateAction<string>>}    onChange        Change handler for the parent's color state.
+ *
+ * @returns                                                       FontPicker component.
+ *
+ * @example
+ * ```tsx
+ * import { FontPicker } from "@/components/font-picker";
+ *
+ * const displayColor = "#ffffff";
+ *  const {
+ *    data: fontData,
+ *    error: fontError,
+ *    isLoading: isFontLoading,
+ * } = useGoogleFonts();
+ * const background = { r: 255, g: 255, b: 255, a: 0.9 };
+ * const [font, setFont] = useState('Inter');
+ *
+ * <FontPicker
+ *    defaultFont={font}
+ *    fonts={fontData?.items}
+ *    isLoading={isFontLoading}
+ *    error={fontError}
+ *    displayColor={fgDisplayColor}
+ *    background={background}
+ *    onChange={setFont}
+ * />
+ * ```
+ */
 const FontPicker = ({
   displayColor,
   background,

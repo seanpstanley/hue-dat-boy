@@ -18,6 +18,30 @@ interface ColorPickerProps {
   className?: string;
 }
 
+/**
+ * A color picker component component wrapped in a Popover.
+ *
+ * @param   {string}                        foreground      The display color calculated by getDisplayColor, necessary for styling
+ *                                                          the Popover's border and text colors.
+ * @param   {string}                        displayColor    The RGBA color object representing the background color.
+ * @param   {(color: RgbaColor) => void}    onChange        Change handler for the parent's color state.
+ *
+ * @returns                                                 ColorPicker component.
+ *
+ * @example
+ * ```tsx
+ * import { ColorPicker } from "@/components/color-picker";
+ *
+ * const displayColor = "#ffffff";
+ * const foreground = { r: 255, g: 255, b: 255, a: 1 };
+ *
+ * <ColorPicker
+ *   color={foreground}
+ *   displayColor={displayColor}
+ *   onChange={(value) => handleColorChange("foreground", value)}
+ * />
+ * ```
+ */
 const ColorPicker = memo(
   ({ color, displayColor, onChange, className }: ColorPickerProps) => {
     const [internalColor, setInternalColor] = useState<RgbaColor>(color);
