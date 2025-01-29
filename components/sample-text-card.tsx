@@ -1,6 +1,6 @@
 import { AccessibleIcon } from "@radix-ui/react-accessible-icon";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { Maximize2 } from "lucide-react";
+import { Maximize2, X } from "lucide-react";
 
 import { TooltipButton } from "@/components/tooltip-button";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import {
   SheetContent,
   SheetTitle,
   SheetTrigger,
+  SheetClose,
 } from "@/components/ui/sheet";
 import { RgbaColor, ColorBlindnessType, AnimechanQuote } from "@/lib/types";
 import { cn } from "@/lib/utils/cn";
@@ -17,9 +18,9 @@ import { rgbToHex, rgbaToHex } from "@/lib/utils/color";
 
 /**
  * Simulates color blindness by transforming RGB colors.
- * @param {RgbaColor} color - Input color as an RGBA color object to be transformed based on type selection.
- * @param {ColorBlindnessType} type - The type of color blindness to simulate.
- * @returns The transformed color as an object with properties {r, g, b}.
+ * @param     {RgbaColor}           color   Input color as an RGBA color object to be transformed based on type selection.
+ * @param     {ColorBlindnessType}  type    The type of color blindness to simulate.
+ * @returns                                 The transformed color as an object with properties {r, g, b}.
  */
 function simulateColorBlindness(
   color: RgbaColor,
@@ -124,9 +125,9 @@ const SampleTextCard = ({
           >
             <SheetTrigger asChild>
               <Button
-                variant="ghost"
+                variant="ghost-outline"
                 size="icon"
-                className="absolute right-0.5 top-1/2 size-8 -translate-y-1/2 p-2 md:size-9"
+                className={`absolute right-1 top-1/2 size-8 -translate-y-1/2 p-2 md:size-10 border-[${bgDisplayColor}]`}
                 style={{ color: bgDisplayColor }}
               >
                 <AccessibleIcon label="Fullscreen view">
@@ -225,6 +226,16 @@ const SampleTextCard = ({
             )}
           </blockquote>
         </div>
+        <SheetClose asChild>
+          <Button
+            size="auto"
+            variant="ghost-outline"
+            className={`absolute right-4 top-4 p-1 md:size-9 border-[${fgDisplayColor}]`}
+          >
+            <X className="!size-full" />
+            <span className="sr-only">Close</span>
+          </Button>
+        </SheetClose>
       </SheetContent>
     </Sheet>
   );

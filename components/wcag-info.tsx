@@ -3,6 +3,25 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 
+/**
+ * A section with information and links related to the WCAG standard.
+ *
+ * @param   {string}      displayColor  The display color calculated by getDisplayColor, necessary for styling
+ *                                      the tooltip's border and text color.
+ *
+ * @returns                             The 'WcagInfo' component, containing details and links related to the WCAG standard.
+ *
+ * @example
+ * ```tsx
+ * import { WcagInfo } from "@/components/wcag-info";
+ *
+ * const displayColor = "#000000";
+ *
+ * <WcagInfo
+ *   displayColor={displayColor}
+ * />
+ * ```
+ */
 const WcagInfo = ({ displayColor }: { displayColor: string }) => {
   return (
     <MathJaxContext>
@@ -11,12 +30,12 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
         className="flex flex-col gap-y-6"
         style={{ color: displayColor }}
       >
-        <h3 className="font-bold text-xl md:text-2xl mb-0">
+        <h3 className="mb-0 text-xl font-bold md:text-2xl">
           About WCAG (Web Content Accessibility Guidelines)
         </h3>
 
         <div className="flex flex-col gap-y-2">
-          <h4 className="font-medium text-lg md:text-xl">What is WCAG?</h4>
+          <h4 className="text-lg font-medium md:text-xl">What is WCAG?</h4>
 
           <p>
             The Web Content Accessibility Guidelines (WCAG) are internationally
@@ -28,7 +47,7 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
 
           <p>WCAG ensures that content is:</p>
 
-          <ul className="list-disc list-inside">
+          <ul className="list-inside list-disc">
             <li>
               <strong>Perceivable</strong>: Users can recognize and use
               information.
@@ -53,7 +72,7 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
         </div>
 
         <div className="flex flex-col gap-y-2">
-          <h4 className="font-medium text-lg md:text-xl">
+          <h4 className="text-lg font-medium md:text-xl">
             How WCAG Calculates Contrast
           </h4>
 
@@ -74,7 +93,7 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
           </MathJax>
 
           <p>Where:</p>
-          <ul className="list-disc list-inside" suppressHydrationWarning>
+          <ul className="list-inside list-disc" suppressHydrationWarning>
             <li>
               <MathJax inline suppressHydrationWarning>
                 {"\\({L_{1}}\\)"}
@@ -98,17 +117,17 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
         </div>
 
         <div className="flex flex-col gap-y-2">
-          <h4 className="font-medium text-lg md:text-xl">WCAG Levels</h4>
+          <h4 className="text-lg font-medium md:text-xl">WCAG Levels</h4>
 
           <p>
             WCAG contrast requirements are split into levels to meet varying
             accessibility needs:
           </p>
 
-          <ul className="list-disc list-inside [&_ul]:list-[revert]">
+          <ul className="list-inside list-disc [&_ul]:list-[revert]">
             <li>
               <strong>Level AA</strong>: Minimum contrast for readability.
-              <ul className="list-inside ml-4">
+              <ul className="ml-4 list-inside">
                 <li>
                   <strong>Normal Text (12–18px)</strong>: 4.5:1
                 </li>
@@ -120,7 +139,7 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
             <li>
               <strong>Level AAA</strong>: Enhanced contrast for high
               accessibility.
-              <ul className="list-inside ml-4">
+              <ul className="ml-4 list-inside">
                 <li>
                   <strong>Normal Text</strong>: 7:1
                 </li>
@@ -133,7 +152,7 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
         </div>
 
         <div className="flex flex-col gap-y-2">
-          <h4 className="font-medium text-lg md:text-xl">Attributions</h4>
+          <h4 className="text-lg font-medium md:text-xl">Attributions</h4>
 
           <p>
             WCAG is developed and maintained by the W3C Web Accessibility
@@ -143,7 +162,7 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
 
           <p>For more information, visit:</p>
 
-          <ul className="list-disc list-inside">
+          <ul className="list-inside list-disc">
             <li>
               <Button
                 asChild
@@ -174,14 +193,14 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
         </div>
 
         <div className="flex flex-col gap-y-2">
-          <h4 className="font-medium text-lg md:text-xl">Disclaimer</h4>
+          <h4 className="text-lg font-medium md:text-xl">Disclaimer</h4>
 
           <p>
             The WCAG compliance compliance calculation of this tool aims to
             provide accurate and reliable contrast results. However:
           </p>
 
-          <ul className="list-decimal list-inside">
+          <ul className="list-inside list-decimal">
             <li>
               The displayed values and thresholds may differ slightly depending
               on the color precision and calculation methods used.
@@ -195,11 +214,11 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
         </div>
 
         <div className="flex flex-col gap-y-2">
-          <h4 className="font-medium text-lg md:text-xl">Further Reading</h4>
+          <h4 className="text-lg font-medium md:text-xl">Further Reading</h4>
 
           <p>Explore more about WCAG and color contrast::</p>
 
-          <ul className="list-disc list-inside">
+          <ul className="list-inside list-disc">
             <li>
               <Button
                 asChild

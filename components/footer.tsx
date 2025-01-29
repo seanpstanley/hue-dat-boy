@@ -6,21 +6,40 @@ import { Button } from "@/components/ui/button";
 
 const getCurrentYear = () => new Date().getFullYear();
 
+/**
+ * A footer with the current year and personal links.
+ *
+ * @param   {string}      displayColor  The display color calculated by getDisplayColor, necessary for styling
+ *                                      the tooltip's border and text color.
+ *
+ * @returns                             'Footer' component with the current year and personal links.
+ *
+ * @example
+ * ```tsx
+ * import { Footer } from "@/components/footer";
+ *
+ * const displayColor = "#000000";
+ *
+ * <Footer
+ *   displayColor={displayColor}
+ * />
+ * ```
+ */
 const Footer = ({ displayColor }: { displayColor: string }) => {
   return (
     <footer
-      className="mt-12 py-6 container mx-auto"
+      className="container mx-auto mt-12 py-6"
       style={{
         color: displayColor,
       }}
     >
-      <div className="flex flex-col items-center sm:flex-row-reverse justify-between gap-4">
+      <div className="flex flex-col items-center justify-between gap-4 sm:flex-row-reverse">
         <div className="flex gap-x-4">
           <Button
             asChild
-            variant={"ghost"}
-            size={"auto"}
-            className="size-12 p-2"
+            variant="ghost-outline"
+            size="auto"
+            className={`size-12 p-2 border-[${displayColor}]`}
           >
             <Link
               href="https://github.com/seanpstanley/hue-dat-boy"
@@ -34,9 +53,9 @@ const Footer = ({ displayColor }: { displayColor: string }) => {
           </Button>
           <Button
             asChild
-            variant={"ghost"}
-            size={"auto"}
-            className="size-12 p-2"
+            variant="ghost-outline"
+            size="auto"
+            className={`size-12 p-2 border-[${displayColor}]`}
           >
             <Link
               href="https://www.linkedin.com/in/seanpstanley/"

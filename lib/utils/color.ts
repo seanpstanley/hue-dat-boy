@@ -2,9 +2,9 @@ import { RgbaColor, HslaColor } from "@/lib/types";
 
 /**
  * Blends two colors using alpha compositing.
- * @param fg - The RGBA color object representing the foreground color.
- * @param bg - The RGBA color object representing the background color.
- * @returns The blended RGBA color object.
+ * @param {RgbaColor} fg The RGBA color object representing the foreground color.
+ * @param {RgbaColor} bg The RGBA color object representing the background color.
+ * @returns {RgbaColor} The blended RGBA color object.
  */
 export function blendColors(fg: RgbaColor, bg: RgbaColor): RgbaColor {
   const alpha = fg.a;
@@ -25,10 +25,10 @@ function calculateRelativeLuminance({ r, g, b }: RgbaColor) {
 
 /**
  * Calculates the WCAG contrast ratio between two colors.
- * @param bg - The RGBA color object representing the background color
- * @param fg - The RGBA color object representing the foreground color.
- * @param solidBg - Optional solid background RGBA color for blending.
- * @returns The contrast ratio as a number.
+ * @param {RgbaColor} bg  The RGBA color object representing the background color
+ * @param {RgbaColor} fg  The RGBA color object representing the foreground color.
+ * @param {RgbaColor} solidBg  Optional solid background RGBA color for blending.
+ * @returns {number} The contrast ratio as a number.
  */
 export function calculateWCAGContrast(
   bg: RgbaColor,
@@ -68,9 +68,9 @@ export function calculateWCAGContrast(
 /**
  * Determines the display color (foreground) for a given background color.
  * Will return black (#000) or white (#fff) if the WCAG contrast ratio is less than 3, depending on which color creates a higher contrast.
- * @param bg - The RGBA color object representing the backround color
- * @param fg - The RGBA color object representing the foreground color.
- * @returns The HEX color string for the foreground color.
+ * @param {RgbaColor} bg The RGBA color object representing the backround color
+ * @param {RgbaColor} fg The RGBA color object representing the foreground color.
+ * @returns {string} The HEX color string for the foreground color.
  */
 export function getDisplayColor(bg: RgbaColor, fg: RgbaColor): string {
   const displayFg: RgbaColor = { r: fg.r, g: fg.g, b: fg.b, a: 1 };
@@ -101,8 +101,8 @@ export function getDisplayColor(bg: RgbaColor, fg: RgbaColor): string {
 
 /**
  * Converts a HEX color string to an RGBA color object.
- * @param hex - The HEX color string (e.g., "#RRGGBB").
- * @returns The RGBA color object with properties {r, g, b, a}.
+ * @param {string} hex The HEX color string (e.g., "#RRGGBB").
+ * @returns {RgbaColor} The RGBA color object with properties {r, g, b, a}.
  */
 export function hexToRgba(hex: string): RgbaColor {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -118,8 +118,8 @@ export function hexToRgba(hex: string): RgbaColor {
 
 /**
  * Converts an RGBA color object to a HEX color string.
- * @param rgba - The RGBA color object with properties {r, g, b, a}.
- * @returns The HEX color string.
+ * @param {RgbaColor} rgba The RGBA color object with properties {r, g, b, a}.
+ * @returns {string} The HEX color string.
  */
 export function rgbaToHex({ r, g, b, a }: RgbaColor): string {
   const toHex = (value: number) =>
@@ -131,8 +131,8 @@ export function rgbaToHex({ r, g, b, a }: RgbaColor): string {
 
 /**
  * Converts an RGB color object to a HEX color string.
- * @param rgb - The RGB color object with properties {r, g, b}.
- * @returns The HEX color string.
+ * @param {RgbColor} rgb The RGB color object with properties {r, g, b}.
+ * @returns {string} The HEX color string.
  */
 export function rgbToHex({ r, g, b }: RgbaColor): string {
   return `#${[r, g, b].map((x) => x.toString(16).padStart(2, "0")).join("")}`;
@@ -152,8 +152,8 @@ export function rgbToHex({ r, g, b }: RgbaColor): string {
 
 /**
  * Converts a HEX color string to an RGBA color object.
- * @param hex - The HEX color string (e.g., "#RRGGBB" or "#RRGGBBAA").
- * @returns The RGBA color object with properties {r, g, b, a}.
+ * @param {string} hex The HEX color string (e.g., "#RRGGBB" or "#RRGGBBAA").
+ * @returns {RgbaColor} The RGBA color object with properties {r, g, b, a}.
  * @throws Will throw an error if the HEX color format is invalid.
  */
 export function hexToRgb(hex: string): RgbaColor {
@@ -181,8 +181,8 @@ export function hexToRgb(hex: string): RgbaColor {
 
 /**
  * Converts an RGBA color object to an HSLA color object.
- * @param rgba - The RGBA color object with properties {r, g, b, a}.
- * @returns The HSLA color object with properties {h, s, l, a}.
+ * @param     {RgbaColor}   rgba    The RGBA color object with properties {r, g, b, a}.
+ * @returns   {HslaColor}           The HSLA color object with properties {h, s, l, a}.
  */
 export function rgbaToHsla({ r, g, b, a }: RgbaColor): HslaColor {
   r /= 255;
@@ -216,20 +216,43 @@ export function rgbaToHsla({ r, g, b, a }: RgbaColor): HslaColor {
 }
 
 /**
- * Converts an HSLA color object to an RGBA color object.
- * @param hsla - The HSLA color object with properties {h, s, l, a}.
- * @returns The RGBA color object with properties {r, g, b, a}.
+ * Converts an HSL color object to an RGB color object. Conversion formula
+ * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+ * Assumes h, s, and l are contained in the set [0, 1] and
+ * returns r, g, and b in the set [0, 255].
+ *
+ * @param   {HslaColor}   hsla    The HSLA color object with properties {h, s, l, a}.
+ * @return  {RgbaColor}           The RGBA color object with properties {r, g, b, a}.
  */
 export function hslaToRgba({ h, s, l, a }: HslaColor): RgbaColor {
+  var r, g, b;
+
   s /= 100;
   l /= 100;
-  const k = (n: number) => (n + h / 30) % 12;
-  const f = (n: number) =>
-    l - s * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+
+  if (s == 0) {
+    r = g = b = l; // achromatic
+  } else {
+    var hue2rgb = function hue2rgb(p: number, q: number, t: number) {
+      if (t < 0) t += 1;
+      if (t > 1) t -= 1;
+      if (t < 1 / 6) return p + (q - p) * 6 * t;
+      if (t < 1 / 2) return q;
+      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+      return p;
+    };
+
+    var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    var p = 2 * l - q;
+    r = hue2rgb(p, q, h + 1 / 3);
+    g = hue2rgb(p, q, h);
+    b = hue2rgb(p, q, h - 1 / 3);
+  }
+
   return {
-    r: Math.round(255 * f(0)),
-    g: Math.round(255 * f(8)),
-    b: Math.round(255 * f(4)),
-    a,
+    r: Math.round(r * 255),
+    g: Math.round(g * 255),
+    b: Math.round(b * 255),
+    a: 1,
   };
 }

@@ -328,6 +328,7 @@ export default function ContrastChecker() {
     );
 
   const [enhanceMenuOpen, setEnhanceMenuOpen] = useState(false);
+  const [copyUrlOpen, setCopyUrlOpen] = useState(false);
 
   const wcagContrast = calculateWCAGContrast(background, foreground);
   const contrastRange = calculateContrastRange(background, foreground, useAPCA);
@@ -415,8 +416,10 @@ export default function ContrastChecker() {
     setForeground(newForeground);
   };
 
-  const handleCopyUrl = () => {
-    navigator.clipboard.writeText(window.location.toString());
+  const handleCopyUrl = async () => {
+    await navigator.clipboard.writeText(window.location.toString());
+    setCopyUrlOpen(true);
+    setTimeout(() => setCopyUrlOpen(false), 2000); // Reset after 2 seconds
   };
 
   const handleEnhanceContrast = (type: "text" | "background" | "both") => {
@@ -509,7 +512,7 @@ export default function ContrastChecker() {
       {/* Website Title */}
       <header className="mb-12 text-center md:mb-16">
         <span
-          className="font-medium"
+          className="text-sm font-medium md:text-base"
           style={{
             color: fgDisplayColor,
           }}
@@ -521,7 +524,7 @@ export default function ContrastChecker() {
       {/* Main Content Area */}
       <main className="container mx-auto">
         {/* Page Title */}
-        <div className="mb-8">
+        <div className="mb-8 md:mb-12">
           <h1
             className="text-2xl font-bold md:text-4xl"
             style={{
@@ -752,19 +755,34 @@ export default function ContrastChecker() {
             </Popover>
 
             {/* Copy URL Button */}
-            <Button
-              variant="outline"
-              onClick={handleCopyUrl}
-              size="xl"
-              className="w-full gap-x-1 text-base sm:w-fit"
-              style={{
-                color: fgDisplayColor,
-                borderColor: fgDisplayColor,
-              }}
-            >
-              share these colors
-              <Clipboard className="h-4 w-4" />
-            </Button>
+            <Popover open={copyUrlOpen} onOpenChange={setCopyUrlOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  onClick={handleCopyUrl}
+                  size="xl"
+                  className="w-full gap-x-1 text-base sm:w-fit"
+                  style={{
+                    color: fgDisplayColor,
+                    borderColor: fgDisplayColor,
+                  }}
+                >
+                  share these colors
+                  <Clipboard className="h-4 w-4" />
+                </Button>
+              </PopoverTrigger>
+
+              <PopoverContent
+                className="w-fit border-3 px-3 py-1.5 text-sm"
+                style={{
+                  backgroundColor: `rgba(${background.r}, ${background.g}, ${background.b}, ${background.a})`,
+                  color: fgDisplayColor,
+                  borderColor: fgDisplayColor,
+                }}
+              >
+                copied!
+              </PopoverContent>
+            </Popover>
           </div>
 
           {/* Color Controls */}
@@ -813,9 +831,9 @@ export default function ContrastChecker() {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
-                    variant="ghost"
+                    variant="ghost-outline"
                     size="auto"
-                    className="size-12 shrink-0 p-2"
+                    className={`size-12 shrink-0 p-2 border-[${fgDisplayColor}]/0 border-opacity-0`}
                     onClick={handleReverseColors}
                   >
                     <span className="sr-only">Swap colors</span>

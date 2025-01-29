@@ -4,9 +4,9 @@ import * as React from "react";
 
 import * as SheetPrimitive from "@radix-ui/react-dialog";
 import { cva, type VariantProps } from "class-variance-authority";
-import { X } from "lucide-react";
+// import { X } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils/cn";
 
 const Sheet = SheetPrimitive.Root;
@@ -67,7 +67,7 @@ const SheetContent = React.forwardRef<
       {...props}
     >
       {children}
-      <SheetPrimitive.Close asChild>
+      {/* <SheetPrimitive.Close asChild>
         <Button
           size="auto"
           variant="ghost"
@@ -77,7 +77,7 @@ const SheetContent = React.forwardRef<
           <X className="!size-full" style={props.style} />
           <span className="sr-only">Close</span>
         </Button>
-      </SheetPrimitive.Close>
+      </SheetPrimitive.Close> */}
     </SheetPrimitive.Content>
   </SheetPortal>
 ));

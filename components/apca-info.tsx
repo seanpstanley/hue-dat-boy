@@ -2,6 +2,25 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 
+/**
+ * A section with information and links related to the APCA standard.
+ *
+ * @param   {string}      displayColor  The display color calculated by getDisplayColor, necessary for styling
+ *                                      the tooltip's border and text color.
+ *
+ * @returns                             The 'APCA' component, containing details and links related to the WCAG standard.
+ *
+ * @example
+ * ```tsx
+ * import { ApcaInfo } from "@/components/apca-info";
+ *
+ * const displayColor = "#000000";
+ *
+ * <ApcaInfo
+ *   displayColor={displayColor}
+ * />
+ * ```
+ */
 const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
   return (
     <section
@@ -9,12 +28,12 @@ const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
       className="flex flex-col gap-y-6"
       style={{ color: displayColor }}
     >
-      <h3 className="font-bold text-xl md:text-2xl mb-0">
+      <h3 className="mb-0 text-xl font-bold md:text-2xl">
         About APCA (Advanced Perceptual Contrast Algorithm)
       </h3>
 
       <div className="flex flex-col gap-y-2">
-        <h4 className="font-medium text-lg md:text-xl">What is APCA?</h4>
+        <h4 className="text-lg font-medium md:text-xl">What is APCA?</h4>
 
         <p>
           The Advanced Perceptual Contrast Algorithm (APCA) is a modern standard
@@ -29,7 +48,7 @@ const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
           approach that accounts for:
         </p>
 
-        <ul className="list-disc list-inside">
+        <ul className="list-inside list-disc">
           <li>Text size and weight</li>
           <li>Display environments (light or dark modes)</li>
           <li>The impact of background and foreground colors on readability</li>
@@ -43,7 +62,7 @@ const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
       </div>
 
       <div className="flex flex-col gap-y-2">
-        <h4 className="font-medium text-lg md:text-xl">
+        <h4 className="text-lg font-medium md:text-xl">
           How APCA Calculates Contrast
         </h4>
 
@@ -54,7 +73,7 @@ const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
           combination is legible. Here&apos;s a quick overview:
         </p>
 
-        <ul className="list-disc list-inside">
+        <ul className="list-inside list-disc">
           <li>
             <strong>Relative Luminance</strong>: APCA evaluates the perceived
             brightness of colors, factoring in the non-linear way humans
@@ -72,7 +91,7 @@ const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
 
         <p>For example:</p>
 
-        <ul className="list-disc list-inside">
+        <ul className="list-inside list-disc">
           <li>Small, body text requires an Lc value of 75 or higher.</li>
           <li>
             Large or bold text is readable at lower contrast, with a threshold
@@ -88,14 +107,14 @@ const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
       </div>
 
       <div className="flex flex-col gap-y-2">
-        <h4 className="font-medium text-lg md:text-xl">APCA Levels</h4>
+        <h4 className="text-lg font-medium md:text-xl">APCA Levels</h4>
 
         <p>
           APCA does not use fixed &quot;pass/fail&quot; thresholds but instead
           provides dynamic guidance based on text characteristics:
         </p>
 
-        <ul className="list-disc list-inside">
+        <ul className="list-inside list-disc">
           <li>
             <strong>Normal Text (12–18px)</strong>: Lc ≥ 75 for readability.
           </li>
@@ -111,7 +130,7 @@ const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
       </div>
 
       <div className="flex flex-col gap-y-2">
-        <h4 className="font-medium text-lg md:text-xl">Attributions</h4>
+        <h4 className="text-lg font-medium md:text-xl">Attributions</h4>
 
         <p>
           The APCA algorithm was developed by Andrew Somers at Myndex
@@ -120,7 +139,7 @@ const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
 
         <p>For more information, visit:</p>
 
-        <ul className="list-disc list-inside">
+        <ul className="list-inside list-disc">
           <li>
             <Button
               asChild
@@ -177,7 +196,7 @@ const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
       </div>
 
       <div className="flex flex-col gap-y-2">
-        <h4 className="font-medium text-lg md:text-xl">Disclaimer</h4>
+        <h4 className="text-lg font-medium md:text-xl">Disclaimer</h4>
         <p>
           This website is beta testing the APCA guidelines for determining text
           and non-text contrast. It is well known that WCAG 2 contrast maths are
@@ -196,7 +215,7 @@ const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
           reliable contrast results. However:
         </p>
 
-        <ul className="list-decimal list-inside">
+        <ul className="list-inside list-decimal">
           <li>
             The displayed values and thresholds may differ slightly depending on
             the color precision and calculation methods used. This tool uses the
@@ -228,11 +247,11 @@ const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
       </div>
 
       <div className="flex flex-col gap-y-2">
-        <h4 className="font-medium text-lg md:text-xl">Further Reading</h4>
+        <h4 className="text-lg font-medium md:text-xl">Further Reading</h4>
 
         <p>Explore more about color contrast and its role in accessibility:</p>
 
-        <ul className="list-disc list-inside">
+        <ul className="list-inside list-disc">
           <li>
             <Button
               asChild
