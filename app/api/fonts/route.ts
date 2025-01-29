@@ -5,17 +5,17 @@ export async function GET() {
 
   try {
     const res = await fetch(
-      `${GOOGLE_FONTS_API}?key=${apiKey}&subset=latin&capability=WOFF2&sort=popularity`
+      `${GOOGLE_FONTS_API}?key=${apiKey}&subset=latin&capability=WOFF2&sort=popularity`,
     );
 
     const data = await res.json();
 
     return Response.json(data);
   } catch (error: unknown) {
-    console.log(error);
-    // return Response.json(`Error: ${error.message}`, {
-    //   status: 500,
-    // })
+    // console.log(error);
+    return Response.json(`Error: ${error}`, {
+      status: 500,
+    });
     //   return Response.json(
     //     { message: error.message },
     //     { status: 500 },

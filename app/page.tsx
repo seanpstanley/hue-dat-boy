@@ -769,7 +769,7 @@ export default function ContrastChecker() {
                   variant="outline"
                   onClick={handleCopyUrl}
                   size="xl"
-                  className="w-full gap-x-1 text-base sm:w-fit"
+                  className={`w-full gap-x-1 text-base hover:text-[${bgDisplayColor}] sm:w-fit`}
                   style={{
                     color: fgDisplayColor,
                     borderColor: fgDisplayColor,
@@ -802,7 +802,12 @@ export default function ContrastChecker() {
           >
             {/* Text Color */}
             <div className="flex w-full flex-col gap-y-2">
-              <Label className="text-base md:text-lg">text color</Label>
+              <Label
+                htmlFor="foreground-color"
+                className="text-base md:text-lg"
+              >
+                text color
+              </Label>
               <div className="relative">
                 <ColorPicker
                   color={foreground}
@@ -951,10 +956,10 @@ export default function ContrastChecker() {
                 onValueChange={(value: ColorBlindnessType) =>
                   setColorBlindnessSimulation(value)
                 }
-                name="colorblind-select"
               >
                 <SelectTrigger
                   className="h-fit border-3 bg-transparent py-2 text-lg md:text-2xl"
+                  id="colorblind-select"
                   style={{
                     borderColor: fgDisplayColor,
                   }}

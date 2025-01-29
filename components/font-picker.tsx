@@ -91,6 +91,7 @@ const FontPicker = ({
           <Button
             variant="naked"
             role="combobox"
+            name="typeface-select"
             aria-expanded={open}
             className="h-fit justify-between border-3 bg-transparent px-3 py-2 text-lg font-normal md:text-2xl"
             style={{
@@ -144,6 +145,7 @@ const FontPicker = ({
       <DrawerTrigger asChild>
         <Button
           variant="naked"
+          name="typeface-select"
           role="combobox"
           aria-expanded={open}
           className="h-fit justify-between border-3 bg-transparent px-3 py-2 text-lg font-normal md:text-2xl"

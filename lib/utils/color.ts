@@ -224,9 +224,8 @@ export function rgbaToHsla({ r, g, b, a }: RgbaColor): HslaColor {
  * @param    {HslaColor}   hsla    The HSLA color object with properties {h, s, l, a}.
  * @returns  {RgbaColor}           The RGBA color object with properties {r, g, b, a}.
  */
-export function hslaToRgba({ h, s, l, a }: HslaColor): RgbaColor {
+export function hslaToRgba({ h, s, l }: HslaColor): RgbaColor {
   let r, g, b;
-  console.log(a);
 
   s /= 100;
   l /= 100;

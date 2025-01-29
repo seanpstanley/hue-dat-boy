@@ -14,11 +14,11 @@ export async function GET() {
 
     return Response.json(data);
   } catch (error: unknown) {
-    console.log(error);
+    // console.log(error);
 
-    // return Response.json(`Error: ${error.message}`, {
-    //   status: 500,
-    // })
+    return Response.json(`Error: ${error}`, {
+      status: 500,
+    });
     //   return Response.json(
     //     { message: error.message },
     //     { status: 500 },

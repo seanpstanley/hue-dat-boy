@@ -173,7 +173,7 @@ const SampleTextCard = ({
               <Button
                 variant="ghost-outline"
                 size="icon"
-                className={`absolute right-1 top-1/2 size-8 -translate-y-1/2 p-2 md:size-10 border-[${bgDisplayColor}]`}
+                className={`absolute right-0.5 top-1/2 size-8 -translate-y-1/2 p-1 md:right-1 md:size-10 md:p-2 border-[${bgDisplayColor}]`}
                 style={{ color: bgDisplayColor }}
               >
                 <AccessibleIcon label="Fullscreen view">
