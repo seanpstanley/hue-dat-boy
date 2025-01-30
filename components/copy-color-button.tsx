@@ -78,7 +78,7 @@ const CopyColorButton = ({
           <Button
             size="auto"
             variant="ghost-outline"
-            className={`border-ghost absolute right-2.5 top-1/2 size-9 -translate-y-1/2 border-opacity-0 p-1 md:right-3 md:size-10 lg:right-4 lg:size-16 lg:p-2`}
+            className={`border-ghost absolute right-2.5 top-1/2 size-9 -translate-y-1/2 p-1 md:right-3 md:size-10 lg:right-4 lg:size-16 lg:p-2`}
             onClick={handleCopy}
           >
             <AccessibleIcon label="Copy color">

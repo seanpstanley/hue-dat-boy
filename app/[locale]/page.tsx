@@ -6,6 +6,7 @@ import { AccessibleIcon } from "@radix-ui/react-accessible-icon";
 import { calcAPCA } from "apca-w3";
 import { Clipboard, ArrowLeftRight, Check, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import { useAnimeQuote } from "@/app/hooks/use-anime-quote";
 import { useGoogleFonts } from "@/app/hooks/use-google-fonts";
@@ -39,6 +40,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { WcagInfo } from "@/components/wcag-info";
+// import { Link } from "@/i18n/routing";
 import { ColorBlindnessType, RgbaColor } from "@/lib/types";
 import {
   rgbToHex,
@@ -520,6 +522,8 @@ export default function ContrastChecker() {
     isLoading: isFontLoading,
   } = useGoogleFonts();
 
+  const t = useTranslations("ContrastChecker");
+
   return (
     <div
       className={`min-h-screen p-4 pt-8 transition-[background-color]`}
@@ -537,7 +541,7 @@ export default function ContrastChecker() {
         {/* Page Title */}
         <div className="mb-8 md:mb-12">
           <h1 className="text-fg-display text-2xl font-bold md:text-4xl">
-            color contrast checker (& more!)
+            {t("title")}
           </h1>
         </div>
 
@@ -551,7 +555,7 @@ export default function ContrastChecker() {
             {/* Contrast Ratio  */}
             <div className="flex w-fit flex-col gap-y-2 text-nowrap">
               <Label htmlFor="contrast-value" className="text-base md:text-lg">
-                contrast value
+                {t("labels.contrast")}
               </Label>
 
               <div className="border-fg-display flex items-center gap-10 rounded-lg border-3 px-2.5 py-4">
@@ -590,7 +594,7 @@ export default function ContrastChecker() {
             {/* Standards Levels */}
             <div className="flex flex-col gap-y-2">
               <Label htmlFor="contrast-value" className="text-base md:text-lg">
-                {useAPCA ? "apca" : "wcag"} levels
+                {useAPCA ? "apca" : "wcag"} {t("labels.badges.levels")}
               </Label>
               <div className="flex flex-wrap gap-2 md:grid md:grid-cols-2 lg:grid-cols-4">
                 {useAPCA ? (
@@ -694,7 +698,7 @@ export default function ContrastChecker() {
                   }
                   className={`bg-dynamic w-full text-base sm:ml-auto sm:w-fit`}
                 >
-                  enhance contrast
+                  {t("buttons.enhance.title")}
                 </Button>
               </PopoverTrigger>
               <PopoverContent
@@ -712,7 +716,7 @@ export default function ContrastChecker() {
                       handleEnhanceContrast("text");
                     }}
                   >
-                    adjust text color
+                    {t("buttons.enhance.popover.text")}{" "}
                   </Button>
                   <Button
                     variant="ghost"
@@ -722,7 +726,7 @@ export default function ContrastChecker() {
                       handleEnhanceContrast("background");
                     }}
                   >
-                    adjust background color
+                    {t("buttons.enhance.popover.background")}{" "}
                   </Button>
                   <Button
                     variant="ghost"
@@ -732,7 +736,7 @@ export default function ContrastChecker() {
                       handleEnhanceContrast("both");
                     }}
                   >
-                    adjust both colors
+                    {t("buttons.enhance.popover.both")}
                   </Button>
                 </div>
               </PopoverContent>
@@ -747,7 +751,7 @@ export default function ContrastChecker() {
                   size="xl"
                   className={`bg-dynamic w-full gap-x-1 text-base hover:text-[${bgDisplayColor}] sm:w-fit`}
                 >
-                  share these colors
+                  {t("buttons.share.title")}
                   <Clipboard className="h-4 w-4" />
                 </Button>
               </PopoverTrigger>
@@ -758,7 +762,7 @@ export default function ContrastChecker() {
                   backgroundColor: `rgba(${background.r}, ${background.g}, ${background.b}, ${background.a})`,
                 }}
               >
-                copied url!
+                {t("buttons.share.popover")}!
               </PopoverContent>
             </Popover>
           </div>
@@ -771,7 +775,7 @@ export default function ContrastChecker() {
                 htmlFor="foreground-color"
                 className="text-base md:text-lg"
               >
-                text color
+                {t("labels.inputs.text")}
               </Label>
               <div className="relative">
                 <ColorPicker
@@ -821,7 +825,7 @@ export default function ContrastChecker() {
                   }}
                   className="border-fg-display text-fg-display"
                 >
-                  <span>swap colors</span>
+                  <span> {t("buttons.swap.tooltip")}</span>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -832,7 +836,7 @@ export default function ContrastChecker() {
                 htmlFor="background-color"
                 className="text-base md:text-lg"
               >
-                background color
+                {t("labels.inputs.background")}
               </Label>
               <div className="relative">
                 <ColorPicker
@@ -868,7 +872,7 @@ export default function ContrastChecker() {
           <div className="flex flex-col gap-x-8 gap-y-4 md:flex-row">
             <div className="text-fg-display flex flex-1 flex-col gap-y-2">
               <Label id="typeface-select" className="text-base md:text-lg">
-                typeface
+                {t("labels.selects.typeface")}
               </Label>
               <FontPicker
                 defaultFont={font}
@@ -886,7 +890,7 @@ export default function ContrastChecker() {
                 htmlFor="colorblind-select"
                 className="text-base md:text-lg"
               >
-                simulate colorblindness
+                {t("labels.selects.color-blindness")}
               </Label>
               <Select
                 value={colorBlindnessSimulation}
@@ -924,7 +928,7 @@ export default function ContrastChecker() {
           {/* Sample Text Section */}
           <section className="flex flex-col gap-y-4" id="sample-text">
             <h3 className="text-fg-display text-xl font-bold md:text-2xl">
-              sample text
+              {t("headings.sample-text")}
             </h3>
 
             <div className="grid grid-cols-1 gap-x-8 gap-y-4 md:grid-cols-2">

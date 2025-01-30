@@ -89,7 +89,8 @@ body {
   border-color: var(--fg-display);
 }
 
-.bg-dynamic:hover {
+.bg-dynamic:hover,
+.bg-dynamic:focus {
   background-color: var(--fg-display);
   color: var(--bg);
 }
@@ -110,7 +111,22 @@ body {
   border-color: rgba(255, 255, 255, 0);
   background-clip: padding-box;
 }
-.border-ghost:hover {
+
+.border-ghost:hover,
+.border-ghost:focus {
+  border-color: var(--fg-display);
+}
+
+.border-ghost-select {
+  border-color: rgba(255, 255, 255, 0);
+  background-clip: padding-box;
+}
+
+.ring-ghost-select {
+  box-shadow: 0 0 0 2px var(--fg-display);
+}
+
+.border-ghost-select:focus {
   border-color: var(--fg-display);
 }
 
@@ -118,7 +134,8 @@ body {
   border-color: rgba(255, 255, 255, 0);
   background-clip: padding-box;
 }
-.border-ghost-blind:hover {
+.border-ghost-blind:hover,
+.border-ghost-blind:focus {
   border-color: var(--bg-display);
 }
 
@@ -143,8 +160,4 @@ body {
       var(--checkerboard-color-dark) 0 180deg
     )
     0 0 / var(--checkerboard-size-sm) var(--checkerboard-size-sm) round;
-}
-
-.border-radiusImportant {
-  border-radius: 5px !important;
 }

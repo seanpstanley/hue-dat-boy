@@ -1,6 +1,7 @@
 import { AccessibleIcon } from "@radix-ui/react-accessible-icon";
 import { Github, Linkedin } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 
@@ -9,30 +10,20 @@ const getCurrentYear = () => new Date().getFullYear();
 /**
  * A footer with the current year and personal links.
  *
- * @param   {string}      displayColor  The display color calculated by getDisplayColor, necessary for styling
- *                                      the tooltip's border and text color.
- *
  * @returns                             'Footer' component with the current year and personal links.
  *
  * @example
  * ```tsx
  * import { Footer } from "@/components/footer";
  *
- * const displayColor = "#000000";
- *
- * <Footer
- *   displayColor={displayColor}
- * />
+ * <Footer />
  * ```
  */
-const Footer = ({ displayColor }: { displayColor: string }) => {
+const Footer = () => {
+  const t = useTranslations("Footer");
+
   return (
-    <footer
-      className="container mx-auto mt-12 py-6"
-      style={{
-        color: displayColor,
-      }}
-    >
+    <footer className="text-fg-display container mx-auto mt-12 py-6">
       <div className="flex flex-col items-center justify-between gap-4 sm:flex-row-reverse">
         <div className="flex gap-x-4">
           <Button
@@ -46,7 +37,7 @@ const Footer = ({ displayColor }: { displayColor: string }) => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <AccessibleIcon label="GitHub">
+              <AccessibleIcon label={t("links.github.alt")}>
                 <Github className="!size-full" />
               </AccessibleIcon>
             </Link>
@@ -62,14 +53,14 @@ const Footer = ({ displayColor }: { displayColor: string }) => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <AccessibleIcon label="Twitter">
+              <AccessibleIcon label={t("links.linkedin.alt")}>
                 <Linkedin className="!size-full" />
               </AccessibleIcon>
             </Link>
           </Button>
         </div>
         <small className="text-sm">
-          © {getCurrentYear()} Sean Stanley. Built with shadcn.
+          {t("text", { year: getCurrentYear(), tech: "shadcn" })}
         </small>
       </div>
     </footer>

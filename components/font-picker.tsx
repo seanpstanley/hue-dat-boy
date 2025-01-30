@@ -1,6 +1,7 @@
 import { useState, Dispatch, SetStateAction } from "react";
 
 import { Check, ChevronsUpDown } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { useMediaQuery } from "@/app/hooks/use-media-query";
 import { Button } from "@/components/ui/button";
@@ -84,6 +85,8 @@ const FontPicker = ({
 
   const [open, setOpen] = useState(false);
 
+  const t = useTranslations("FontPicker");
+
   if (isDesktop) {
     return (
       <Popover open={open} onOpenChange={setOpen}>
@@ -93,25 +96,22 @@ const FontPicker = ({
             role="combobox"
             aria-labelledby="typeface-select"
             aria-expanded={open}
-            className="h-fit justify-between border-3 bg-transparent px-3 py-2 text-lg font-normal md:text-2xl"
-            style={{
-              borderColor: displayColor,
-              color: displayColor,
-            }}
+            className="border-fg-display text-fg-display h-fit justify-between border-3 bg-transparent px-3 py-2 text-lg font-normal md:text-2xl"
             disabled={error}
           >
             {error ? (
-              "font picker unavailable"
+              <span>{t("error")}</span>
             ) : (
               <>
                 {isLoading ? (
-                  "loading..."
+                  <span>{t("loading")}...</span>
                 ) : (
                   <>
-                    {selectedFont
-                      ? fonts.find((font) => font.family === selectedFont)
-                          ?.family
-                      : "select font..."}
+                    {selectedFont ? (
+                      fonts.find((font) => font.family === selectedFont)?.family
+                    ) : (
+                      <span>{t("placeholder")}...</span>
+                    )}
                   </>
                 )}
               </>
@@ -120,7 +120,7 @@ const FontPicker = ({
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="border-3 p-0 md:w-[368px] lg:w-[624px]"
+          className="text-fg-display border-fg-display border-3 p-0 md:w-[368px] lg:w-[624px]"
           style={{
             borderColor: displayColor,
             color: displayColor,
@@ -131,9 +131,10 @@ const FontPicker = ({
             setOpen={setOpen}
             setSelectedFont={setSelectedFont}
             handleChange={handleChange}
-            displayColor={displayColor}
             fonts={fonts}
             selectedFont={selectedFont}
+            placeholder={t("search")}
+            emptyText={t("empty")}
           />
         </PopoverContent>
       </Popover>
@@ -199,9 +200,10 @@ const FontPicker = ({
             setOpen={setOpen}
             setSelectedFont={setSelectedFont}
             handleChange={handleChange}
-            displayColor={displayColor}
             fonts={fonts}
             selectedFont={selectedFont}
+            placeholder={t("search")}
+            emptyText={t("empty")}
           />
         </div>
       </DrawerContent>
@@ -213,38 +215,27 @@ interface FontListProps {
   setOpen: (open: boolean) => void;
   setSelectedFont: Dispatch<SetStateAction<string>>;
   handleChange: Dispatch<SetStateAction<string>>;
-  displayColor: string;
   fonts: GoogleFont[];
   selectedFont: string;
+  placeholder: string;
+  emptyText: string;
 }
 
 const FontList = ({
   setOpen,
   setSelectedFont,
   handleChange,
-  displayColor,
   fonts,
   selectedFont,
+  placeholder,
+  emptyText,
 }: FontListProps) => {
-  const borderColor = `border-[${displayColor}]/0`;
-  const hoverBorderColor = `data-[selected='true']:border-[${displayColor}]/100 hover:border-[${displayColor}]/100`;
-
   return (
     <Command>
-      <CommandInput
-        style={{
-          color: displayColor,
-          borderColor: displayColor,
-        }}
-        placeholder="search fonts..."
-      />
+      <CommandInput placeholder={`${placeholder}...`} />
       <CommandList>
-        <CommandEmpty
-          style={{
-            color: displayColor,
-          }}
-        >
-          no font found.
+        <CommandEmpty className="text-fg-display p-4 text-center text-lg md:text-2xl">
+          {emptyText}.
         </CommandEmpty>
         <CommandGroup>
           {fonts?.map((font) => (
@@ -258,10 +249,6 @@ const FontList = ({
                 handleChange(newFont); // Pass the updated (and current!) value to the parent
                 setOpen(false);
               }}
-              style={{
-                color: displayColor,
-              }}
-              className={`${borderColor} ${hoverBorderColor}`}
             >
               <Check
                 className={cn(

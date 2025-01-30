@@ -1,0 +1,67 @@
+{
+  "ContrastChecker": {
+    "title": "color contrast checker (& more!)",
+    "headings": {
+      "sample-text": "sample text"
+    },
+    "buttons": {
+      "enhance": {
+        "title": "enhance contrast",
+        "popover": {
+          "text": "text",
+          "background": "background",
+          "both": "both"
+        }
+      },
+      "share": {
+        "title": "share these colors",
+        "popover": "copied url"
+      },
+      "swap": {
+        "tooltip": "swap colors"
+      }
+    },
+    "labels": {
+      "contrast": "contrast value",
+      "badges": {
+        "levels": "levels"
+      },
+
+      "inputs": {
+        "text": "text color",
+        "background": "background color"
+      },
+      "selects": {
+        "typeface": "typeface",
+        "color-blindness": "simulate color blindness"
+      }
+    },
+    "selects": {
+      "typeface": {
+        "placeholder": "select font",
+        "empty": "no font found",
+        "loading": "loading",
+        "error": "font picker unavailable"
+      }
+    },
+    "about": {
+      "wcag": {
+        "title": "About WCAG (Web Content Accessibility Guidelines)"
+      }
+    }
+  },
+  "FontPicker": {
+    "placeholder": "select font",
+    "empty": "no font found",
+    "loading": "loading",
+    "error": "font picker unavailable",
+    "search": "search fonts"
+  },
+  "Footer": {
+    "text": "© {year} Sean Stanley. Built with {tech}.",
+    "links": {
+      "github": { "alt": "Sean's GitHub" },
+      "linkedin": { "alt": "Sean's LinkedIn" }
+    }
+  }
+}
