@@ -143,6 +143,11 @@ const SampleTextCard = ({
   error,
   data,
 }: SampleTextCardProps) => {
+  const fgBorderColor = `border-[${fgDisplayColor}]/0`;
+  const bgBorderColor = `border-[${bgDisplayColor}]/0`;
+  const hoverFgBorderColor = `hover:border-[${fgDisplayColor}]/100`;
+  const hoverBgBorderColor = `hover:border-[${bgDisplayColor}]/100`;
+
   return (
     <Sheet>
       <Card
@@ -173,7 +178,7 @@ const SampleTextCard = ({
               <Button
                 variant="ghost-outline"
                 size="icon"
-                className={`absolute right-0.5 top-1/2 size-8 -translate-y-1/2 p-1 md:right-1 md:size-10 md:p-2 border-[${bgDisplayColor}]`}
+                className={`absolute right-0.5 top-1/2 size-8 -translate-y-1/2 p-1 md:right-1 md:size-10 md:p-2 ${bgBorderColor} ${hoverBgBorderColor}`}
                 style={{ color: bgDisplayColor }}
               >
                 <AccessibleIcon label="Fullscreen view">
@@ -276,7 +281,7 @@ const SampleTextCard = ({
           <Button
             size="auto"
             variant="ghost-outline"
-            className={`absolute right-4 top-4 p-1 md:size-9 border-[${fgDisplayColor}]`}
+            className={`absolute right-4 top-4 p-1 md:size-9 ${fgBorderColor} ${hoverFgBorderColor}`}
           >
             <X className="!size-full" />
             <span className="sr-only">Close</span>

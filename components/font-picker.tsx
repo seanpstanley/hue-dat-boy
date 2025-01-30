@@ -226,6 +226,9 @@ const FontList = ({
   fonts,
   selectedFont,
 }: FontListProps) => {
+  const borderColor = `border-[${displayColor}]/0`;
+  const hoverBorderColor = `data-[selected='true']:border-[${displayColor}]/100 hover:border-[${displayColor}]/100`;
+
   return (
     <Command>
       <CommandInput
@@ -258,6 +261,7 @@ const FontList = ({
               style={{
                 color: displayColor,
               }}
+              className={`${borderColor} ${hoverBorderColor}`}
             >
               <Check
                 className={cn(

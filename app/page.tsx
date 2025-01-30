@@ -512,6 +512,14 @@ export default function ContrastChecker() {
     isLoading: isFontLoading,
   } = useGoogleFonts();
 
+  // Precomputed Tailwind classes for styling button hover states
+  const borderColor = `border-[${fgDisplayColor}]/0`;
+  const hoverBorderColor = `hover:border-[${fgDisplayColor}]/100`;
+  const bgColor = `bg-[${fgDisplayColor}]/0`;
+  const hoverBgColor = `hover:bg-[${fgDisplayColor}]/100`;
+  const textColor = `text-[${fgDisplayColor}]`;
+  const hoverTextColor = `hover:text-white`;
+
   return (
     <div
       className={`min-h-screen p-4 pt-8 transition-[background-color]`}
@@ -704,7 +712,6 @@ export default function ContrastChecker() {
                 <Button
                   variant="outline"
                   style={{
-                    color: fgDisplayColor,
                     borderColor: fgDisplayColor,
                   }}
                   size="xl"
@@ -714,7 +721,7 @@ export default function ContrastChecker() {
                     foreground.a < 1 ||
                     background.a < 1 // only usable on fully opaque colors
                   }
-                  className="w-full text-base sm:ml-auto sm:w-fit"
+                  className={`w-full text-base sm:ml-auto sm:w-fit ${bgColor} ${hoverBgColor} ${textColor} ${hoverTextColor}`}
                 >
                   enhance contrast
                 </Button>
@@ -727,7 +734,7 @@ export default function ContrastChecker() {
                   backgroundColor: rgbToHex(background),
                 }}
               >
-                <div className="grid gap-2 p-2">
+                <div className="grid p-2">
                   <Button
                     variant="ghost"
                     className="w-full justify-start"
@@ -846,7 +853,7 @@ export default function ContrastChecker() {
                   <Button
                     variant="ghost-outline"
                     size="auto"
-                    className={`size-12 shrink-0 p-2 border-[${fgDisplayColor}]/0 border-opacity-0`}
+                    className={`size-12 shrink-0 p-2 ${borderColor} ${hoverBorderColor}`}
                     onClick={handleReverseColors}
                   >
                     <span className="sr-only">Swap colors</span>

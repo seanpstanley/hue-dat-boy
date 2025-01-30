@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import { AccessibleIcon } from "@radix-ui/react-accessible-icon";
 import { Clipboard } from "lucide-react";
@@ -57,12 +57,7 @@ const CopyColorButton = ({
   foreground,
   background,
 }: CopyColorButtonProps) => {
-  const [borderColor, setBorderColor] = useState(`border-[${displayColor}]/0`);
   const [copied, setCopied] = useState(false);
-
-  useEffect(() => {
-    setBorderColor(`border-[${displayColor}]`);
-  }, [displayColor]);
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(
@@ -71,6 +66,9 @@ const CopyColorButton = ({
     setCopied(true);
     setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
   };
+
+  const borderColor = `border-[${displayColor}]/0`;
+  const hoverBorderColor = `hover:border-[${displayColor}]/100`;
 
   return (
     <Popover open={copied} onOpenChange={setCopied}>
@@ -83,7 +81,7 @@ const CopyColorButton = ({
           <Button
             size="auto"
             variant="ghost-outline"
-            className={`absolute right-2.5 top-1/2 size-9 -translate-y-1/2 border-[${borderColor}] border-opacity-0 p-1 hover:border-black/100 hover:border-opacity-100 md:right-3 md:size-10 lg:right-4 lg:size-16 lg:p-2`}
+            className={`absolute right-2.5 top-1/2 size-9 -translate-y-1/2 ${borderColor} p-1 ${hoverBorderColor} md:right-3 md:size-10 lg:right-4 lg:size-16 lg:p-2`}
             onClick={handleCopy}
           >
             <AccessibleIcon label="Copy color">
