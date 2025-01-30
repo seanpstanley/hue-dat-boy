@@ -82,6 +82,46 @@ body {
   }
 }
 
+.bg-dynamic {
+  background-color: rgba(255, 255, 255, 0);
+  background-clip: padding-box;
+  color: var(--fg-display);
+  border-color: var(--fg-display);
+}
+
+.bg-dynamic:hover {
+  background-color: var(--fg-display);
+  color: var(--bg);
+}
+
+.bg-fg-display {
+  background-color: var(--fg-display);
+}
+
+.text-fg-display {
+  color: var(--fg-display);
+}
+
+.border-fg-display {
+  border-color: var(--fg-display);
+}
+
+.border-ghost {
+  border-color: rgba(255, 255, 255, 0);
+  background-clip: padding-box;
+}
+.border-ghost:hover {
+  border-color: var(--fg-display);
+}
+
+.border-ghost-blind {
+  border-color: rgba(255, 255, 255, 0);
+  background-clip: padding-box;
+}
+.border-ghost-blind:hover {
+  border-color: var(--bg-display);
+}
+
 .checkerboard-lg {
   background: repeating-conic-gradient(
       var(--checkerboard-color-light) 0 90deg,

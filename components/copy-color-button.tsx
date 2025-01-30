@@ -67,9 +67,6 @@ const CopyColorButton = ({
     setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
   };
 
-  const borderColor = `border-[${displayColor}]/0`;
-  const hoverBorderColor = `hover:border-[${displayColor}]/100`;
-
   return (
     <Popover open={copied} onOpenChange={setCopied}>
       <TooltipButton
@@ -81,7 +78,7 @@ const CopyColorButton = ({
           <Button
             size="auto"
             variant="ghost-outline"
-            className={`absolute right-2.5 top-1/2 size-9 -translate-y-1/2 ${borderColor} p-1 ${hoverBorderColor} md:right-3 md:size-10 lg:right-4 lg:size-16 lg:p-2`}
+            className={`border-ghost absolute right-2.5 top-1/2 size-9 -translate-y-1/2 border-opacity-0 p-1 md:right-3 md:size-10 lg:right-4 lg:size-16 lg:p-2`}
             onClick={handleCopy}
           >
             <AccessibleIcon label="Copy color">

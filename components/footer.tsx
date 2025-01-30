@@ -39,7 +39,7 @@ const Footer = ({ displayColor }: { displayColor: string }) => {
             asChild
             variant="ghost-outline"
             size="auto"
-            className={`size-12 p-2 border-[${displayColor}]`}
+            className={`border-ghost size-12 p-2`}
           >
             <Link
               href="https://github.com/seanpstanley/hue-dat-boy"
@@ -55,7 +55,7 @@ const Footer = ({ displayColor }: { displayColor: string }) => {
             asChild
             variant="ghost-outline"
             size="auto"
-            className={`size-12 p-2 border-[${displayColor}]`}
+            className={`border-ghost size-12 p-2`}
           >
             <Link
               href="https://www.linkedin.com/in/seanpstanley/"
