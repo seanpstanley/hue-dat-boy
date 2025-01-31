@@ -164,9 +164,6 @@ const SampleTextCard = ({
   const simulatedFg = rgbToHex(
     simulateColorBlindness(foreground, colorBlindnessSimulation),
   );
-  const simulatedBg = rgbToHex(
-    simulateColorBlindness(foreground, colorBlindnessSimulation),
-  );
 
   const simulatedFgAlpha = rgbaToHex(
     simulateColorBlindness(foreground, colorBlindnessSimulation),
@@ -184,7 +181,12 @@ const SampleTextCard = ({
           backgroundColor: simulatedFg,
         }}
       >
-        <div className="relative px-4 pb-2.5 pt-2">
+        <div
+          className="relative border-b-3 px-4 pb-2.5 pt-2"
+          style={{
+            borderColor: simulatedFg,
+          }}
+        >
           <h4
             className="text-base font-normal leading-none md:text-lg"
             style={{ color: bgDisplayColor }}
