@@ -1,6 +1,13 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo, ChangeEvent } from "react";
+import {
+  useState,
+  useEffect,
+  useLayoutEffect,
+  useCallback,
+  useMemo,
+  ChangeEvent,
+} from "react";
 
 import { AccessibleIcon } from "@radix-ui/react-accessible-icon";
 import { calcAPCA } from "apca-w3";
@@ -504,7 +511,7 @@ export default function ContrastChecker() {
   }, [foreground, background]);
 
   // Update CSS variables for the foreground and background colors
-  useEffect(() => {
+  useLayoutEffect(() => {
     document.documentElement.style.setProperty("--fg", foregroundHex);
     document.documentElement.style.setProperty("--bg", backgroundHex);
     document.documentElement.style.setProperty("--fg-display", fgDisplayColor);
@@ -935,8 +942,6 @@ export default function ContrastChecker() {
               <SampleTextCard
                 foreground={foreground}
                 background={background}
-                fgDisplayColor={fgDisplayColor}
-                bgDisplayColor={bgDisplayColor}
                 font={font}
                 colorBlindnessSimulation={colorBlindnessSimulation}
                 textSize="normal"
@@ -947,8 +952,6 @@ export default function ContrastChecker() {
               <SampleTextCard
                 foreground={foreground}
                 background={background}
-                fgDisplayColor={fgDisplayColor}
-                bgDisplayColor={bgDisplayColor}
                 font={font}
                 colorBlindnessSimulation={colorBlindnessSimulation}
                 textSize="large"
@@ -961,15 +964,11 @@ export default function ContrastChecker() {
 
           <Separator className="bg-fg-display my-8" />
 
-          {useAPCA ? (
-            <ApcaInfo displayColor={fgDisplayColor} />
-          ) : (
-            <WcagInfo displayColor={fgDisplayColor} />
-          )}
+          {useAPCA ? <ApcaInfo /> : <WcagInfo />}
         </section>
       </main>
 
-      <Footer displayColor={fgDisplayColor} />
+      <Footer />
 
       {/* Dynamicly update selection and selected text colors based on foreground/background colors */}
       <style jsx global>{`

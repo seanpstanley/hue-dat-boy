@@ -6,30 +6,19 @@ import { Button } from "@/components/ui/button";
 /**
  * A section with information and links related to the WCAG standard.
  *
- * @param   {string}      displayColor  The display color calculated by getDisplayColor, necessary for styling
- *                                      the tooltip's border and text color.
- *
  * @returns                             The 'WcagInfo' component, containing details and links related to the WCAG standard.
  *
  * @example
  * ```tsx
  * import { WcagInfo } from "@/components/wcag-info";
  *
- * const displayColor = "#000000";
- *
- * <WcagInfo
- *   displayColor={displayColor}
- * />
+ * <WcagInfo />
  * ```
  */
-const WcagInfo = ({ displayColor }: { displayColor: string }) => {
+const WcagInfo = () => {
   return (
     <MathJaxContext>
-      <section
-        id="wcag-info"
-        className="flex flex-col gap-y-6"
-        style={{ color: displayColor }}
-      >
+      <section id="wcag-info" className="text-fg-display flex flex-col gap-y-6">
         <h3 className="mb-0 text-xl font-bold md:text-2xl">
           About WCAG (Web Content Accessibility Guidelines)
         </h3>
@@ -164,26 +153,14 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
 
           <ul className="list-inside list-disc">
             <li>
-              <Button
-                asChild
-                variant="link"
-                size="auto"
-                className="text-base"
-                style={{ color: displayColor }}
-              >
+              <Button asChild variant="link" size="auto" className="text-base">
                 <Link href="https://www.w3.org/WAI/standards-guidelines/wcag/">
                   WCAG 2 Overview
                 </Link>
               </Button>
             </li>
             <li>
-              <Button
-                asChild
-                variant="link"
-                size="auto"
-                className="text-base"
-                style={{ color: displayColor }}
-              >
+              <Button asChild variant="link" size="auto" className="text-base">
                 <Link href="https://www.w3.org/WAI/WCAG22/Understanding/">
                   WCAG 2.2 Understanding Docs
                 </Link>
@@ -220,30 +197,15 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
 
           <ul className="list-inside list-disc">
             <li>
-              <Button
-                asChild
-                variant="link"
-                size="auto"
-                className="text-base"
-                style={{ color: displayColor }}
-              >
+              <Button asChild variant="link" size="auto" className="text-base">
                 <Link href="https://www.w3.org/WAI/standards-guidelines/wcag/wcag3-intro/">
                   WCAG 3 Introduction
                 </Link>
               </Button>
             </li>
             <li>
-              <Button
-                asChild
-                variant="link"
-                size="auto"
-                className="text-base"
-                style={{ color: displayColor }}
-              >
-                <Link
-                  href="https://developer.mozilla.org/en-US/docs/Web/Accessibility/Understanding_WCAG/Perceivable/Color_contrast"
-                  style={{ color: displayColor }}
-                >
+              <Button asChild variant="link" size="auto" className="text-base">
+                <Link href="https://developer.mozilla.org/en-US/docs/Web/Accessibility/Understanding_WCAG/Perceivable/Color_contrast">
                   Color contrast - Accessibility
                 </Link>
               </Button>

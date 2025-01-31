@@ -77,8 +77,6 @@ function simulateColorBlindness(
 interface SampleTextCardProps {
   foreground: RgbaColor;
   background: RgbaColor;
-  bgDisplayColor: string;
-  fgDisplayColor: string;
   font: string;
   colorBlindnessSimulation: ColorBlindnessType;
   textSize: "normal" | "large";
@@ -93,8 +91,6 @@ interface SampleTextCardProps {
  *
  * @param   {RgbaColor}             foreground                  The RGBA color object representing the foreground color.
  * @param   {RgbaColor}             background                  The RGBA color object representing the background color.
- * @param   {string}                bgDisplayColor              The background display color calculated by getDisplayColor.
- * @param   {string}                fgDisplayColor              The foreground display color calculated by getDisplayColor.
  * @param   {string}                font                        The current active font, selected by the "typeface" Drawer/Popover.
  * @param   {ColorBlindnessType}    colorBlindnessSimulation    The display color calculated by getDisplayColor, necessary for styling.
  * @param   {boolean}               textSize                    The display color calculated by getDisplayColor, necessary for styling.
@@ -110,8 +106,6 @@ interface SampleTextCardProps {
  *
  * const foreground = { r: 255, g: 255, b: 255, a: 1 };
  * const background = { r: 255, g: 255, b: 255, a: 1 };
- * const bgDisplayColor = "#000000";
- * const fgDisplayColor = "#ffffff";
  * const font = "Inter";
  * const colorBlindnessSimulation = "protanopia";
  * const {
@@ -122,7 +116,6 @@ interface SampleTextCardProps {
  *
  * <SampleTextCard
  *   copyColor="text"
- *   displayColor={displayColor}
  *   foreground={foreground}
  *   background={background}
  *   colorBlindnessSimulation={colorBlindnessSimulation}
@@ -136,8 +129,6 @@ interface SampleTextCardProps {
 const SampleTextCard = ({
   foreground,
   background,
-  bgDisplayColor,
-  fgDisplayColor,
   font,
   colorBlindnessSimulation,
   textSize,
@@ -171,24 +162,16 @@ const SampleTextCard = ({
         }}
       >
         <div className="relative px-4 pb-2.5 pt-2">
-          <h4
-            className="text-base font-medium leading-none md:text-lg"
-            style={{ color: bgDisplayColor }}
-          >
+          <h4 className="text-bg-display text-base font-medium leading-none md:text-lg">
             {textSize} text
           </h4>
 
-          <TooltipButton
-            background={background}
-            displayColor={fgDisplayColor}
-            tooltip="view fullscreen"
-          >
+          <TooltipButton background={background} tooltip="view fullscreen">
             <SheetTrigger asChild>
               <Button
                 variant="ghost-outline"
                 size="icon"
-                className={`border-ghost-blind absolute right-0.5 top-1/2 size-8 -translate-y-1/2 p-1 md:right-1 md:size-10 md:p-2`}
-                style={{ color: bgDisplayColor }}
+                className={`text-bg-display border-ghost-blind absolute right-0.5 top-1/2 size-8 -translate-y-1/2 p-1 md:right-1 md:size-10 md:p-2`}
               >
                 <AccessibleIcon label="Fullscreen view">
                   <Maximize2 className="!size-full" />
@@ -236,11 +219,8 @@ const SampleTextCard = ({
       </Card>
 
       <SheetContent
-        className="h-full border-none p-0"
+        className="text-fg-display h-full border-none p-0"
         side={"bottom"}
-        style={{
-          color: fgDisplayColor,
-        }}
       >
         <VisuallyHidden>
           <SheetTitle>Full screen {textSize} text</SheetTitle>

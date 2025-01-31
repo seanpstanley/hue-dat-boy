@@ -122,8 +122,6 @@ const FontPicker = ({
         <PopoverContent
           className="text-fg-display border-fg-display border-3 p-0 md:w-[368px] lg:w-[624px]"
           style={{
-            borderColor: displayColor,
-            color: displayColor,
             backgroundColor: rgbToHex(background),
           }}
         >
@@ -149,11 +147,7 @@ const FontPicker = ({
           aria-labelledby="typeface-select"
           role="combobox"
           aria-expanded={open}
-          className="h-fit justify-between border-3 bg-transparent px-3 py-2 text-lg font-normal md:text-2xl"
-          style={{
-            borderColor: displayColor,
-            color: displayColor,
-          }}
+          className="border-fg-display text-fg-display h-fit justify-between border-3 bg-transparent px-3 py-2 text-lg font-normal md:text-2xl"
           disabled={error}
         >
           {error ? (
@@ -176,10 +170,9 @@ const FontPicker = ({
       </DrawerTrigger>
       <DrawerContent
         style={{
-          borderColor: displayColor,
-          color: displayColor,
           backgroundColor: rgbToHex(background),
         }}
+        className="text-fg-display border-fg-display"
       >
         <div
           className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-white/50"

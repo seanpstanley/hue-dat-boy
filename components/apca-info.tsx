@@ -5,29 +5,18 @@ import { Button } from "@/components/ui/button";
 /**
  * A section with information and links related to the APCA standard.
  *
- * @param   {string}      displayColor  The display color calculated by getDisplayColor, necessary for styling
- *                                      the tooltip's border and text color.
- *
  * @returns                             The 'APCA' component, containing details and links related to the WCAG standard.
  *
  * @example
  * ```tsx
  * import { ApcaInfo } from "@/components/apca-info";
  *
- * const displayColor = "#000000";
- *
- * <ApcaInfo
- *   displayColor={displayColor}
- * />
+ * <ApcaInfo />
  * ```
  */
-const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
+const ApcaInfo = () => {
   return (
-    <section
-      id="apca-info"
-      className="flex flex-col gap-y-6"
-      style={{ color: displayColor }}
-    >
+    <section id="apca-info" className="text-fg-display flex flex-col gap-y-6">
       <h3 className="mb-0 text-xl font-bold md:text-2xl">
         About APCA (Advanced Perceptual Contrast Algorithm)
       </h3>
@@ -141,52 +130,28 @@ const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
 
         <ul className="list-inside list-disc">
           <li>
-            <Button
-              asChild
-              variant="link"
-              size="auto"
-              className="text-base"
-              style={{ color: displayColor }}
-            >
+            <Button asChild variant="link" size="auto" className="text-base">
               <Link href="https://www.myndex.com/APCA/">
                 APCA Contrast Calculator
               </Link>
             </Button>
           </li>
           <li>
-            <Button
-              asChild
-              variant="link"
-              size="auto"
-              className="text-base"
-              style={{ color: displayColor }}
-            >
+            <Button asChild variant="link" size="auto" className="text-base">
               <Link href="https://readtech.org/ARC/">
                 APCA Readability Criterion
               </Link>
             </Button>
           </li>
           <li>
-            <Button
-              asChild
-              variant="link"
-              size="auto"
-              className="text-base"
-              style={{ color: displayColor }}
-            >
+            <Button asChild variant="link" size="auto" className="text-base">
               <Link href="https://github.com/Myndex/apca-w3/?tab=readme-ov-file">
                 APCA for W3C & WCAG3 GitHub
               </Link>
             </Button>
           </li>
           <li>
-            <Button
-              asChild
-              variant="link"
-              size="auto"
-              className="text-base"
-              style={{ color: displayColor }}
-            >
+            <Button asChild variant="link" size="auto" className="text-base">
               <Link href="https://www.w3.org/TR/wcag-3.0/">
                 W3C Working Draft
               </Link>
@@ -220,13 +185,7 @@ const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
             The displayed values and thresholds may differ slightly depending on
             the color precision and calculation methods used. This tool uses the
             algorithm provided in the{" "}
-            <Button
-              asChild
-              variant="link"
-              size="auto"
-              className="text-base"
-              style={{ color: displayColor }}
-            >
+            <Button asChild variant="link" size="auto" className="text-base">
               <Link href="https://www.w3.org/WAI/fundamentals/accessibility-principles/">
                 apca-w3
               </Link>
@@ -253,30 +212,15 @@ const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
 
         <ul className="list-inside list-disc">
           <li>
-            <Button
-              asChild
-              variant="link"
-              size="auto"
-              className="text-base"
-              style={{ color: displayColor }}
-            >
+            <Button asChild variant="link" size="auto" className="text-base">
               <Link href="https://www.w3.org/WAI/fundamentals/accessibility-principles/">
                 Accessibility Principles
               </Link>
             </Button>
           </li>
           <li>
-            <Button
-              asChild
-              variant="link"
-              size="auto"
-              className="text-base"
-              style={{ color: displayColor }}
-            >
-              <Link
-                href="https://developer.mozilla.org/en-US/docs/Web/Accessibility/Understanding_Colors_and_Luminance"
-                style={{ color: displayColor }}
-              >
+            <Button asChild variant="link" size="auto" className="text-base">
+              <Link href="https://developer.mozilla.org/en-US/docs/Web/Accessibility/Understanding_Colors_and_Luminance">
                 Web Accessibility: Understanding Colors and Luminance
               </Link>
             </Button>
