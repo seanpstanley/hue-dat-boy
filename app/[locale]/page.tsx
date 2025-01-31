@@ -805,7 +805,6 @@ export default function ContrastChecker() {
 
                 <CopyColorButton
                   copyColor="text"
-                  displayColor={fgDisplayColor}
                   foreground={foreground}
                   background={background}
                 />
@@ -867,7 +866,6 @@ export default function ContrastChecker() {
 
                 <CopyColorButton
                   copyColor="background"
-                  displayColor={fgDisplayColor}
                   foreground={foreground}
                   background={background}
                 />
