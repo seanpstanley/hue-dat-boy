@@ -79,11 +79,9 @@ const CopyColorButton = ({
       </TooltipButton>
 
       <PopoverContent
-        className="w-fit border-3 px-3 py-1.5 text-sm"
+        className="text-fg-display border-fg-display w-fit border-3 px-3 py-1.5 text-sm"
         style={{
-          backgroundColor: `rgba(${background.r}, ${background.g}, ${background.b}, ${background.a})`,
-          color: displayColor,
-          borderColor: displayColor,
+          backgroundColor: `var(--bg)`,
         }}
       >
         copied!
