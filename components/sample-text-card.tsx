@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { AccessibleIcon } from "@radix-ui/react-accessible-icon";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Maximize2, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { TooltipButton } from "@/components/tooltip-button";
 import { Button } from "@/components/ui/button";
@@ -122,7 +123,8 @@ interface SampleTextCardProps {
  *
  * <SampleTextCard
  *   copyColor="text"
- *   displayColor={displayColor}
+ *   bgDisplayColor={bgDisplayColor}
+ *   fgDisplayColor={fgDisplayColor}
  *   foreground={foreground}
  *   background={background}
  *   colorBlindnessSimulation={colorBlindnessSimulation}
@@ -157,17 +159,22 @@ const SampleTextCard = ({
     );
   }, [foreground, background, colorBlindnessSimulation]);
 
+  const t = useTranslations("SampleTextCard");
+
+  const simulatedFg = rgbToHex(
+    simulateColorBlindness(foreground, colorBlindnessSimulation),
+  );
+  const simulatedBg = rgbToHex(
+    simulateColorBlindness(background, colorBlindnessSimulation),
+  );
+
   return (
     <Sheet>
       <Card
         className="overflow-hidden border-3 bg-transparent"
         style={{
-          borderColor: rgbToHex(
-            simulateColorBlindness(foreground, colorBlindnessSimulation),
-          ),
-          backgroundColor: rgbToHex(
-            simulateColorBlindness(foreground, colorBlindnessSimulation),
-          ),
+          borderColor: simulatedFg,
+          backgroundColor: simulatedFg,
         }}
       >
         <div className="relative px-4 pb-2.5 pt-2">
@@ -175,13 +182,13 @@ const SampleTextCard = ({
             className="text-base font-medium leading-none md:text-lg"
             style={{ color: bgDisplayColor }}
           >
-            {textSize} text
+            {textSize === "normal" ? t("title.normal") : t("title.large")}
           </h4>
 
           <TooltipButton
             background={background}
             displayColor={fgDisplayColor}
-            tooltip="view fullscreen"
+            tooltip={t("buttons.expand.tooltip")}
           >
             <SheetTrigger asChild>
               <Button
@@ -190,33 +197,28 @@ const SampleTextCard = ({
                 className={`border-ghost-blind absolute right-0.5 top-1/2 size-8 -translate-y-1/2 p-1 md:right-1 md:size-10 md:p-2`}
                 style={{ color: bgDisplayColor }}
               >
-                <AccessibleIcon label="Fullscreen view">
+                <AccessibleIcon label={t("buttons.expand.alt")}>
                   <Maximize2 className="!size-full" />
                 </AccessibleIcon>
               </Button>
             </SheetTrigger>
           </TooltipButton>
         </div>
-        {/* <div className="absolute inset-0 -z-10 " /> */}
 
         <div className="checkerboard-md h-full p-0">
           <blockquote
             cite="https://animechan.io/api/v1"
             className={cn("h-full p-4", { "text-2xl": textSize === "large" })}
             style={{
-              color: rgbaToHex(
-                simulateColorBlindness(foreground, colorBlindnessSimulation),
-              ),
-              backgroundColor: rgbaToHex(
-                simulateColorBlindness(background, colorBlindnessSimulation),
-              ),
+              color: simulatedFg,
+              backgroundColor: simulatedBg,
               fontFamily: font,
             }}
           >
             {error ? (
-              <span>failed to load resource.</span>
+              <span>{t("error")}</span>
             ) : isLoading ? (
-              <span>loading...</span>
+              <span>{t("loading")}</span>
             ) : (
               <>
                 <p className="mb-2 before:content-[open-quote] after:content-[close-quote]">
@@ -243,14 +245,16 @@ const SampleTextCard = ({
         }}
       >
         <VisuallyHidden>
-          <SheetTitle>Full screen {textSize} text</SheetTitle>
+          <SheetTitle>
+            {textSize === "normal"
+              ? t("sheet-title.normal")
+              : t("sheet-title.large")}
+          </SheetTitle>
         </VisuallyHidden>
         <div
           className="flex h-full items-center justify-center"
           style={{
-            backgroundColor: rgbaToHex(
-              simulateColorBlindness(background, colorBlindnessSimulation),
-            ),
+            backgroundColor: simulatedBg,
           }}
         >
           <div className="checkerboard-lg absolute inset-0 -z-10" />
@@ -260,16 +264,14 @@ const SampleTextCard = ({
               "text-2xl": textSize === "large",
             })}
             style={{
-              color: rgbaToHex(
-                simulateColorBlindness(foreground, colorBlindnessSimulation),
-              ),
+              color: simulatedFg,
               fontFamily: font,
             }}
           >
             {error ? (
-              <span>failed to load resource.</span>
+              <span>{t("error")}</span>
             ) : isLoading ? (
-              <span>loading...</span>
+              <span>{t("loading")}</span>
             ) : (
               <>
                 <p className="mb-2 before:content-[open-quote] after:content-[close-quote]">
@@ -293,7 +295,7 @@ const SampleTextCard = ({
             className={`border-ghost absolute right-4 top-4 p-1 md:size-9`}
           >
             <X className="!size-full" />
-            <span className="sr-only">Close</span>
+            <span className="sr-only">{t("buttons.close.alt")}</span>
           </Button>
         </SheetClose>
       </SheetContent>

@@ -106,13 +106,13 @@ const FontPicker = ({
             ) : (
               <>
                 {isLoading ? (
-                  <span>{t("loading")}...</span>
+                  <span>{t("loading")}</span>
                 ) : (
                   <>
                     {selectedFont ? (
                       fonts.find((font) => font.family === selectedFont)?.family
                     ) : (
-                      <span>{t("placeholder")}...</span>
+                      <span>{t("placeholder")}</span>
                     )}
                   </>
                 )}
@@ -160,16 +160,18 @@ const FontPicker = ({
           disabled={error}
         >
           {error ? (
-            "font picker unavailable"
+            <span>{t("error")}</span>
           ) : (
             <>
               {isLoading ? (
-                "loading..."
+                <span>{t("loading")}</span>
               ) : (
                 <>
-                  {selectedFont
-                    ? fonts.find((font) => font.family === selectedFont)?.family
-                    : "select font..."}
+                  {selectedFont ? (
+                    fonts.find((font) => font.family === selectedFont)?.family
+                  ) : (
+                    <span>{t("placeholder")}</span>
+                  )}
                 </>
               )}
             </>

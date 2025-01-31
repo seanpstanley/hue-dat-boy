@@ -1,7 +1,7 @@
 import { MathJax, MathJaxContext } from "better-react-mathjax";
-import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/routing";
 
 /**
  * A section with information and links related to the WCAG standard.

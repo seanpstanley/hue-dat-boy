@@ -18,6 +18,7 @@
         "popover": "copied url"
       },
       "swap": {
+        "alt": "Swap colors",
         "tooltip": "swap colors"
       }
     },
@@ -36,14 +37,6 @@
         "color-blindness": "simulate color blindness"
       }
     },
-    "selects": {
-      "typeface": {
-        "placeholder": "select font",
-        "empty": "no font found",
-        "loading": "loading",
-        "error": "font picker unavailable"
-      }
-    },
     "about": {
       "wcag": {
         "title": "About WCAG (Web Content Accessibility Guidelines)"
@@ -51,11 +44,37 @@
     }
   },
   "FontPicker": {
-    "placeholder": "select font",
-    "empty": "no font found",
-    "loading": "loading",
+    "placeholder": "select font...",
+    "empty": "no font found.",
+    "loading": "loading...",
     "error": "font picker unavailable",
     "search": "search fonts"
+  },
+  "CopyColorButton": {
+    "alt": "Copy color",
+    "tooltip": "copy color",
+    "popover": "copied!"
+  },
+  "SampleTextCard": {
+    "title": {
+      "normal": "normal text",
+      "large": "large text"
+    },
+    "error": "failed to load resource.",
+    "loading": "loading...",
+    "buttons": {
+      "expand": {
+        "alt": "Fullscreen view",
+        "tooltip": "view fullscreen"
+      },
+      "close": {
+        "alt": "Close"
+      }
+    },
+    "sheet-title": {
+      "normal": "Full screen normal text",
+      "large": "Full screen large text"
+    }
   },
   "Footer": {
     "text": "© {year} Sean Stanley. Built with {tech}.",

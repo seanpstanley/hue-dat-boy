@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 import { AccessibleIcon } from "@radix-ui/react-accessible-icon";
 import { Clipboard } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { TooltipButton } from "@/components/tooltip-button";
 import { Button } from "@/components/ui/button";
@@ -58,6 +59,7 @@ const CopyColorButton = ({
   background,
 }: CopyColorButtonProps) => {
   const [copied, setCopied] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(
@@ -65,24 +67,30 @@ const CopyColorButton = ({
     );
     setCopied(true);
     setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
+
+    // Avoid tooltip reappearing after click
+    buttonRef.current?.blur();
   };
+
+  const t = useTranslations("CopyColorButton");
 
   return (
     <Popover open={copied} onOpenChange={setCopied}>
       <TooltipButton
         displayColor={displayColor}
         background={background}
-        tooltip="copy color"
+        tooltip={t("tooltip")}
       >
         <PopoverTrigger asChild>
           <Button
+            ref={buttonRef}
             size="auto"
             variant="ghost-outline"
             className={`border-ghost absolute right-2.5 top-1/2 size-9 -translate-y-1/2 p-1 md:right-3 md:size-10 lg:right-4 lg:size-16 lg:p-2`}
             onClick={handleCopy}
             style={{ color: displayColor }}
           >
-            <AccessibleIcon label="Copy color">
+            <AccessibleIcon label={t("alt")}>
               <Clipboard className="!size-full" />
             </AccessibleIcon>
           </Button>
@@ -97,7 +105,7 @@ const CopyColorButton = ({
           borderColor: displayColor,
         }}
       >
-        copied!
+        {t("popover")}
       </PopoverContent>
     </Popover>
   );

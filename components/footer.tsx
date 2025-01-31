@@ -1,9 +1,9 @@
 import { AccessibleIcon } from "@radix-ui/react-accessible-icon";
 import { Github, Linkedin } from "lucide-react";
-import Link from "next/link";
 import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/routing";
 
 const getCurrentYear = () => new Date().getFullYear();
 

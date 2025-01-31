@@ -16,6 +16,7 @@ import { CopyColorButton } from "@/components/copy-color-button";
 import { FontPicker } from "@/components/font-picker";
 import { Footer } from "@/components/footer";
 import { SampleTextCard } from "@/components/sample-text-card";
+import { TooltipButton } from "@/components/tooltip-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,12 +34,6 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { WcagInfo } from "@/components/wcag-info";
 // import { Link } from "@/i18n/routing";
 import { ColorBlindnessType, RgbaColor } from "@/lib/types";
@@ -728,7 +723,7 @@ export default function ContrastChecker() {
                       handleEnhanceContrast("background");
                     }}
                   >
-                    {t("buttons.enhance.popover.background")}{" "}
+                    {t("buttons.enhance.popover.background")}
                   </Button>
                   <Button
                     variant="ghost"
@@ -762,6 +757,7 @@ export default function ContrastChecker() {
                 className="w-fit border-3 px-3 py-1.5 text-sm"
                 style={{
                   borderColor: fgDisplayColor,
+                  color: fgDisplayColor,
                   backgroundColor: `rgba(${background.r}, ${background.g}, ${background.b}, ${background.a})`,
                 }}
               >
@@ -810,29 +806,21 @@ export default function ContrastChecker() {
             </div>
 
             {/* Swap Colors */}
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost-outline"
-                    size="auto"
-                    className={`border-ghost size-12 shrink-0 p-2`}
-                    onClick={handleReverseColors}
-                  >
-                    <span className="sr-only">Swap colors</span>
-                    <ArrowLeftRight className="!size-full rotate-90 transition-transform md:rotate-0" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent
-                  style={{
-                    borderColor: fgDisplayColor,
-                    backgroundColor: rgbToHex(background),
-                  }}
-                >
-                  <span> {t("buttons.swap.tooltip")}</span>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <TooltipButton
+              background={background}
+              displayColor={fgDisplayColor}
+              tooltip={t("buttons.swap.tooltip")}
+            >
+              <Button
+                variant="ghost-outline"
+                size="auto"
+                className={`border-ghost size-12 shrink-0 p-2`}
+                onClick={handleReverseColors}
+              >
+                <span className="sr-only">{t("buttons.swap.alt")}</span>
+                <ArrowLeftRight className="!size-full rotate-90 transition-transform md:rotate-0" />
+              </Button>
+            </TooltipButton>
 
             {/* Background Color */}
             <div className="flex w-full flex-col gap-y-2">
@@ -914,6 +902,7 @@ export default function ContrastChecker() {
                 <SelectContent
                   className="border-3"
                   style={{
+                    color: fgDisplayColor,
                     borderColor: fgDisplayColor,
                     backgroundColor: `rgba(${background.r}, ${background.g}, ${background.b}, ${background.a})`,
                   }}
