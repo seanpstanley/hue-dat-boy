@@ -80,6 +80,7 @@ const CopyColorButton = ({
             variant="ghost-outline"
             className={`border-ghost absolute right-2.5 top-1/2 size-9 -translate-y-1/2 p-1 md:right-3 md:size-10 lg:right-4 lg:size-16 lg:p-2`}
             onClick={handleCopy}
+            style={{ color: displayColor }}
           >
             <AccessibleIcon label="Copy color">
               <Clipboard className="!size-full" />

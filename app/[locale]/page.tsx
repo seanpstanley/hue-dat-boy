@@ -527,27 +527,23 @@ export default function ContrastChecker() {
   return (
     <div
       className={`min-h-screen p-4 pt-8 transition-[background-color]`}
-      style={{ backgroundColor: rgbToHex(background) }}
+      style={{ backgroundColor: rgbToHex(background), color: fgDisplayColor }}
     >
       {/* Website Title */}
       <header className="mb-12 text-center md:mb-16">
-        <span className="text-fg-display text-sm font-medium md:text-base">
-          hue dat boy.
-        </span>
+        <span className="text-sm font-medium md:text-base">hue dat boy.</span>
       </header>
 
       {/* Main Content Area */}
       <main className="container mx-auto">
         {/* Page Title */}
         <div className="mb-8 md:mb-12">
-          <h1 className="text-fg-display text-2xl font-bold md:text-4xl">
-            {t("title")}
-          </h1>
+          <h1 className="text-2xl font-bold md:text-4xl">{t("title")}</h1>
         </div>
 
         {/* Contrast Info and Standards Compliance */}
         <section
-          className="text-fg-display mb-8 flex flex-col items-start gap-y-4"
+          className="mb-8 flex flex-col items-start gap-y-4"
           id="contrast-info"
         >
           {/* Contrast Ratio and Standards Levels */}
@@ -558,7 +554,10 @@ export default function ContrastChecker() {
                 {t("labels.contrast")}
               </Label>
 
-              <div className="border-fg-display flex items-center gap-10 rounded-lg border-3 px-2.5 py-4">
+              <div
+                className="flex items-center gap-10 rounded-lg border-3 px-2.5 py-4"
+                style={{ borderColor: fgDisplayColor }}
+              >
                 <h2
                   id="contrast-value"
                   className="text-5xl font-bold sm:text-6xl md:text-7xl lg:text-8xl"
@@ -602,8 +601,9 @@ export default function ContrastChecker() {
                     {Object.entries(apcaResults).map(([level, passes]) => (
                       <div
                         key={level}
-                        className="border-fg-display inline-flex items-center justify-between gap-x-2 rounded-full border-3 bg-transparent px-4 py-2 text-base font-semibold transition-colors md:text-lg"
+                        className="inline-flex items-center justify-between gap-x-2 rounded-full border-3 bg-transparent px-4 py-2 text-base font-semibold transition-colors md:text-lg"
                         style={{
+                          borderColor: fgDisplayColor,
                           backgroundColor: passes
                             ? fgDisplayColor
                             : rgbToHex(background),
@@ -628,8 +628,9 @@ export default function ContrastChecker() {
                     {Object.entries(wcagResults).map(([level, passes]) => (
                       <div
                         key={level}
-                        className="border-fg-display inline-flex items-center justify-between gap-x-2 rounded-full border-3 bg-transparent px-4 py-2 text-base font-semibold transition-colors md:text-lg"
+                        className="inline-flex items-center justify-between gap-x-2 rounded-full border-3 bg-transparent px-4 py-2 text-base font-semibold transition-colors md:text-lg"
                         style={{
+                          borderColor: fgDisplayColor,
                           backgroundColor: passes
                             ? fgDisplayColor
                             : rgbToHex(background),
@@ -662,7 +663,7 @@ export default function ContrastChecker() {
             <div className="flex items-center gap-x-2">
               <Label
                 htmlFor="contrast-standard"
-                className="text-fg-display text-base md:text-lg"
+                className="text-base md:text-lg"
               >
                 wcag 2.2
               </Label>
@@ -671,14 +672,14 @@ export default function ContrastChecker() {
                 checked={useAPCA}
                 onCheckedChange={setUseAPCA}
                 style={{
+                  borderColor: fgDisplayColor,
                   backgroundColor: backgroundHex,
                 }}
-                className="border-fg-display"
                 color={fgDisplayColor}
               />
               <Label
                 htmlFor="contrast-standard"
-                className="text-fg-display text-base md:text-lg"
+                className="text-base md:text-lg"
               >
                 apca
               </Label>
@@ -702,8 +703,9 @@ export default function ContrastChecker() {
                 </Button>
               </PopoverTrigger>
               <PopoverContent
-                className="text-fg-display border-fg-display w-fit border-3 p-0"
+                className="w-fit border-3 p-0"
                 style={{
+                  borderColor: fgDisplayColor,
                   backgroundColor: rgbToHex(background),
                 }}
               >
@@ -757,8 +759,9 @@ export default function ContrastChecker() {
               </PopoverTrigger>
 
               <PopoverContent
-                className="text-fg-display border-fg-display w-fit border-3 px-3 py-1.5 text-sm"
+                className="w-fit border-3 px-3 py-1.5 text-sm"
                 style={{
+                  borderColor: fgDisplayColor,
                   backgroundColor: `rgba(${background.r}, ${background.g}, ${background.b}, ${background.a})`,
                 }}
               >
@@ -768,7 +771,7 @@ export default function ContrastChecker() {
           </div>
 
           {/* Color Controls */}
-          <div className="text-fg-display flex flex-col items-center justify-between gap-x-4 gap-y-2 md:flex-row">
+          <div className="flex flex-col items-center justify-between gap-x-4 gap-y-2 md:flex-row">
             {/* Text Color */}
             <div className="flex w-full flex-col gap-y-2">
               <Label
@@ -793,7 +796,8 @@ export default function ContrastChecker() {
                   }}
                   spellCheck={false}
                   maxLength={9} // Allow for "#" + 8 characters
-                  className="border-fg-display h-fit border-3 bg-transparent px-14 py-2 font-mono text-3xl font-medium leading-none md:px-16 md:text-4xl lg:px-20 lg:text-6xl"
+                  className="h-fit border-3 bg-transparent px-14 py-2 font-mono text-3xl font-medium leading-none md:px-16 md:text-4xl lg:px-20 lg:text-6xl"
+                  style={{ borderColor: fgDisplayColor }}
                 />
 
                 <CopyColorButton
@@ -821,9 +825,9 @@ export default function ContrastChecker() {
                 </TooltipTrigger>
                 <TooltipContent
                   style={{
+                    borderColor: fgDisplayColor,
                     backgroundColor: rgbToHex(background),
                   }}
-                  className="border-fg-display text-fg-display"
                 >
                   <span> {t("buttons.swap.tooltip")}</span>
                 </TooltipContent>
@@ -831,7 +835,7 @@ export default function ContrastChecker() {
             </TooltipProvider>
 
             {/* Background Color */}
-            <div className="border-fg-display flex w-full flex-col gap-y-2">
+            <div className="flex w-full flex-col gap-y-2">
               <Label
                 htmlFor="background-color"
                 className="text-base md:text-lg"
@@ -843,7 +847,7 @@ export default function ContrastChecker() {
                   color={background}
                   onChange={(value) => handleColorChange("background", value)}
                   displayColor={fgDisplayColor}
-                  className="border-fg-display absolute left-2.5 top-1/2 size-9 -translate-y-1/2 md:left-3.5 md:size-10 lg:left-4 lg:size-14"
+                  className="absolute left-2.5 top-1/2 size-9 -translate-y-1/2 md:left-3.5 md:size-10 lg:left-4 lg:size-14"
                 />
 
                 <Input
@@ -855,7 +859,8 @@ export default function ContrastChecker() {
                   }}
                   spellCheck={false}
                   maxLength={9} // Allow for "#" + 8 characters
-                  className="border-fg-display h-fit border-3 bg-transparent px-14 py-2 font-mono text-3xl font-medium leading-none md:px-16 md:text-4xl lg:px-20 lg:text-6xl"
+                  style={{ borderColor: fgDisplayColor }}
+                  className="h-fit border-3 bg-transparent px-14 py-2 font-mono text-3xl font-medium leading-none md:px-16 md:text-4xl lg:px-20 lg:text-6xl"
                 />
 
                 <CopyColorButton
@@ -870,7 +875,7 @@ export default function ContrastChecker() {
 
           {/* Font and Color Blindness Dropdowns */}
           <div className="flex flex-col gap-x-8 gap-y-4 md:flex-row">
-            <div className="text-fg-display flex flex-1 flex-col gap-y-2">
+            <div className="flex flex-1 flex-col gap-y-2">
               <Label id="typeface-select" className="text-base md:text-lg">
                 {t("labels.selects.typeface")}
               </Label>
@@ -885,7 +890,7 @@ export default function ContrastChecker() {
               />
             </div>
 
-            <div className="text-fg-display flex flex-1 flex-col gap-y-2">
+            <div className="flex flex-1 flex-col gap-y-2">
               <Label
                 htmlFor="colorblind-select"
                 className="text-base md:text-lg"
@@ -899,15 +904,17 @@ export default function ContrastChecker() {
                 }
               >
                 <SelectTrigger
-                  className="border-fg-display h-fit border-3 bg-transparent py-2 text-lg md:text-2xl"
+                  className="h-fit border-3 bg-transparent py-2 text-lg md:text-2xl"
                   id="colorblind-select"
+                  style={{ borderColor: fgDisplayColor }}
                 >
                   {colorBlindnessSimulation}
                   {/* <SelectValue /> */}
                 </SelectTrigger>
                 <SelectContent
-                  className="border-fg-display text-fg-display border-3"
+                  className="border-3"
                   style={{
+                    borderColor: fgDisplayColor,
                     backgroundColor: `rgba(${background.r}, ${background.g}, ${background.b}, ${background.a})`,
                   }}
                 >
@@ -927,7 +934,7 @@ export default function ContrastChecker() {
 
           {/* Sample Text Section */}
           <section className="flex flex-col gap-y-4" id="sample-text">
-            <h3 className="text-fg-display text-xl font-bold md:text-2xl">
+            <h3 className="text-xl font-bold md:text-2xl">
               {t("headings.sample-text")}
             </h3>
 
@@ -959,7 +966,10 @@ export default function ContrastChecker() {
             </div>
           </section>
 
-          <Separator className="bg-fg-display my-8" />
+          <Separator
+            className="my-8"
+            style={{ backgroundColor: fgDisplayColor }}
+          />
 
           {useAPCA ? (
             <ApcaInfo displayColor={fgDisplayColor} />

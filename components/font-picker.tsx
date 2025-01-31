@@ -39,6 +39,7 @@ interface FontPickerProps {
  * @param   {string}                              displayColor    The display color calculated by getDisplayColor, necessary for styling
  *                                                                the Popover and Drawer's border and text colors.
  * @param   {RgbaColor}                           background      The RGBA color object representing the background color.
+ * @param   {string}                              defaultFont     The pre-selected font, based on parent state
  * @param   {GoogleFont[]}                        fonts           The array of GoogleFont objects received from the Google Fonts API.
  * @param   {boolean}                             isLoading       Loading state provided by SWR.
  * @param   {any}                                 error           Error object provided by SWR.
@@ -64,7 +65,8 @@ interface FontPickerProps {
  *    fonts={fontData?.items}
  *    isLoading={isFontLoading}
  *    error={fontError}
- *    displayColor={fgDisplayColor}
+ *    defaultFont={font}
+ *    displayColor={displayColor}
  *    background={background}
  *    onChange={setFont}
  * />
@@ -132,6 +134,7 @@ const FontPicker = ({
             setSelectedFont={setSelectedFont}
             handleChange={handleChange}
             fonts={fonts}
+            displayColor={displayColor}
             selectedFont={selectedFont}
             placeholder={t("search")}
             emptyText={t("empty")}
@@ -200,6 +203,7 @@ const FontPicker = ({
             setOpen={setOpen}
             setSelectedFont={setSelectedFont}
             handleChange={handleChange}
+            displayColor={displayColor}
             fonts={fonts}
             selectedFont={selectedFont}
             placeholder={t("search")}
@@ -215,6 +219,7 @@ interface FontListProps {
   setOpen: (open: boolean) => void;
   setSelectedFont: Dispatch<SetStateAction<string>>;
   handleChange: Dispatch<SetStateAction<string>>;
+  displayColor: string;
   fonts: GoogleFont[];
   selectedFont: string;
   placeholder: string;
@@ -225,16 +230,32 @@ const FontList = ({
   setOpen,
   setSelectedFont,
   handleChange,
+  displayColor,
   fonts,
   selectedFont,
   placeholder,
   emptyText,
 }: FontListProps) => {
+  const borderColor = `border-[${displayColor}]/0`;
+  const hoverBorderColor = `data-[selected='true']:border-[${displayColor}]/100 hover:border-[${displayColor}]/100`;
+
   return (
     <Command>
-      <CommandInput placeholder={`${placeholder}...`} />
+      <CommandInput
+        style={{
+          color: displayColor,
+          borderColor: displayColor,
+        }}
+        className="text-fg-diplay border-fg-display"
+        placeholder={`${placeholder}...`}
+      />
       <CommandList>
-        <CommandEmpty className="text-fg-display p-4 text-center text-lg md:text-2xl">
+        <CommandEmpty
+          style={{
+            color: displayColor,
+          }}
+          className="text-fg-display p-3 text-lg md:text-2xl"
+        >
           {emptyText}.
         </CommandEmpty>
         <CommandGroup>
@@ -249,6 +270,10 @@ const FontList = ({
                 handleChange(newFont); // Pass the updated (and current!) value to the parent
                 setOpen(false);
               }}
+              style={{
+                color: displayColor,
+              }}
+              className={`${borderColor} ${hoverBorderColor}`}
             >
               <Check
                 className={cn(

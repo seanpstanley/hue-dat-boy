@@ -10,20 +10,30 @@ const getCurrentYear = () => new Date().getFullYear();
 /**
  * A footer with the current year and personal links.
  *
+ * @param   {string}      displayColor  The display color calculated by getDisplayColor, necessary for styling
+ *                                      the tooltip's border and text color.
+ *
  * @returns                             'Footer' component with the current year and personal links.
  *
  * @example
  * ```tsx
  * import { Footer } from "@/components/footer";
  *
- * <Footer />
+ * const displayColor = "#000000";
+
+ * <Footer 
+ * displayColor={displayColor}
+ * />
  * ```
  */
-const Footer = () => {
+const Footer = ({ displayColor }: { displayColor: string }) => {
   const t = useTranslations("Footer");
 
   return (
-    <footer className="text-fg-display container mx-auto mt-12 py-6">
+    <footer
+      className="container mx-auto mt-12 py-6"
+      style={{ color: displayColor }}
+    >
       <div className="flex flex-col items-center justify-between gap-4 sm:flex-row-reverse">
         <div className="flex gap-x-4">
           <Button
