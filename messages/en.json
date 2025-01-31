@@ -36,11 +36,6 @@
         "typeface": "typeface",
         "color-blindness": "simulate color blindness"
       }
-    },
-    "about": {
-      "wcag": {
-        "title": "About WCAG (Web Content Accessibility Guidelines)"
-      }
     }
   },
   "FontPicker": {
@@ -82,5 +77,8 @@
       "github": { "alt": "Sean's GitHub" },
       "linkedin": { "alt": "Sean's LinkedIn" }
     }
+  },
+  "ApcaInfo": {
+    "title": "About APCA (Advanced Perceptual Contrast Algorithm)"
   }
 }

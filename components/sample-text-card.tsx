@@ -165,6 +165,13 @@ const SampleTextCard = ({
     simulateColorBlindness(foreground, colorBlindnessSimulation),
   );
   const simulatedBg = rgbToHex(
+    simulateColorBlindness(foreground, colorBlindnessSimulation),
+  );
+
+  const simulatedFgAlpha = rgbaToHex(
+    simulateColorBlindness(foreground, colorBlindnessSimulation),
+  );
+  const simulatedBgAlpha = rgbaToHex(
     simulateColorBlindness(background, colorBlindnessSimulation),
   );
 
@@ -179,7 +186,7 @@ const SampleTextCard = ({
       >
         <div className="relative px-4 pb-2.5 pt-2">
           <h4
-            className="text-base font-medium leading-none md:text-lg"
+            className="text-base font-normal leading-none md:text-lg"
             style={{ color: bgDisplayColor }}
           >
             {textSize === "normal" ? t("title.normal") : t("title.large")}
@@ -210,8 +217,8 @@ const SampleTextCard = ({
             cite="https://animechan.io/api/v1"
             className={cn("h-full p-4", { "text-2xl": textSize === "large" })}
             style={{
-              color: simulatedFg,
-              backgroundColor: simulatedBg,
+              color: simulatedFgAlpha,
+              backgroundColor: simulatedBgAlpha,
               fontFamily: font,
             }}
           >
@@ -254,7 +261,7 @@ const SampleTextCard = ({
         <div
           className="flex h-full items-center justify-center"
           style={{
-            backgroundColor: simulatedBg,
+            backgroundColor: simulatedBgAlpha,
           }}
         >
           <div className="checkerboard-lg absolute inset-0 -z-10" />
@@ -264,7 +271,7 @@ const SampleTextCard = ({
               "text-2xl": textSize === "large",
             })}
             style={{
-              color: simulatedFg,
+              color: simulatedFgAlpha,
               fontFamily: font,
             }}
           >

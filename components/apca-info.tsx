@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/routing";
+import { useTranslations } from "next-intl";
 
 /**
  * A section with information and links related to the APCA standard.
@@ -21,15 +22,15 @@ import { Link } from "@/i18n/routing";
  * ```
  */
 const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
+  const t = useTranslations("ApcaInfo");
+
   return (
     <section
       id="apca-info"
       className="flex flex-col gap-y-6"
       style={{ color: displayColor }}
     >
-      <h3 className="mb-0 text-xl font-bold md:text-2xl">
-        About APCA (Advanced Perceptual Contrast Algorithm)
-      </h3>
+      <h3 className="mb-0 text-xl font-bold md:text-2xl">{t("title")}</h3>
 
       <div className="flex flex-col gap-y-2">
         <h4 className="text-lg font-medium md:text-xl">What is APCA?</h4>

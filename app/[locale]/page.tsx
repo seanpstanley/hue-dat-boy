@@ -521,11 +521,11 @@ export default function ContrastChecker() {
 
   return (
     <div
-      className={`min-h-screen p-4 pt-8 transition-[background-color]`}
+      className={`min-h-screen p-4 transition-[background-color]`}
       style={{ backgroundColor: rgbToHex(background), color: fgDisplayColor }}
     >
       {/* Website Title */}
-      <header className="mb-12 text-center md:mb-16">
+      <header className="mb-4 text-center md:mb-6 md:mt-4">
         <span className="text-sm font-medium md:text-base">hue dat boy.</span>
       </header>
 
@@ -533,7 +533,7 @@ export default function ContrastChecker() {
       <main className="container mx-auto">
         {/* Page Title */}
         <div className="mb-8 md:mb-12">
-          <h1 className="text-2xl font-bold md:text-4xl">{t("title")}</h1>
+          <h1 className="text-2xl font-semibold md:text-5xl">{t("title")}</h1>
         </div>
 
         {/* Contrast Info and Standards Compliance */}
@@ -923,7 +923,7 @@ export default function ContrastChecker() {
 
           {/* Sample Text Section */}
           <section className="flex flex-col gap-y-4" id="sample-text">
-            <h3 className="text-xl font-bold md:text-2xl">
+            <h3 className="text-xl font-semibold md:text-2xl">
               {t("headings.sample-text")}
             </h3>
 
