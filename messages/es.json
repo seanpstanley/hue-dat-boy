@@ -1,0 +1,213 @@
+{
+  "ContrastChecker": {
+    "title": "verificador de contraste de color (¡y más!)",
+    "sections": {
+      "sample-text": "texto de muestra"
+    },
+    "buttons": {
+      "enhance": {
+        "title": "mejorar contraste",
+        "popover": {
+          "text": "texto",
+          "background": "fondo",
+          "both": "ambos"
+        }
+      },
+      "share": {
+        "title": "compartir estos colores",
+        "popover": "URL copiada"
+      },
+      "swap": {
+        "alt": "Intercambiar colores",
+        "tooltip": "intercambiar colores"
+      }
+    },
+    "selects": {
+      "color-blindness": {
+        "normal-vision": "visión normal"
+      }
+    },
+    "labels": {
+      "contrast": "valor de contraste",
+      "badges": {
+        "levels": "niveles"
+      },
+      "inputs": {
+        "text": "color del texto",
+        "background": "color de fondo"
+      },
+      "selects": {
+        "typeface": "tipografía",
+        "color-blindness": "simular daltonismo"
+      }
+    }
+  },
+  "FontPicker": {
+    "placeholder": "seleccionar fuente...",
+    "empty": "ninguna fuente encontrada.",
+    "loading": "cargando...",
+    "error": "selector de fuentes no disponible",
+    "search": "buscar fuentes"
+  },
+  "CopyColorButton": {
+    "alt": "Copiar color",
+    "tooltip": "copiar color",
+    "popover": "¡copiado!"
+  },
+  "SampleTextCard": {
+    "title": {
+      "normal": "texto normal",
+      "large": "texto grande"
+    },
+    "error": "fallo al cargar el recurso.",
+    "loading": "cargando...",
+    "buttons": {
+      "expand": {
+        "alt": "Vista de pantalla completa",
+        "tooltip": "ver en pantalla completa"
+      },
+      "close": {
+        "alt": "Cerrar"
+      }
+    },
+    "sheet-title": {
+      "normal": "Texto normal en pantalla completa",
+      "large": "Texto grande en pantalla completa"
+    }
+  },
+  "Footer": {
+    "text": "© {year} Sean Stanley. Construido con {tech}.",
+    "links": {
+      "github": { "alt": "GitHub de Sean" },
+      "linkedin": { "alt": "LinkedIn de Sean" }
+    }
+  },
+  "WcagInfo": {
+    "title": "About APCA (Advanced Perceptual Contrast Algorithm)",
+    "sections": {
+      "background": "What is APCA?",
+      "calculation": "How APCA Calculates Contrast",
+      "levels": "APCA Levels",
+      "attributions": "Atribuciones",
+      "disclaimer": "Aviso legal",
+      "further-reading": "Lectura adicional"
+    },
+    "content": {
+      "background": {
+        "description": "The Advanced Perceptual Contrast Algorithm (APCA) is a modern standard for evaluating text readability and visual accessibility based on human perception. Unlike traditional contrast ratios, APCA leverages advanced perceptual science to assess how humans perceive contrast across different colors, luminance levels, and text sizes.",
+        "shift": "APCA represents a shift from fixed thresholds to a more nuanced approach that accounts for",
+        "list": {
+          "text-size": "Text size and weight",
+          "display-env": "Display environments (light or dark modes)",
+          "color-impact": "The impact of background and foreground colors on readability"
+        },
+        "real-world": "This approach ensures accessible design tailored to real-world viewing conditions, making it especially valuable for modern digital interfaces."
+      },
+      "calculation": {
+        "description": "The Advanced Perceptual Contrast Algorithm (APCA) is a modern standard for evaluating text readability and visual accessibility based on human perception. Unlike traditional contrast ratios, APCA leverages advanced perceptual science to assess how humans perceive contrast across different colors, luminance levels, and text sizes.",
+        "overview": "APCA calculates contrast using a formula based on the relative luminance of foreground and background colors. The output is a score, measured in Lightness Contrast (Lc), which determines whether the combination is legible. Here's a quick overview",
+        "overview-list": {
+          "relative-luminance": {
+            "title": "Relative Luminance",
+            "description": "APCA evaluates the perceived brightness of colors, factoring in the non-linear way humans perceive light."
+          },
+          "directional-contrast": {
+            "title": "Directional Contrast",
+            "description": "The score reflects whether the foreground text is darker or lighter than the background."
+          },
+          "dynamic-thresholds": {
+            "title": "Dynamic Thresholds",
+            "description": "Different text sizes and weights have distinct thresholds for accessibility."
+          }
+        },
+        "example": "For example",
+        "example-list": {
+          "body-text": "Small, body text requires an Lc value of 75 or higher.",
+          "large-text": "Large or bold text is readable at lower contrast, with a threshold of 60 or higher."
+        },
+        "replaces": "The algorithm replaces the traditional \"contrast ratio\" and focuses on achieving visual clarity aligned with the natural perception of contrast."
+      },
+      "levels": {
+        "description": "APCA does not use fixed \"pass/fail\" thresholds but instead provides dynamic guidance based on text characteristics",
+        "levels-list": {
+          "normal-text": {
+            "title": "Normal Text (12–18px)",
+            "description": "Lc ≥ 75 for readability."
+          },
+          "large-text": {
+            "title": "Large Text (24px or bold 18px)",
+            "description": "Lc ≥ 60 for acceptable legibility."
+          },
+          "non-text": {
+            "title": "Non-Text Elements",
+            "description": "Lc ≥ 45 for UI elements like icons and dividers."
+          }
+        }
+      }
+    }
+  },
+  "ApcaInfo": {
+    "title": "About APCA (Advanced Perceptual Contrast Algorithm)",
+    "sections": {
+      "background": "What is APCA?",
+      "calculation": "How APCA Calculates Contrast",
+      "levels": "APCA Levels",
+      "attributions": "Atribuciones",
+      "disclaimer": "Aviso legal",
+      "further-reading": "Lectura adicional"
+    },
+    "content": {
+      "background": {
+        "description": "The Advanced Perceptual Contrast Algorithm (APCA) is a modern standard for evaluating text readability and visual accessibility based on human perception. Unlike traditional contrast ratios, APCA leverages advanced perceptual science to assess how humans perceive contrast across different colors, luminance levels, and text sizes.",
+        "shift": "APCA represents a shift from fixed thresholds to a more nuanced approach that accounts for",
+        "list": {
+          "text-size": "Text size and weight",
+          "display-env": "Display environments (light or dark modes)",
+          "color-impact": "The impact of background and foreground colors on readability"
+        },
+        "real-world": "This approach ensures accessible design tailored to real-world viewing conditions, making it especially valuable for modern digital interfaces."
+      },
+      "calculation": {
+        "description": "The Advanced Perceptual Contrast Algorithm (APCA) is a modern standard for evaluating text readability and visual accessibility based on human perception. Unlike traditional contrast ratios, APCA leverages advanced perceptual science to assess how humans perceive contrast across different colors, luminance levels, and text sizes.",
+        "overview": "APCA calculates contrast using a formula based on the relative luminance of foreground and background colors. The output is a score, measured in Lightness Contrast (Lc), which determines whether the combination is legible. Here's a quick overview",
+        "overview-list": {
+          "relative-luminance": {
+            "title": "Relative Luminance",
+            "description": "APCA evaluates the perceived brightness of colors, factoring in the non-linear way humans perceive light."
+          },
+          "directional-contrast": {
+            "title": "Directional Contrast",
+            "description": "The score reflects whether the foreground text is darker or lighter than the background."
+          },
+          "dynamic-thresholds": {
+            "title": "Dynamic Thresholds",
+            "description": "Different text sizes and weights have distinct thresholds for accessibility."
+          }
+        },
+        "example": "For example",
+        "example-list": {
+          "body-text": "Small, body text requires an Lc value of 75 or higher.",
+          "large-text": "Large or bold text is readable at lower contrast, with a threshold of 60 or higher."
+        },
+        "replaces": "The algorithm replaces the traditional \"contrast ratio\" and focuses on achieving visual clarity aligned with the natural perception of contrast."
+      },
+      "levels": {
+        "description": "APCA does not use fixed \"pass/fail\" thresholds but instead provides dynamic guidance based on text characteristics",
+        "levels-list": {
+          "normal-text": {
+            "title": "Normal Text (12–18px)",
+            "description": "Lc ≥ 75 for readability."
+          },
+          "large-text": {
+            "title": "Large Text (24px or bold 18px)",
+            "description": "Lc ≥ 60 for acceptable legibility."
+          },
+          "non-text": {
+            "title": "Non-Text Elements",
+            "description": "Lc ≥ 45 for UI elements like icons and dividers."
+          }
+        }
+      }
+    }
+  }
+}

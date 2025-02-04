@@ -913,7 +913,9 @@ export default function ContrastChecker() {
                       value={simulation}
                       className="text-lg md:text-2xl"
                     >
-                      {simulation}
+                      {simulation === "normal vision"
+                        ? t("selects.color-blindness.normal-vision")
+                        : simulation}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -924,7 +926,7 @@ export default function ContrastChecker() {
           {/* Sample Text Section */}
           <section className="flex flex-col gap-y-4" id="sample-text">
             <h3 className="text-xl font-semibold md:text-2xl">
-              {t("headings.sample-text")}
+              {t("sections.sample-text")}
             </h3>
 
             <div className="grid grid-cols-1 gap-x-8 gap-y-4 md:grid-cols-2">

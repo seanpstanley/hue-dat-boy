@@ -92,7 +92,7 @@ body {
 .bg-dynamic:hover,
 .bg-dynamic:focus {
   background-color: var(--fg-display);
-  color: var(--bg);
+  color: var(--bg-display);
 }
 
 .bg-fg-display {

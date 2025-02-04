@@ -1,7 +1,7 @@
 import { MathJax, MathJaxContext } from "better-react-mathjax";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
-import { Link } from "@/i18n/routing";
 
 /**
  * A section with information and links related to the WCAG standard.
@@ -23,6 +23,8 @@ import { Link } from "@/i18n/routing";
  * ```
  */
 const WcagInfo = ({ displayColor }: { displayColor: string }) => {
+  const t = useTranslations("WcagInfo");
+
   return (
     <MathJaxContext>
       <section
@@ -30,121 +32,152 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
         className="flex flex-col gap-y-6"
         style={{ color: displayColor }}
       >
-        <h3 className="mb-0 text-xl font-bold md:text-2xl">
-          About WCAG (Web Content Accessibility Guidelines)
-        </h3>
+        <h3 className="mb-0 text-xl font-bold md:text-2xl">{t("title")}</h3>
 
         <div className="flex flex-col gap-y-2">
-          <h4 className="text-lg font-medium md:text-xl">What is WCAG?</h4>
+          <h4 className="text-lg font-medium md:text-xl">
+            {t("sections.background")}
+          </h4>
 
-          <p>
-            The Web Content Accessibility Guidelines (WCAG) are internationally
-            recognized standards for making web content accessible to people
-            with disabilities. These guidelines, developed by the World Wide Web
-            Consortium (W3C), aim to improve web usability for individuals with
-            visual, auditory, cognitive, and motor impairments.
-          </p>
+          <p>{t("content.background.description")}</p>
 
-          <p>WCAG ensures that content is:</p>
+          <p>{t("content.background.ensures")}:</p>
 
           <ul className="list-inside list-disc">
             <li>
-              <strong>Perceivable</strong>: Users can recognize and use
-              information.
+              <strong>
+                {t("content.background.ensures-list.perceivable.title")}
+              </strong>
+              : {t("content.background.ensures-list.perceivable.description")}
             </li>
             <li>
-              <strong>Operable</strong>: Interfaces are functional for a wide
-              range of users.
+              <strong>
+                {t("content.background.ensures-list.operable.title")}
+              </strong>
+              : {t("content.background.ensures-list.operable.description")}
             </li>
             <li>
-              <strong>Understandable</strong>: Content is clear and predictable.
+              <strong>
+                {t("content.background.ensures-list.understandable.title")}
+              </strong>
+              :{" "}
+              {t("content.background.ensures-list.understandable.description")}
             </li>
             <li>
-              <strong>Robust</strong>: Content works well with assistive
-              technologies.
+              <strong>
+                {t("content.background.ensures-list.robust.title")}
+              </strong>
+              : {t("content.background.ensures-list.robust.description")}
             </li>
           </ul>
 
-          <p>
-            The guidelines are part of accessibility regulations in many
-            countries, making them crucial for compliance and inclusivity.
-          </p>
+          <p>{t("content.background.regulation-compliance")}</p>
         </div>
 
         <div className="flex flex-col gap-y-2">
           <h4 className="text-lg font-medium md:text-xl">
-            How WCAG Calculates Contrast
+            {t("sections.calculation")}
           </h4>
 
-          <p>
-            The current WCAG 2.2 standard defines contrast ratios as the
-            luminance difference between text and background colors. The ratio
-            ranges from 1:1 (no contrast) to 21:1 (maximum contrast).
-          </p>
+          <p>{t("content.calculation.description")}:</p>
 
-          <h5 className="font-bold">Calculation Formula:</h5>
+          <h5 className="font-bold">
+            {t("content.calculation.calculation-formula")}:
+          </h5>
           <MathJax>
             <p>
-              <i>Contrast Ratio</i> =
+              <i>{t("content.calculation.contrast-ratio")}</i> =
               <span
                 suppressHydrationWarning
               >{`\\(\\frac{L_{1} + 0.05}{L_{2} + 0.05}\\)`}</span>
             </p>
           </MathJax>
 
-          <p>Where:</p>
+          <p>{t("content.calculation.where")}</p>
           <ul className="list-inside list-disc" suppressHydrationWarning>
             <li>
               <MathJax inline suppressHydrationWarning>
                 {"\\({L_{1}}\\)"}
-              </MathJax>
-              ​ is the relative luminance of the lighter color.
+              </MathJax>{" "}
+              {t("content.calculation.lighter-luminance")}
             </li>
             <li>
               <MathJax inline suppressHydrationWarning>
                 {"\\({L_{2}}\\)"}
-              </MathJax>
-              ​ is the relative luminance of the darker color.
+              </MathJax>{" "}
+              {t("content.calculation.darker-luminance")}
             </li>
           </ul>
 
           <p>
-            <strong>Relative Luminance</strong> considers the perceived
-            brightness of colors based on human vision. It accounts for the RGB
-            values of the color and adjusts them using a weighting system to
-            approximate perception.
+            <strong>
+              {t("content.calculation.overview-list.relative-luminance.title")}
+            </strong>{" "}
+            {t("content.calculation.relative-luminance.description")}
           </p>
         </div>
 
         <div className="flex flex-col gap-y-2">
-          <h4 className="text-lg font-medium md:text-xl">WCAG Levels</h4>
+          <h4 className="text-lg font-medium md:text-xl">
+            {t("sections.levels")}
+          </h4>
 
-          <p>
-            WCAG contrast requirements are split into levels to meet varying
-            accessibility needs:
-          </p>
+          <p>{t("content.levels.description")}</p>
 
           <ul className="list-inside list-disc [&_ul]:list-[revert]">
             <li>
-              <strong>Level AA</strong>: Minimum contrast for readability.
+              <strong>{t("content.levels.levels-list.aa.title")}</strong>:
+              {t("content.levels.levels-list.aa.description")}
               <ul className="ml-4 list-inside">
                 <li>
-                  <strong>Normal Text (12–18px)</strong>: 4.5:1
+                  <strong>
+                    {t(
+                      "content.levels.levels-list.aa.text-sizes-list.normal.title",
+                    )}
+                  </strong>
+                  :{" "}
+                  {t(
+                    "content.levels.levels-list.aa.text-sizes-list.normal.description",
+                  )}
                 </li>
                 <li>
-                  <strong>Large Text (18px bold or 24px regular)</strong>: 3:1
+                  <strong>
+                    {t(
+                      "content.levels.levels-list.aa.text-sizes-list.large.title",
+                    )}
+                  </strong>
+                  :{" "}
+                  {t(
+                    "content.levels.levels-list.aa.text-sizes-list.large.description",
+                  )}
                 </li>
               </ul>
             </li>
             <li>
-              <strong>Level AAA</strong>: Enhanced contrast for high
-              accessibility.
+              <strong>{t("content.levels.levels-list.aaa.title")}</strong>:{" "}
+              {t("content.levels.levels-list.aaa.description")}
               <ul className="ml-4 list-inside">
                 <li>
-                  <strong>Normal Text</strong>: 7:1
+                  <strong>
+                    {t(
+                      "content.levels.levels-list.aaa.text-sizes-list.normal.description",
+                    )}
+                  </strong>
+                  :{" "}
+                  {t(
+                    "content.levels.levels-list.aaa.text-sizes-list.normal.description",
+                  )}
                 </li>
                 <li>
-                  <strong>Large Text</strong>: 4.5:1
+                  <strong>
+                    {t(
+                      "content.levels.levels-list.aaa.text-sizes-list.large.title",
+                    )}
+                  </strong>
+                  :{" "}
+                  {t(
+                    "content.levels.levels-list.aaa.text-sizes-list.large.description",
+                  )}
                 </li>
               </ul>
             </li>
@@ -152,100 +185,97 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
         </div>
 
         <div className="flex flex-col gap-y-2">
-          <h4 className="text-lg font-medium md:text-xl">Attributions</h4>
+          <h4 className="text-lg font-medium md:text-xl">
+            {t("sections.attributions")}
+          </h4>
 
-          <p>
-            WCAG is developed and maintained by the W3C Web Accessibility
-            Initiative (WAI). The guidelines are part of an ongoing effort to
-            ensure that digital content is usable by all.
-          </p>
+          <p>{t("content.attributions.description")}</p>
 
-          <p>For more information, visit:</p>
+          <p>{t("content.attributions.more-info")}:</p>
 
           <ul className="list-inside list-disc">
             <li>
-              <Button
-                asChild
-                variant="link"
-                size="auto"
-                className="text-base"
-                style={{ color: displayColor }}
-              >
-                <Link href="https://www.w3.org/WAI/standards-guidelines/wcag/">
-                  WCAG 2 Overview
-                </Link>
+              <Button asChild variant="link" size="auto" className="text-base">
+                <a
+                  href={t(
+                    "content.attributions.more-info-list.wcag-overview.link-url",
+                  )}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  {t(
+                    "content.attributions.more-info-list.wcag-overview.link-text",
+                  )}
+                </a>
               </Button>
             </li>
             <li>
-              <Button
-                asChild
-                variant="link"
-                size="auto"
-                className="text-base"
-                style={{ color: displayColor }}
-              >
-                <Link href="https://www.w3.org/WAI/WCAG22/Understanding/">
-                  WCAG 2.2 Understanding Docs
-                </Link>
+              <Button asChild variant="link" size="auto" className="text-base">
+                <a
+                  href={t(
+                    "content.attributions.more-info-list.wcag-understanding.link-url",
+                  )}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  {t(
+                    "content.attributions.more-info-list.wcag-understanding.link-text",
+                  )}
+                </a>
               </Button>
             </li>
           </ul>
         </div>
 
         <div className="flex flex-col gap-y-2">
-          <h4 className="text-lg font-medium md:text-xl">Disclaimer</h4>
+          <h4 className="text-lg font-medium md:text-xl">
+            {t("sections.disclaimer")}
+          </h4>
 
-          <p>
-            The WCAG compliance compliance calculation of this tool aims to
-            provide accurate and reliable contrast results. However:
-          </p>
+          <p>{t("content.disclaimer.description")}</p>
 
           <ul className="list-inside list-decimal">
-            <li>
-              The displayed values and thresholds may differ slightly depending
-              on the color precision and calculation methods used.
-            </li>
-            <li>
-              This tool is designed for educational and reference purposes and
-              should not replace a full accessibility audit by a qualified
-              professional.
-            </li>
+            <li>{t("content.disclaimer.disclaimer-list.thresholds")}</li>
+            <li>{t("content.disclaimer.disclaimer-list.educational")}</li>
           </ul>
         </div>
 
         <div className="flex flex-col gap-y-2">
-          <h4 className="text-lg font-medium md:text-xl">Further Reading</h4>
+          <h4 className="text-lg font-medium md:text-xl">
+            {t("sections.further-reading")}
+          </h4>
 
-          <p>Explore more about WCAG and color contrast::</p>
+          <p>{t("content.further-reading.description")}:</p>
 
           <ul className="list-inside list-disc">
             <li>
-              <Button
-                asChild
-                variant="link"
-                size="auto"
-                className="text-base"
-                style={{ color: displayColor }}
-              >
-                <Link href="https://www.w3.org/WAI/standards-guidelines/wcag/wcag3-intro/">
-                  WCAG 3 Introduction
-                </Link>
+              <Button asChild variant="link" size="auto" className="text-base">
+                <a
+                  href={t(
+                    "content.further-reading.further-reading-list.wcag3-intro.link-url",
+                  )}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  {t(
+                    "content.further-reading.further-reading-list.wcag3-intro.link-text",
+                  )}
+                </a>
               </Button>
             </li>
             <li>
-              <Button
-                asChild
-                variant="link"
-                size="auto"
-                className="text-base"
-                style={{ color: displayColor }}
-              >
-                <Link
-                  href="https://developer.mozilla.org/en-US/docs/Web/Accessibility/Understanding_WCAG/Perceivable/Color_contrast"
-                  style={{ color: displayColor }}
+              <Button asChild variant="link" size="auto" className="text-base">
+                <a
+                  href={t(
+                    "content.further-reading.further-reading-list.color-contrast.link-url",
+                  )}
+                  rel="noopener noreferrer"
+                  target="_blank"
                 >
-                  Color contrast - Accessibility
-                </Link>
+                  {t(
+                    "content.further-reading.further-reading-list.color-contrast.link-text",
+                  )}
+                </a>
               </Button>
             </li>
           </ul>

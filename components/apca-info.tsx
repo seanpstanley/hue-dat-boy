@@ -1,7 +1,6 @@
 import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
-import { Link } from "@/i18n/routing";
 
 /**
  * A section with information and links related to the APCA standard.
@@ -34,252 +33,235 @@ const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
       <h3 className="mb-0 text-xl font-bold md:text-2xl">{t("title")}</h3>
 
       <div className="flex flex-col gap-y-2">
-        <h4 className="text-lg font-medium md:text-xl">What is APCA?</h4>
+        <h4 className="text-lg font-medium md:text-xl">
+          {t("sections.background")}
+        </h4>
 
-        <p>
-          The Advanced Perceptual Contrast Algorithm (APCA) is a modern standard
-          for evaluating text readability and visual accessibility based on
-          human perception. Unlike traditional contrast ratios, APCA leverages
-          advanced perceptual science to assess how humans perceive contrast
-          across different colors, luminance levels, and text sizes.
-        </p>
+        <p>{t("content.background.description")}</p>
 
-        <p>
-          APCA represents a shift from fixed thresholds to a more nuanced
-          approach that accounts for:
-        </p>
+        <p>{t("content.background.shift")}:</p>
 
         <ul className="list-inside list-disc">
-          <li>Text size and weight</li>
-          <li>Display environments (light or dark modes)</li>
-          <li>The impact of background and foreground colors on readability</li>
+          <li>{t("content.background.considerations-list.text-size")}</li>
+          <li>{t("content.background.considerations-list.display-env")}</li>
+          <li>{t("content.background.considerations-list.color-impact")}</li>
         </ul>
 
-        <p>
-          This approach ensures accessible design tailored to real-world viewing
-          conditions, making it especially valuable for modern digital
-          interfaces.
-        </p>
+        <p>{t("content.background.real-world")}</p>
       </div>
 
       <div className="flex flex-col gap-y-2">
         <h4 className="text-lg font-medium md:text-xl">
-          How APCA Calculates Contrast
+          {t("sections.calculation")}
         </h4>
 
-        <p>
-          APCA calculates contrast using a formula based on the relative
-          luminance of foreground and background colors. The output is a score,
-          measured in Lightness Contrast (Lc), which determines whether the
-          combination is legible. Here&apos;s a quick overview:
-        </p>
+        <p>{t("content.calculation.overview")}:</p>
 
         <ul className="list-inside list-disc">
           <li>
-            <strong>Relative Luminance</strong>: APCA evaluates the perceived
-            brightness of colors, factoring in the non-linear way humans
-            perceive light.
+            <strong>
+              {t("content.calculation.overview-list.relative-luminance.title")}
+            </strong>
+            :{" "}
+            {t(
+              "content.calculation.overview-list.relative-luminance.description",
+            )}
           </li>
           <li>
-            <strong>Directional Contrast</strong>: The score reflects whether
-            the foreground text is darker or lighter than the background.
+            <strong>
+              {t(
+                "content.calculation.overview-list.directional-contrast.title",
+              )}
+            </strong>
+            :{" "}
+            {t(
+              "content.calculation.overview-list.directional-contrast.description",
+            )}
           </li>
           <li>
-            <strong>Dynamic Thresholds</strong>: Different text sizes and
-            weights have distinct thresholds for accessibility.
+            <strong>
+              {t("content.calculation.overview-list.dynamic-thresholds.title")}
+            </strong>
+            :{" "}
+            {t(
+              "content.calculation.overview-list.dynamic-thresholds.description",
+            )}
           </li>
         </ul>
 
-        <p>For example:</p>
+        <p>{t("content.calculation.example")}:</p>
 
         <ul className="list-inside list-disc">
-          <li>Small, body text requires an Lc value of 75 or higher.</li>
-          <li>
-            Large or bold text is readable at lower contrast, with a threshold
-            of 60 or higher.
-          </li>
+          <li>{t("content.calculation.example-list.body-text")}</li>
+          <li>{t("content.calculation.example-list.large-text")}:</li>
         </ul>
 
-        <p>
-          The algorithm replaces the traditional &quot;contrast ratio&quot; and
-          focuses on achieving visual clarity aligned with the natural
-          perception of contrast.
-        </p>
+        <p>{t("content.calculation.replaces")}</p>
       </div>
 
       <div className="flex flex-col gap-y-2">
-        <h4 className="text-lg font-medium md:text-xl">APCA Levels</h4>
+        <h4 className="text-lg font-medium md:text-xl">
+          {t("sections.levels")}
+        </h4>
 
-        <p>
-          APCA does not use fixed &quot;pass/fail&quot; thresholds but instead
-          provides dynamic guidance based on text characteristics:
-        </p>
-
-        <ul className="list-inside list-disc">
-          <li>
-            <strong>Normal Text (12–18px)</strong>: Lc ≥ 75 for readability.
-          </li>
-          <li>
-            <strong>Large Text (24px or bold 18px)</strong>: Lc ≥ 60 for
-            acceptable legibility.
-          </li>
-          <li>
-            <strong>Non-Text Elements</strong>: Lc ≥ 45 for UI elements like
-            icons and dividers.
-          </li>
-        </ul>
-      </div>
-
-      <div className="flex flex-col gap-y-2">
-        <h4 className="text-lg font-medium md:text-xl">Attributions</h4>
-
-        <p>
-          The APCA algorithm was developed by Andrew Somers at Myndex
-          Technologies.
-        </p>
-
-        <p>For more information, visit:</p>
+        <p>{t("content.levels.description")}</p>
 
         <ul className="list-inside list-disc">
           <li>
-            <Button
-              asChild
-              variant="link"
-              size="auto"
-              className="text-base"
-              style={{ color: displayColor }}
-            >
-              <Link href="https://www.myndex.com/APCA/">
-                APCA Contrast Calculator
-              </Link>
-            </Button>
+            <strong>{t("content.levels.levels-list.normal-text.title")}</strong>
+            : {t("content.levels.levels-list.normal-text.description")}
           </li>
           <li>
-            <Button
-              asChild
-              variant="link"
-              size="auto"
-              className="text-base"
-              style={{ color: displayColor }}
-            >
-              <Link href="https://readtech.org/ARC/">
-                APCA Readability Criterion
-              </Link>
-            </Button>
+            <strong>{t("content.levels.levels-list.large-text.title")}</strong>:{" "}
+            {t("content.levels.levels-list.large-text.description")}
           </li>
           <li>
-            <Button
-              asChild
-              variant="link"
-              size="auto"
-              className="text-base"
-              style={{ color: displayColor }}
-            >
-              <Link href="https://github.com/Myndex/apca-w3/?tab=readme-ov-file">
-                APCA for W3C & WCAG3 GitHub
-              </Link>
-            </Button>
-          </li>
-          <li>
-            <Button
-              asChild
-              variant="link"
-              size="auto"
-              className="text-base"
-              style={{ color: displayColor }}
-            >
-              <Link href="https://www.w3.org/TR/wcag-3.0/">
-                W3C Working Draft
-              </Link>
-            </Button>
+            <strong>{t("content.levels.levels-list.non-text.title")}</strong>:{" "}
+            {t("content.levels.levels-list.non-text.description")}
           </li>
         </ul>
       </div>
 
       <div className="flex flex-col gap-y-2">
-        <h4 className="text-lg font-medium md:text-xl">Disclaimer</h4>
-        <p>
-          This website is beta testing the APCA guidelines for determining text
-          and non-text contrast. It is well known that WCAG 2 contrast maths are
-          not accurate regarding human perception, and automated testing using
-          WCAG 2 math may incorrectly indicate errors in some color pairs on
-          this site. The APCA guidelines are a substantial improvement in
-          accessibility over WCAG 2 contrast criterions, and therefore compliant
-          with the ADA, and also 508 rules under the alternative methods
-          section. Any automated or manual testing done to determine conformance
-          of this site needs to be conducted using a perceptually accurate
-          method such as APCA.
-        </p>
+        <h4 className="text-lg font-medium md:text-xl">
+          {t("sections.attributions")}
+        </h4>
 
-        <p>
-          The APCA implementation of this tool aims to provide accurate and
-          reliable contrast results. However:
-        </p>
+        <p>{t("content.attributions.description")}</p>
+
+        <p>{t("content.attributions.more-info")}:</p>
+
+        <ul className="list-inside list-disc">
+          <li>
+            <Button asChild variant="link" size="auto" className="text-base">
+              <a
+                href={t(
+                  "content.attributions.more-info-list.contrast-calculator.link-url",
+                )}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                {t(
+                  "content.attributions.more-info-list.contrast-calculator.link-text",
+                )}
+              </a>
+            </Button>
+          </li>
+          <li>
+            <Button asChild variant="link" size="auto" className="text-base">
+              <a
+                href={t(
+                  "content.attributions.more-info-list.readability-criterion.link-url",
+                )}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                {t(
+                  "content.attributions.more-info-list.readability-criterion.link-text",
+                )}
+              </a>
+            </Button>
+          </li>
+          <li>
+            <Button asChild variant="link" size="auto" className="text-base">
+              <a
+                href={t(
+                  "content.attributions.more-info-list.apca-github.link-url",
+                )}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                {t("content.attributions.more-info-list.apca-github.link-text")}
+              </a>
+            </Button>
+          </li>
+          <li>
+            <Button asChild variant="link" size="auto" className="text-base">
+              <a
+                href={t(
+                  "content.attributions.more-info-list.w3c-draft.link-url",
+                )}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                {t("content.attributions.more-info-list.w3c-draft.link-text")}
+              </a>
+            </Button>
+          </li>
+        </ul>
+      </div>
+
+      <div className="flex flex-col gap-y-2">
+        <h4 className="text-lg font-medium md:text-xl">
+          {t("sections.disclaimer")}
+        </h4>
+        <p>{t("content.disclaimer.description")}</p>
+
+        <p>{t("content.disclaimer.accuracy-disclaimer")}: </p>
 
         <ul className="list-inside list-decimal">
           <li>
-            The displayed values and thresholds may differ slightly depending on
-            the color precision and calculation methods used. This tool uses the
-            algorithm provided in the{" "}
-            <Button
-              asChild
-              variant="link"
-              size="auto"
-              className="text-base"
-              style={{ color: displayColor }}
-            >
-              <Link href="https://www.w3.org/WAI/fundamentals/accessibility-principles/">
-                apca-w3
-              </Link>
+            {t(
+              "content.disclaimer.accuracy-disclaimer-list.thresholds.description",
+            )}{" "}
+            <Button asChild variant="link" size="auto" className="text-base">
+              <a
+                href={t(
+                  "content.disclaimer.accuracy-disclaimer-list.thresholds.link-url",
+                )}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                {t(
+                  "content.disclaimer.accuracy-disclaimer-list.thresholds.link-text",
+                )}
+              </a>
             </Button>{" "}
-            package.
+            {t("content.disclaimer.accuracy-disclaimer-list.package")}
           </li>
           <li>
-            This tool is designed for educational and reference purposes and
-            should not replace a full accessibility audit by a qualified
-            professional.
+            {t("content.disclaimer.accuracy-disclaimer-list.educational")}
           </li>
-          <li>
-            APCA has not yes been integrated into any current standard, so it
-            should not be used as the single source of truth for production
-            work.
-          </li>
+          <li>{t("content.disclaimer.accuracy-disclaimer-list.production")}</li>
         </ul>
       </div>
 
       <div className="flex flex-col gap-y-2">
-        <h4 className="text-lg font-medium md:text-xl">Further Reading</h4>
+        <h4 className="text-lg font-medium md:text-xl">
+          {t("sections.further-reading")}
+        </h4>
 
-        <p>Explore more about color contrast and its role in accessibility:</p>
+        <p>{t("content.further-reading.description")}:</p>
 
         <ul className="list-inside list-disc">
           <li>
-            <Button
-              asChild
-              variant="link"
-              size="auto"
-              className="text-base"
-              style={{ color: displayColor }}
-            >
-              <Link href="https://www.w3.org/WAI/fundamentals/accessibility-principles/">
-                Accessibility Principles
-              </Link>
+            <Button asChild variant="link" size="auto" className="text-base">
+              <a
+                href={t(
+                  "content.further-reading.further-reading-list.accessibility-principles.link-url",
+                )}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                {t(
+                  "content.further-reading.further-reading-list.accessibility-principles.link-text",
+                )}
+              </a>
             </Button>
           </li>
           <li>
-            <Button
-              asChild
-              variant="link"
-              size="auto"
-              className="text-base"
-              style={{ color: displayColor }}
-            >
-              <Link
-                href="https://developer.mozilla.org/en-US/docs/Web/Accessibility/Understanding_Colors_and_Luminance"
-                style={{ color: displayColor }}
+            <Button asChild variant="link" size="auto" className="text-base">
+              <a
+                href={t(
+                  "content.further-reading.further-reading-list.understanding-colors.link-url",
+                )}
+                rel="noopener noreferrer"
+                target="_blank"
               >
-                Web Accessibility: Understanding Colors and Luminance
-              </Link>
+                {t(
+                  "content.further-reading.further-reading-list.understanding-colors.link-text",
+                )}
+              </a>
             </Button>
           </li>
         </ul>
