@@ -93,7 +93,7 @@ const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
 
         <ul className="list-inside list-disc">
           <li>{t("content.calculation.example-list.body-text")}</li>
-          <li>{t("content.calculation.example-list.large-text")}:</li>
+          <li>{t("content.calculation.example-list.large-text")}</li>
         </ul>
 
         <p>{t("content.calculation.replaces")}</p>
@@ -104,7 +104,7 @@ const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
           {t("sections.levels")}
         </h4>
 
-        <p>{t("content.levels.description")}</p>
+        <p>{t("content.levels.description")}:</p>
 
         <ul className="list-inside list-disc">
           <li>

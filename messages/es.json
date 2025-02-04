@@ -15,7 +15,7 @@
       },
       "share": {
         "title": "compartir estos colores",
-        "popover": "URL copiada"
+        "popover": "¡url copiada!"
       },
       "swap": {
         "alt": "Intercambiar colores",
@@ -27,10 +27,24 @@
         "normal-vision": "visión normal"
       }
     },
+    "badges": {
+      "wcag": {
+        "aa_large": "AA grande",
+        "aaa_large": "AAA grande",
+        "aa_normal": "AA normal",
+        "aaa_normal": "AAA normal"
+      },
+      "apca": {
+        "normal_text": "texto normal",
+        "large_text": "texto grande",
+        "non_text": "iconos"
+      }
+    },
     "labels": {
       "contrast": "valor de contraste",
       "badges": {
-        "levels": "niveles"
+        "wcag": "niveles de wcag",
+        "apca": "niveles de apca"
       },
       "inputs": {
         "text": "color del texto",
@@ -83,128 +97,193 @@
     }
   },
   "WcagInfo": {
-    "title": "About APCA (Advanced Perceptual Contrast Algorithm)",
+    "title": "Acerca de WCAG (Pautas de Accesibilidad para el Contenido Web)",
     "sections": {
-      "background": "What is APCA?",
-      "calculation": "How APCA Calculates Contrast",
-      "levels": "APCA Levels",
+      "background": "¿Qué es WCAG?",
+      "calculation": "Cómo WCAG calcula el contraste",
+      "levels": "Niveles de WCAG",
       "attributions": "Atribuciones",
       "disclaimer": "Aviso legal",
       "further-reading": "Lectura adicional"
     },
     "content": {
       "background": {
-        "description": "The Advanced Perceptual Contrast Algorithm (APCA) is a modern standard for evaluating text readability and visual accessibility based on human perception. Unlike traditional contrast ratios, APCA leverages advanced perceptual science to assess how humans perceive contrast across different colors, luminance levels, and text sizes.",
-        "shift": "APCA represents a shift from fixed thresholds to a more nuanced approach that accounts for",
-        "list": {
-          "text-size": "Text size and weight",
-          "display-env": "Display environments (light or dark modes)",
-          "color-impact": "The impact of background and foreground colors on readability"
-        },
-        "real-world": "This approach ensures accessible design tailored to real-world viewing conditions, making it especially valuable for modern digital interfaces."
-      },
-      "calculation": {
-        "description": "The Advanced Perceptual Contrast Algorithm (APCA) is a modern standard for evaluating text readability and visual accessibility based on human perception. Unlike traditional contrast ratios, APCA leverages advanced perceptual science to assess how humans perceive contrast across different colors, luminance levels, and text sizes.",
-        "overview": "APCA calculates contrast using a formula based on the relative luminance of foreground and background colors. The output is a score, measured in Lightness Contrast (Lc), which determines whether the combination is legible. Here's a quick overview",
-        "overview-list": {
-          "relative-luminance": {
-            "title": "Relative Luminance",
-            "description": "APCA evaluates the perceived brightness of colors, factoring in the non-linear way humans perceive light."
+        "description": "Las Pautas de Accesibilidad para el Contenido Web (WCAG) son estándares reconocidos internacionalmente para hacer que el contenido web sea accesible para personas con discapacidades. Estas pautas, desarrolladas por el Consorcio World Wide Web (W3C), tienen como objetivo mejorar la usabilidad web para personas con discapacidades visuales, auditivas, cognitivas y motoras.",
+        "ensures": "WCAG garantiza que el contenido sea",
+        "ensures-list": {
+          "perceivable": {
+            "title": "Perceptible",
+            "description": "Los usuarios pueden reconocer y utilizar la información."
           },
-          "directional-contrast": {
-            "title": "Directional Contrast",
-            "description": "The score reflects whether the foreground text is darker or lighter than the background."
+          "operable": {
+            "title": "Operable",
+            "description": "Las interfaces son funcionales para una amplia gama de usuarios."
           },
-          "dynamic-thresholds": {
-            "title": "Dynamic Thresholds",
-            "description": "Different text sizes and weights have distinct thresholds for accessibility."
+          "understandable": {
+            "title": "Comprensible",
+            "description": "El contenido es claro y predecible."
+          },
+          "robust": {
+            "title": "Robusto",
+            "description": "El contenido funciona bien con tecnologías de asistencia."
           }
         },
-        "example": "For example",
-        "example-list": {
-          "body-text": "Small, body text requires an Lc value of 75 or higher.",
-          "large-text": "Large or bold text is readable at lower contrast, with a threshold of 60 or higher."
-        },
-        "replaces": "The algorithm replaces the traditional \"contrast ratio\" and focuses on achieving visual clarity aligned with the natural perception of contrast."
+        "regulation-compliance": "Las pautas forman parte de las regulaciones de accesibilidad en muchos países, lo que las hace cruciales para el cumplimiento y la inclusión."
+      },
+      "calculation": {
+        "description": "El estándar WCAG 2.2 actual define las proporciones de contraste como la diferencia de luminancia entre los colores del texto y el fondo. La proporción varía de 1:1 (sin contraste) a 21:1 (máximo contraste).",
+        "calculation-formula": "Fórmula de cálculo",
+        "contrast-ratio": "Proporción de contraste",
+        "where": "Dónde",
+        "lighter-luminance": "es la luminancia relativa del color más claro.",
+        "darker-luminance": "es la luminancia relativa del color más oscuro.",
+        "relative-luminance": {
+          "title": "Luminancia Relativa",
+          "description": "considera el brillo percibido de los colores basado en la visión humana. Tiene en cuenta los valores RGB del color y los ajusta mediante un sistema de ponderación para aproximar la percepción."
+        }
       },
       "levels": {
-        "description": "APCA does not use fixed \"pass/fail\" thresholds but instead provides dynamic guidance based on text characteristics",
+        "description": "Los requisitos de contraste de WCAG se dividen en niveles para satisfacer diversas necesidades de accesibilidad.",
         "levels-list": {
-          "normal-text": {
-            "title": "Normal Text (12–18px)",
-            "description": "Lc ≥ 75 for readability."
+          "aa": {
+            "title": "Nivel AA",
+            "description": "Lc ≥ 75 para legibilidad.",
+            "text-sizes-list": {
+              "normal": {
+                "title": "Texto Normal (12–18px)",
+                "description": "4.5:1"
+              },
+              "large": {
+                "title": "Texto Grande (18px en negrita o 24px regular)",
+                "description": "3:1"
+              }
+            }
           },
-          "large-text": {
-            "title": "Large Text (24px or bold 18px)",
-            "description": "Lc ≥ 60 for acceptable legibility."
-          },
-          "non-text": {
-            "title": "Non-Text Elements",
-            "description": "Lc ≥ 45 for UI elements like icons and dividers."
+          "aaa": {
+            "title": "Nivel AAA",
+            "description": "Contraste mejorado para alta accesibilidad.",
+            "text-sizes-list": {
+              "normal": {
+                "title": "Texto Normal",
+                "description": "7:1"
+              },
+              "large": {
+                "title": "Texto Grande",
+                "description": "4.5:1"
+              }
+            }
           }
         }
       }
     }
   },
   "ApcaInfo": {
-    "title": "About APCA (Advanced Perceptual Contrast Algorithm)",
+    "title": "Acerca de APCA (Algoritmo Avanzado de Contraste Perceptual)",
     "sections": {
-      "background": "What is APCA?",
-      "calculation": "How APCA Calculates Contrast",
-      "levels": "APCA Levels",
+      "background": "¿Qué es APCA?",
+      "calculation": "Cómo APCA calcula el contraste",
+      "levels": "Niveles de APCA",
       "attributions": "Atribuciones",
       "disclaimer": "Aviso legal",
       "further-reading": "Lectura adicional"
     },
     "content": {
       "background": {
-        "description": "The Advanced Perceptual Contrast Algorithm (APCA) is a modern standard for evaluating text readability and visual accessibility based on human perception. Unlike traditional contrast ratios, APCA leverages advanced perceptual science to assess how humans perceive contrast across different colors, luminance levels, and text sizes.",
-        "shift": "APCA represents a shift from fixed thresholds to a more nuanced approach that accounts for",
-        "list": {
-          "text-size": "Text size and weight",
-          "display-env": "Display environments (light or dark modes)",
-          "color-impact": "The impact of background and foreground colors on readability"
+        "description": "El Algoritmo Avanzado de Contraste Perceptual (APCA) es un estándar moderno para evaluar la legibilidad del texto y la accesibilidad visual basada en la percepción humana. A diferencia de las proporciones de contraste tradicionales, APCA aprovecha la ciencia perceptual avanzada para evaluar cómo los humanos perciben el contraste en diferentes colores, niveles de luminancia y tamaños de texto.",
+        "shift": "APCA representa un cambio de umbrales fijos a un enfoque más matizado que tiene en cuenta",
+        "considerations-list": {
+          "text-size": "Tamaño y peso del texto",
+          "display-env": "Entornos de visualización (modos claro u oscuro)",
+          "color-impact": "El impacto de los colores de fondo y primer plano en la legibilidad"
         },
-        "real-world": "This approach ensures accessible design tailored to real-world viewing conditions, making it especially valuable for modern digital interfaces."
+        "real-world": "Este enfoque garantiza un diseño accesible adaptado a las condiciones de visualización del mundo real, lo que lo hace especialmente valioso para las interfaces digitales modernas."
       },
       "calculation": {
-        "description": "The Advanced Perceptual Contrast Algorithm (APCA) is a modern standard for evaluating text readability and visual accessibility based on human perception. Unlike traditional contrast ratios, APCA leverages advanced perceptual science to assess how humans perceive contrast across different colors, luminance levels, and text sizes.",
-        "overview": "APCA calculates contrast using a formula based on the relative luminance of foreground and background colors. The output is a score, measured in Lightness Contrast (Lc), which determines whether the combination is legible. Here's a quick overview",
+        "description": "APCA calcula el contraste utilizando una fórmula basada en la luminancia relativa de los colores de primer plano y de fondo. El resultado es una puntuación, medida en Contraste de Luminosidad (Lc), que determina si la combinación es legible. Aquí hay una descripción general rápida",
         "overview-list": {
           "relative-luminance": {
-            "title": "Relative Luminance",
-            "description": "APCA evaluates the perceived brightness of colors, factoring in the non-linear way humans perceive light."
+            "title": "Luminancia Relativa",
+            "description": "APCA evalúa el brillo percibido de los colores, teniendo en cuenta la forma no lineal en que los humanos perciben la luz."
           },
           "directional-contrast": {
-            "title": "Directional Contrast",
-            "description": "The score reflects whether the foreground text is darker or lighter than the background."
+            "title": "Contraste Direccional",
+            "description": "La puntuación refleja si el texto en primer plano es más oscuro o más claro que el fondo."
           },
           "dynamic-thresholds": {
-            "title": "Dynamic Thresholds",
-            "description": "Different text sizes and weights have distinct thresholds for accessibility."
+            "title": "Umbrales Dinámicos",
+            "description": "Diferentes tamaños y pesos de texto tienen distintos umbrales de accesibilidad."
           }
         },
-        "example": "For example",
+        "example": "Por ejemplo",
         "example-list": {
-          "body-text": "Small, body text requires an Lc value of 75 or higher.",
-          "large-text": "Large or bold text is readable at lower contrast, with a threshold of 60 or higher."
+          "body-text": "El texto pequeño requiere un valor Lc de 75 o superior.",
+          "large-text": "El texto grande o en negrita es legible con un umbral de 60 o superior."
         },
-        "replaces": "The algorithm replaces the traditional \"contrast ratio\" and focuses on achieving visual clarity aligned with the natural perception of contrast."
+        "replaces": "El algoritmo reemplaza la tradicional \"proporción de contraste\" y se enfoca en lograr una claridad visual alineada con la percepción natural del contraste."
       },
       "levels": {
-        "description": "APCA does not use fixed \"pass/fail\" thresholds but instead provides dynamic guidance based on text characteristics",
+        "description": "APCA no utiliza umbrales fijos de \"aprobado/reprobado\", sino que proporciona una guía dinámica basada en características del texto como la fuente, el tamaño y el peso de la fuente. Esta herramienta utiliza un sistema de puntuación simplificado basado en el APCA Readability Criterion (ARC) Bronze Simple Mode",
         "levels-list": {
           "normal-text": {
-            "title": "Normal Text (12–18px)",
-            "description": "Lc ≥ 75 for readability."
+            "title": "Texto Corporal Normal (14px)",
+            "description": "Lc ≥ 75 para legibilidad."
           },
           "large-text": {
-            "title": "Large Text (24px or bold 18px)",
-            "description": "Lc ≥ 60 for acceptable legibility."
+            "title": "Texto Mediano (mínimo 24px) o Texto en Negrita (16px)",
+            "description": "Lc ≥ 60 para legibilidad aceptable."
           },
           "non-text": {
-            "title": "Non-Text Elements",
-            "description": "Lc ≥ 45 for UI elements like icons and dividers."
+            "title": "Texto Grande (mínimo 36px), Texto en Negrita (24px) o Elementos No Textuales",
+            "description": "Lc ≥ 45 para elementos de UI como íconos y divisores."
+          }
+        }
+      },
+      "attributions": {
+        "description": "El algoritmo APCA fue desarrollado por Andrew Somers en Myndex Technologies.",
+        "more-info": "Para más información, visite",
+        "more-info-list": {
+          "contrast-calculator": {
+            "link-text": "Calculadora de Contraste APCA",
+            "link-url": "https://www.myndex.com/APCA/"
+          },
+          "readability-criterion": {
+            "link-text": "Criterio de Legibilidad APCA",
+            "link-url": "https://readtech.org/ARC/"
+          },
+          "apca-github": {
+            "link-text": "APCA para W3C & WCAG3 en GitHub",
+            "link-url": "https://github.com/Myndex/apca-w3/?tab=readme-ov-file"
+          },
+          "w3c-draft": {
+            "link-text": "Borrador de Trabajo de W3C",
+            "link-url": "https://www.w3.org/TR/wcag-3.0/"
+          }
+        }
+      },
+      "disclaimer": {
+        "description": "Este sitio web está probando en fase beta las pautas APCA para determinar el contraste del texto y elementos no textuales. Se sabe que los cálculos de contraste de WCAG 2 no son precisos con respecto a la percepción humana, y las pruebas automatizadas utilizando WCAG 2 pueden indicar errores incorrectamente en algunos pares de colores en este sitio. Las pautas APCA representan una mejora sustancial en la accesibilidad en comparación con los criterios de contraste de WCAG 2, y por lo tanto cumplen con la ADA y también con las reglas 508 bajo la sección de métodos alternativos.",
+        "accuracy-disclaimer": "La implementación de APCA en esta herramienta tiene como objetivo proporcionar resultados de contraste precisos y confiables. Sin embargo",
+        "accuracy-disclaimer-list": {
+          "thresholds": {
+            "description": "Los valores y umbrales mostrados pueden diferir ligeramente dependiendo de la precisión del color y los métodos de cálculo utilizados. Esta herramienta usa el algoritmo proporcionado en el",
+            "link-text": "apca-w3",
+            "link-url": "https://www.npmjs.com/package/apca-w3"
+          },
+          "package": "paquete.",
+          "educational": "Esta herramienta está diseñada para fines educativos y de referencia y no debe reemplazar una auditoría de accesibilidad completa realizada por un profesional calificado.",
+          "production": "APCA aún no se ha integrado en ningún estándar actual, por lo que no debe usarse como única fuente de verdad para trabajos en producción."
+        }
+      },
+      "further-reading": {
+        "description": "Explora más sobre el contraste de color y su papel en la accesibilidad",
+        "further-reading-list": {
+          "accessibility-principles": {
+            "link-text": "Principios de Accesibilidad",
+            "link-url": "https://www.w3.org/WAI/fundamentals/accessibility-principles/"
+          },
+          "understanding-colors": {
+            "link-text": "Accesibilidad Web: Comprendiendo Colores y Luminancia",
+            "link-url": "https://developer.mozilla.org/en-US/docs/Web/Accessibility/Understanding_Colors_and_Luminance"
           }
         }
       }

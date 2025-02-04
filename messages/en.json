@@ -15,7 +15,7 @@
       },
       "share": {
         "title": "share these colors",
-        "popover": "copied url"
+        "popover": "copied url!"
       },
       "swap": {
         "alt": "Swap colors",
@@ -27,10 +27,24 @@
         "normal-vision": "normal vision"
       }
     },
+    "badges": {
+      "wcag": {
+        "aa_large": "AA large",
+        "aaa_large": "AAA large",
+        "aa_normal": "AA normal",
+        "aaa_normal": "AAA normal"
+      },
+      "apca": {
+        "normal_text": "normal text",
+        "large_text": "large text",
+        "non_text": "icons"
+      }
+    },
     "labels": {
       "contrast": "contrast value",
       "badges": {
-        "levels": "levels"
+        "wcag": "wcag levels",
+        "apca": "apca levels"
       },
       "inputs": {
         "text": "text color",
@@ -126,27 +140,7 @@
         "relative-luminance": {
           "title": "Relative Luminance",
           "description": "considers the perceived brightness of colors based on human vision. It accounts for the RGB values of the color and adjusts them using a weighting system to approximate perception."
-        },
-        "overview-list": {
-          "relative-luminance": {
-            "title": "Relative Luminance",
-            "description": "APCA evaluates the perceived brightness of colors, factoring in the non-linear way humans perceive light."
-          },
-          "directional-contrast": {
-            "title": "Directional Contrast",
-            "description": "The score reflects whether the foreground text is darker or lighter than the background."
-          },
-          "dynamic-thresholds": {
-            "title": "Dynamic Thresholds",
-            "description": "Different text sizes and weights have distinct thresholds for accessibility."
-          }
-        },
-        "example": "For example",
-        "example-list": {
-          "body-text": "Small, body text requires an Lc value of 75 or higher.",
-          "large-text": "Large or bold text is readable at lower contrast, with a threshold of 60 or higher."
-        },
-        "replaces": "The algorithm replaces the traditional \"contrast ratio\" and focuses on achieving visual clarity aligned with the natural perception of contrast."
+        }
       },
       "levels": {
         "description": "WCAG contrast requirements are split into levels to meet varying accessibility needs",
@@ -263,18 +257,18 @@
         "replaces": "The algorithm replaces the traditional \"contrast ratio\" and focuses on achieving visual clarity aligned with the natural perception of contrast."
       },
       "levels": {
-        "description": "APCA does not use fixed \"pass/fail\" thresholds but instead provides dynamic guidance based on text characteristics",
+        "description": "APCA does not use fixed \"pass/fail\" thresholds but instead provides dynamic guidance based on text characteristics such as font, font size, and font weight. This tool uses a simplified scoring system based on the APCA Readability Criterion (ARC) Bronze Simple Mode",
         "levels-list": {
           "normal-text": {
-            "title": "Normal Text (12–18px)",
+            "title": "Normal Body Text (14px)",
             "description": "Lc ≥ 75 for readability."
           },
           "large-text": {
-            "title": "Large Text (24px or bold 18px)",
+            "title": "Medium Text (minimum 24px) or Bold Text (16px)",
             "description": "Lc ≥ 60 for acceptable legibility."
           },
           "non-text": {
-            "title": "Non-Text Elements",
+            "title": "Large Text (minimum 36px), Bold Text (24px), or Non-Text Elements",
             "description": "Lc ≥ 45 for UI elements like icons and dividers."
           }
         }

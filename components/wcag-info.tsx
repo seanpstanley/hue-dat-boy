@@ -79,7 +79,7 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
             {t("sections.calculation")}
           </h4>
 
-          <p>{t("content.calculation.description")}:</p>
+          <p>{t("content.calculation.description")}</p>
 
           <h5 className="font-bold">
             {t("content.calculation.calculation-formula")}:
@@ -110,9 +110,7 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
           </ul>
 
           <p>
-            <strong>
-              {t("content.calculation.overview-list.relative-luminance.title")}
-            </strong>{" "}
+            <strong>{t("content.calculation.relative-luminance.title")}</strong>{" "}
             {t("content.calculation.relative-luminance.description")}
           </p>
         </div>
@@ -131,6 +129,7 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
               <ul className="ml-4 list-inside">
                 <li>
                   <strong>
+                    {" "}
                     {t(
                       "content.levels.levels-list.aa.text-sizes-list.normal.title",
                     )}
@@ -232,7 +231,7 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
             {t("sections.disclaimer")}
           </h4>
 
-          <p>{t("content.disclaimer.description")}</p>
+          <p>{t("content.disclaimer.description")}:</p>
 
           <ul className="list-inside list-decimal">
             <li>{t("content.disclaimer.disclaimer-list.thresholds")}</li>

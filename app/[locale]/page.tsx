@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo, ChangeEvent } from "react";
 
 import { AccessibleIcon } from "@radix-ui/react-accessible-icon";
 import { calcAPCA } from "apca-w3";
-import { Clipboard, ArrowLeftRight, Check, X } from "lucide-react";
+import { Clipboard, ArrowLeftRight, Check, X, Rabbit } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 
@@ -15,6 +15,7 @@ import { ColorPicker } from "@/components/color-picker";
 import { CopyColorButton } from "@/components/copy-color-button";
 import { FontPicker } from "@/components/font-picker";
 import { Footer } from "@/components/footer";
+import { SampleIconCard } from "@/components/sample-icons-card";
 import { SampleTextCard } from "@/components/sample-text-card";
 import { TooltipButton } from "@/components/tooltip-button";
 import { Button } from "@/components/ui/button";
@@ -340,41 +341,41 @@ export default function ContrastChecker() {
   const apcaContrast = calculateAPCAContrast(background, foreground);
 
   const wcagResults = {
-    "AA Large":
+    aa_large:
       background.a && background.a < 1
         ? contrastRange.min >= 3
         : wcagContrast >= 3,
-    "AAA Large":
+    aaa_large:
       background.a && background.a < 1
         ? contrastRange.min >= 4.5
         : wcagContrast >= 4.5,
-    "AA Normal":
+    aa_normal:
       background.a && background.a < 1
         ? contrastRange.min >= 4.5
         : wcagContrast >= 4.5,
-    "AAA Normal":
+    aaa_normal:
       background.a && background.a < 1
         ? contrastRange.min >= 7
         : wcagContrast >= 7,
   };
 
   const apcaResults = {
-    "normal body text":
+    normal_text:
       background.a && background.a < 1
         ? contrastRange.min >= 4.5
         : Math.abs(apcaContrast) >= 75,
-    "medium-size (24px or more) or bold (16px) text":
+    large_text:
       background.a && background.a < 1
         ? contrastRange.min >= 7
-        : Math.abs(wcagContrast) >= 60,
-    "large (36px or more) or bold (24px or more) or non-text elements":
+        : Math.abs(apcaContrast) >= 60,
+    non_text:
       background.a && background.a < 1
         ? contrastRange.min >= 7
-        : Math.abs(wcagContrast) >= 45,
+        : Math.abs(apcaContrast) >= 45,
   };
 
   //  precompute / cache the list of fonts/ color blindness for refresh to avoid flicker
-  const COLOR_BLINDNESS_TYPES = [
+  const COLOR_BLINDNESS_TYPES: ColorBlindnessType[] = [
     "normal vision",
     "protanopia",
     "deuteranopia",
@@ -588,9 +589,9 @@ export default function ContrastChecker() {
             {/* Standards Levels */}
             <div className="flex flex-col gap-y-2">
               <Label htmlFor="contrast-value" className="text-base md:text-lg">
-                {useAPCA ? "apca" : "wcag"} {t("labels.badges.levels")}
+                {useAPCA ? t("labels.badges.apca") : t("labels.badges.wcag")}
               </Label>
-              <div className="flex flex-wrap gap-2 md:grid md:grid-cols-2 lg:grid-cols-4">
+              <div className="ml-auto flex flex-wrap gap-2">
                 {useAPCA ? (
                   <>
                     {Object.entries(apcaResults).map(([level, passes]) => (
@@ -605,14 +606,14 @@ export default function ContrastChecker() {
                           color: passes ? bgDisplayColor : fgDisplayColor,
                         }}
                       >
-                        {level}
+                        {t(`badges.apca.${level}`)}
                         {passes ? (
                           <AccessibleIcon label="Pass">
-                            <Check className="h-6 w-6" />
+                            <Check className="size-6" />
                           </AccessibleIcon>
                         ) : (
                           <AccessibleIcon label="Fail">
-                            <X className="h-6 w-6" />
+                            <X className="size-6" />
                           </AccessibleIcon>
                         )}
                       </div>
@@ -632,7 +633,7 @@ export default function ContrastChecker() {
                           color: passes ? bgDisplayColor : fgDisplayColor,
                         }}
                       >
-                        {level}
+                        {t(`badges.wcag.${level}`)}
                         {passes ? (
                           <AccessibleIcon label="Pass">
                             <Check className="h-6 w-6" />
@@ -761,7 +762,7 @@ export default function ContrastChecker() {
                   backgroundColor: `rgba(${background.r}, ${background.g}, ${background.b}, ${background.a})`,
                 }}
               >
-                {t("buttons.share.popover")}!
+                {t("buttons.share.popover")}
               </PopoverContent>
             </Popover>
           </div>
@@ -896,7 +897,9 @@ export default function ContrastChecker() {
                   id="colorblind-select"
                   style={{ borderColor: fgDisplayColor }}
                 >
-                  {colorBlindnessSimulation}
+                  {colorBlindnessSimulation === "normal vision"
+                    ? t("selects.color-blindness.normal-vision")
+                    : colorBlindnessSimulation}
                   {/* <SelectValue /> */}
                 </SelectTrigger>
                 <SelectContent
@@ -910,7 +913,11 @@ export default function ContrastChecker() {
                   {COLOR_BLINDNESS_TYPES.map((simulation) => (
                     <SelectItem
                       key={simulation}
-                      value={simulation}
+                      value={
+                        simulation === "normal vision"
+                          ? t("selects.color-blindness.normal-vision")
+                          : simulation
+                      }
                       className="text-lg md:text-2xl"
                     >
                       {simulation === "normal vision"
@@ -929,7 +936,7 @@ export default function ContrastChecker() {
               {t("sections.sample-text")}
             </h3>
 
-            <div className="grid grid-cols-1 gap-x-8 gap-y-4 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-3">
               <SampleTextCard
                 foreground={foreground}
                 background={background}
@@ -943,6 +950,18 @@ export default function ContrastChecker() {
                 data={quoteData?.data}
               />
               <SampleTextCard
+                foreground={foreground}
+                background={background}
+                fgDisplayColor={fgDisplayColor}
+                bgDisplayColor={bgDisplayColor}
+                font={font}
+                colorBlindnessSimulation={colorBlindnessSimulation}
+                textSize="large"
+                isLoading={isQuoteLoading}
+                error={quoteError}
+                data={quoteData?.data}
+              />
+              <SampleIconCard
                 foreground={foreground}
                 background={background}
                 fgDisplayColor={fgDisplayColor}

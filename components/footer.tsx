@@ -3,7 +3,6 @@ import { Github, Linkedin } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
-import { Link } from "@/i18n/routing";
 
 const getCurrentYear = () => new Date().getFullYear();
 
@@ -42,7 +41,7 @@ const Footer = ({ displayColor }: { displayColor: string }) => {
             size="auto"
             className={`border-ghost size-12 p-2`}
           >
-            <Link
+            <a
               href="https://github.com/seanpstanley/hue-dat-boy"
               target="_blank"
               rel="noopener noreferrer"
@@ -50,7 +49,7 @@ const Footer = ({ displayColor }: { displayColor: string }) => {
               <AccessibleIcon label={t("links.github.alt")}>
                 <Github className="!size-full" />
               </AccessibleIcon>
-            </Link>
+            </a>
           </Button>
           <Button
             asChild
@@ -58,7 +57,7 @@ const Footer = ({ displayColor }: { displayColor: string }) => {
             size="auto"
             className={`border-ghost size-12 p-2`}
           >
-            <Link
+            <a
               href="https://www.linkedin.com/in/seanpstanley/"
               target="_blank"
               rel="noopener noreferrer"
@@ -66,7 +65,7 @@ const Footer = ({ displayColor }: { displayColor: string }) => {
               <AccessibleIcon label={t("links.linkedin.alt")}>
                 <Linkedin className="!size-full" />
               </AccessibleIcon>
-            </Link>
+            </a>
           </Button>
         </div>
         <small className="text-sm">
