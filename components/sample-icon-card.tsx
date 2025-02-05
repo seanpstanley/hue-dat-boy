@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 import { AccessibleIcon } from "@radix-ui/react-accessible-icon";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { Maximize2, X } from "lucide-react";
+import { Maximize2, X, Rabbit } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { TooltipButton } from "@/components/tooltip-button";
@@ -15,77 +15,18 @@ import {
   SheetTrigger,
   SheetClose,
 } from "@/components/ui/sheet";
-import { RgbaColor, ColorBlindnessType, AnimechanQuote } from "@/lib/types";
+import { RgbaColor, ColorBlindnessType } from "@/lib/types";
 import { cn } from "@/lib/utils/cn";
-import { rgbToHex, rgbaToHex } from "@/lib/utils/color";
+import { rgbToHex, rgbaToHex, simulateColorBlindness } from "@/lib/utils/color";
 
-/**
- * Simulates color blindness by transforming RGB colors.
- * @param     {RgbaColor}           color   Input color as an RGBA color object to be transformed based on type selection.
- * @param     {ColorBlindnessType}  type    The type of color blindness to simulate.
- * @returns                                 The transformed color as an object with properties {r, g, b}.
- */
-function simulateColorBlindness(
-  color: RgbaColor,
-  type: ColorBlindnessType,
-): RgbaColor {
-  if (type === "normal vision") return color;
-
-  const { r, g, b, a } = color;
-  let simulatedColor: RgbaColor;
-
-  switch (type) {
-    case "protanopia":
-      simulatedColor = {
-        r: 0.567 * r + 0.433 * g,
-        g: 0.558 * r + 0.442 * g,
-        b: 0.242 * r + 0.758 * b,
-        a,
-      };
-      break;
-    case "deuteranopia":
-      simulatedColor = {
-        r: 0.625 * r + 0.375 * g,
-        g: 0.7 * r + 0.3 * g,
-        b: 0.3 * r + 0.7 * b,
-        a,
-      };
-      break;
-    case "tritanopia":
-      simulatedColor = {
-        r: 0.95 * r + 0.05 * g,
-        g: 0.433 * r + 0.567 * g,
-        b: 0.475 * r + 0.525 * g,
-        a,
-      };
-      break;
-    case "achromatopsia":
-      const gray = 0.299 * r + 0.587 * g + 0.114 * b;
-      simulatedColor = { r: gray, g: gray, b: gray, a: a };
-      break;
-    default:
-      simulatedColor = color;
-  }
-
-  return {
-    r: Math.round(simulatedColor.r),
-    g: Math.round(simulatedColor.g),
-    b: Math.round(simulatedColor.b),
-    a: simulatedColor.a,
-  };
-}
-
-interface SampleTextCardProps {
+interface SampleIconCardProps {
   foreground: RgbaColor;
   background: RgbaColor;
   bgDisplayColor: string;
   fgDisplayColor: string;
   font: string;
   colorBlindnessSimulation: ColorBlindnessType;
-  textSize: "normal" | "large";
-  isLoading: boolean;
-  error: any;
-  data: AnimechanQuote;
+  className?: string;
 }
 
 /**
@@ -98,16 +39,13 @@ interface SampleTextCardProps {
  * @param   {string}                fgDisplayColor              The foreground display color calculated by getDisplayColor.
  * @param   {string}                font                        The current active font, selected by the "typeface" Drawer/Popover.
  * @param   {ColorBlindnessType}    colorBlindnessSimulation    The display color calculated by getDisplayColor, necessary for styling.
- * @param   {boolean}               textSize                    The display color calculated by getDisplayColor, necessary for styling.
- * @param   {boolean}               isLoading                   Loading state provided by SWR.
- * @param   {any}                   error                       Error object provided by SWR.
- * @param   {AnimechanQuote}        data                        The RGBA color object representing the background color.
+ * @param   {string}                className                   String of classes to apply to the component using cn.
  *
  * @returns                                                     A SampleTextCard component that displays a random Anime Quote.
  *
  * @example
  * ```tsx
- * import { SampleTextCard } from "@/components/sample-text-card";
+ * import { SampleIconCard } from "@/components/sample-icon-card";
  *
  * const foreground = { r: 255, g: 255, b: 255, a: 1 };
  * const background = { r: 255, g: 255, b: 255, a: 1 };
@@ -115,23 +53,15 @@ interface SampleTextCardProps {
  * const fgDisplayColor = "#ffffff";
  * const font = "Inter";
  * const colorBlindnessSimulation = "protanopia";
- * const {
- *   data: quoteData,
- *   error: quoteError,
- *   isLoading: isQuoteLoading,
- * } = useAnimeQuote();
  *
- * <SampleTextCard
+ * <SampleIconCard
  *   copyColor="text"
  *   bgDisplayColor={bgDisplayColor}
  *   fgDisplayColor={fgDisplayColor}
  *   foreground={foreground}
  *   background={background}
  *   colorBlindnessSimulation={colorBlindnessSimulation}
- *   textSize="normal"
- *   isLoading={isQuoteLoading}
- *   error={quoteError}
- *   data={quoteData?.data}
+ *   className="w-80 md:w-96"
  * />
  * ```
  */
@@ -142,11 +72,8 @@ const SampleIconCard = ({
   fgDisplayColor,
   font,
   colorBlindnessSimulation,
-  textSize,
-  isLoading,
-  error,
-  data,
-}: SampleTextCardProps) => {
+  className,
+}: SampleIconCardProps) => {
   // Update CSS variables for the color blindness-simulated colors
   useEffect(() => {
     document.documentElement.style.setProperty(
@@ -175,7 +102,7 @@ const SampleIconCard = ({
   return (
     <Sheet>
       <Card
-        className="overflow-hidden border-3 bg-transparent"
+        className={cn("overflow-hidden border-3 bg-transparent", className)}
         style={{
           borderColor: simulatedFg,
           backgroundColor: simulatedFg,
@@ -191,7 +118,7 @@ const SampleIconCard = ({
             className="text-base font-normal leading-none md:text-lg"
             style={{ color: bgDisplayColor }}
           >
-            {textSize === "normal" ? t("title.normal") : t("title.large")}
+            {t("title.icons")}
           </h4>
 
           <TooltipButton
@@ -215,34 +142,30 @@ const SampleIconCard = ({
         </div>
 
         <div className="checkerboard-md h-full p-0">
-          <blockquote
-            cite="https://animechan.io/api/v1"
-            className={cn("h-full p-4", { "text-2xl": textSize === "large" })}
+          <div
+            className="flex h-full justify-center gap-x-4 p-4 text-2xl"
             style={{
               color: simulatedFgAlpha,
               backgroundColor: simulatedBgAlpha,
               fontFamily: font,
             }}
           >
-            {error ? (
-              <span>{t("error")}</span>
-            ) : isLoading ? (
-              <span>{t("loading")}</span>
-            ) : (
-              <>
-                <p className="mb-2 before:content-[open-quote] after:content-[close-quote]">
-                  {data?.content}
-                </p>
-
-                <cite className="block text-end">
-                  <span className="not-italic">
-                    &mdash; {data?.character?.name},{" "}
-                  </span>
-                  {data?.anime?.name}
-                </cite>
-              </>
-            )}
-          </blockquote>
+            <Rabbit className="size-8" />
+            {/* <Separator
+                orientation="vertical"
+                style={{
+                  backgroundColor: simulatedFgAlpha,
+                }}
+              /> */}
+            <Rabbit className="size-8" />
+            {/* <Separator
+                orientation="vertical"
+                style={{
+                  backgroundColor: simulatedFgAlpha,
+                }}
+              /> */}
+            <Rabbit className="size-8" />
+          </div>
         </div>
       </Card>
 
@@ -254,11 +177,7 @@ const SampleIconCard = ({
         }}
       >
         <VisuallyHidden>
-          <SheetTitle>
-            {textSize === "normal"
-              ? t("sheet-title.normal")
-              : t("sheet-title.large")}
-          </SheetTitle>
+          <SheetTitle>{t("sheet-title.icons")}</SheetTitle>
         </VisuallyHidden>
         <div
           className="flex h-full items-center justify-center"
@@ -267,35 +186,17 @@ const SampleIconCard = ({
           }}
         >
           <div className="checkerboard-lg absolute inset-0 -z-10" />
-          <blockquote
-            cite="https://animechan.io/api/v1"
-            className={cn("max-w-2xl p-4", {
-              "text-2xl": textSize === "large",
-            })}
+          <div
+            className="flex max-w-2xl gap-x-4 p-4 text-2xl"
             style={{
               color: simulatedFgAlpha,
               fontFamily: font,
             }}
           >
-            {error ? (
-              <span>{t("error")}</span>
-            ) : isLoading ? (
-              <span>{t("loading")}</span>
-            ) : (
-              <>
-                <p className="mb-2 before:content-[open-quote] after:content-[close-quote]">
-                  {data?.content}
-                </p>
-
-                <cite className="block text-end">
-                  <span className="not-italic">
-                    &mdash; {data?.character?.name},{" "}
-                  </span>
-                  {data?.anime?.name}
-                </cite>
-              </>
-            )}
-          </blockquote>
+            <Rabbit className="size-8" />
+            <Rabbit className="size-8" />
+            <Rabbit className="size-8" />
+          </div>
         </div>
         <SheetClose asChild>
           <Button

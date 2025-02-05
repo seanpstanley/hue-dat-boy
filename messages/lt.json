@@ -71,7 +71,8 @@
   "SampleTextCard": {
     "title": {
       "normal": "normalus tekstas",
-      "large": "didelis tekstas"
+      "large": "didelis tekstas",
+      "icons": "piktogramos"
     },
     "error": "nepavyko įkelti ištekliaus.",
     "loading": "kraunama...",
@@ -86,7 +87,8 @@
     },
     "sheet-title": {
       "normal": "Viso ekrano normalus tekstas",
-      "large": "Viso ekrano didelis tekstas"
+      "large": "Viso ekrano didelis tekstas",
+      "icons": "Viso ekrano piktogramos"
     }
   },
   "Footer": {

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo, ChangeEvent } from "react";
 
 import { AccessibleIcon } from "@radix-ui/react-accessible-icon";
 import { calcAPCA } from "apca-w3";
-import { Clipboard, ArrowLeftRight, Check, X, Rabbit } from "lucide-react";
+import { Clipboard, ArrowLeftRight, Check, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 
@@ -15,7 +15,7 @@ import { ColorPicker } from "@/components/color-picker";
 import { CopyColorButton } from "@/components/copy-color-button";
 import { FontPicker } from "@/components/font-picker";
 import { Footer } from "@/components/footer";
-import { SampleIconCard } from "@/components/sample-icons-card";
+import { SampleIconCard } from "@/components/sample-icon-card";
 import { SampleTextCard } from "@/components/sample-text-card";
 import { TooltipButton } from "@/components/tooltip-button";
 import { Button } from "@/components/ui/button";
@@ -936,7 +936,7 @@ export default function ContrastChecker() {
               {t("sections.sample-text")}
             </h3>
 
-            <div className="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-x-6 gap-y-4 lg:grid-cols-10 lg:flex-row">
               <SampleTextCard
                 foreground={foreground}
                 background={background}
@@ -948,6 +948,7 @@ export default function ContrastChecker() {
                 isLoading={isQuoteLoading}
                 error={quoteError}
                 data={quoteData?.data}
+                className="lg:col-span-3"
               />
               <SampleTextCard
                 foreground={foreground}
@@ -960,6 +961,7 @@ export default function ContrastChecker() {
                 isLoading={isQuoteLoading}
                 error={quoteError}
                 data={quoteData?.data}
+                className="lg:col-span-5"
               />
               <SampleIconCard
                 foreground={foreground}
@@ -968,10 +970,7 @@ export default function ContrastChecker() {
                 bgDisplayColor={bgDisplayColor}
                 font={font}
                 colorBlindnessSimulation={colorBlindnessSimulation}
-                textSize="large"
-                isLoading={isQuoteLoading}
-                error={quoteError}
-                data={quoteData?.data}
+                className="lg:col-span-2"
               />
             </div>
           </section>

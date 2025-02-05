@@ -71,7 +71,8 @@
   "SampleTextCard": {
     "title": {
       "normal": "normal text",
-      "large": "large text"
+      "large": "large text",
+      "icons": "icons"
     },
     "error": "failed to load resource.",
     "loading": "loading...",
@@ -86,7 +87,8 @@
     },
     "sheet-title": {
       "normal": "Full screen normal text",
-      "large": "Full screen large text"
+      "large": "Full screen large text",
+      "icons": "Full screen icons"
     }
   },
   "Footer": {

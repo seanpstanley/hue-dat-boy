@@ -17,63 +17,7 @@ import {
 } from "@/components/ui/sheet";
 import { RgbaColor, ColorBlindnessType, AnimechanQuote } from "@/lib/types";
 import { cn } from "@/lib/utils/cn";
-import { rgbToHex, rgbaToHex } from "@/lib/utils/color";
-
-/**
- * Simulates color blindness by transforming RGB colors.
- * @param     {RgbaColor}           color   Input color as an RGBA color object to be transformed based on type selection.
- * @param     {ColorBlindnessType}  type    The type of color blindness to simulate.
- * @returns                                 The transformed color as an object with properties {r, g, b}.
- */
-function simulateColorBlindness(
-  color: RgbaColor,
-  type: ColorBlindnessType,
-): RgbaColor {
-  if (type === "normal vision") return color;
-
-  const { r, g, b, a } = color;
-  let simulatedColor: RgbaColor;
-
-  switch (type) {
-    case "protanopia":
-      simulatedColor = {
-        r: 0.567 * r + 0.433 * g,
-        g: 0.558 * r + 0.442 * g,
-        b: 0.242 * r + 0.758 * b,
-        a,
-      };
-      break;
-    case "deuteranopia":
-      simulatedColor = {
-        r: 0.625 * r + 0.375 * g,
-        g: 0.7 * r + 0.3 * g,
-        b: 0.3 * r + 0.7 * b,
-        a,
-      };
-      break;
-    case "tritanopia":
-      simulatedColor = {
-        r: 0.95 * r + 0.05 * g,
-        g: 0.433 * r + 0.567 * g,
-        b: 0.475 * r + 0.525 * g,
-        a,
-      };
-      break;
-    case "achromatopsia":
-      const gray = 0.299 * r + 0.587 * g + 0.114 * b;
-      simulatedColor = { r: gray, g: gray, b: gray, a: a };
-      break;
-    default:
-      simulatedColor = color;
-  }
-
-  return {
-    r: Math.round(simulatedColor.r),
-    g: Math.round(simulatedColor.g),
-    b: Math.round(simulatedColor.b),
-    a: simulatedColor.a,
-  };
-}
+import { rgbToHex, rgbaToHex, simulateColorBlindness } from "@/lib/utils/color";
 
 interface SampleTextCardProps {
   foreground: RgbaColor;
@@ -86,6 +30,7 @@ interface SampleTextCardProps {
   isLoading: boolean;
   error: any;
   data: AnimechanQuote;
+  className?: string;
 }
 
 /**
@@ -102,6 +47,8 @@ interface SampleTextCardProps {
  * @param   {boolean}               isLoading                   Loading state provided by SWR.
  * @param   {any}                   error                       Error object provided by SWR.
  * @param   {AnimechanQuote}        data                        The RGBA color object representing the background color.
+ * @param   {string}                className                   String of classes to apply to the component using cn.
+
  *
  * @returns                                                     A SampleTextCard component that displays a random Anime Quote.
  *
@@ -132,6 +79,7 @@ interface SampleTextCardProps {
  *   isLoading={isQuoteLoading}
  *   error={quoteError}
  *   data={quoteData?.data}
+ *   className="w-80 md:w-96"
  * />
  * ```
  */
@@ -146,6 +94,7 @@ const SampleTextCard = ({
   isLoading,
   error,
   data,
+  className,
 }: SampleTextCardProps) => {
   // Update CSS variables for the color blindness-simulated colors
   useEffect(() => {
@@ -175,7 +124,7 @@ const SampleTextCard = ({
   return (
     <Sheet>
       <Card
-        className="overflow-hidden border-3 bg-transparent"
+        className={cn("overflow-hidden border-3 bg-transparent", className)}
         style={{
           borderColor: simulatedFg,
           backgroundColor: simulatedFg,

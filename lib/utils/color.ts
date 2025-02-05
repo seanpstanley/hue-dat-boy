@@ -1,4 +1,4 @@
-import { RgbaColor, HslaColor } from "@/lib/types";
+import { RgbaColor, HslaColor, ColorBlindnessType } from "@/lib/types";
 
 /**
  * Blends two colors using alpha compositing.
@@ -259,5 +259,61 @@ export function hslaToRgba({ h, s, l }: HslaColor): RgbaColor {
     g: Math.round(g * 255),
     b: Math.round(b * 255),
     a: 1,
+  };
+}
+
+/**
+ * Simulates color blindness by transforming RGB colors.
+ * @param     {RgbaColor}           color   Input color as an RGBA color object to be transformed based on type selection.
+ * @param     {ColorBlindnessType}  type    The type of color blindness to simulate.
+ * @returns                                 The transformed color as an object with properties {r, g, b}.
+ */
+export function simulateColorBlindness(
+  color: RgbaColor,
+  type: ColorBlindnessType,
+): RgbaColor {
+  if (type === "normal vision") return color;
+
+  const { r, g, b, a } = color;
+  let simulatedColor: RgbaColor;
+
+  switch (type) {
+    case "protanopia":
+      simulatedColor = {
+        r: 0.567 * r + 0.433 * g,
+        g: 0.558 * r + 0.442 * g,
+        b: 0.242 * r + 0.758 * b,
+        a,
+      };
+      break;
+    case "deuteranopia":
+      simulatedColor = {
+        r: 0.625 * r + 0.375 * g,
+        g: 0.7 * r + 0.3 * g,
+        b: 0.3 * r + 0.7 * b,
+        a,
+      };
+      break;
+    case "tritanopia":
+      simulatedColor = {
+        r: 0.95 * r + 0.05 * g,
+        g: 0.433 * r + 0.567 * g,
+        b: 0.475 * r + 0.525 * g,
+        a,
+      };
+      break;
+    case "achromatopsia":
+      const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+      simulatedColor = { r: gray, g: gray, b: gray, a: a };
+      break;
+    default:
+      simulatedColor = color;
+  }
+
+  return {
+    r: Math.round(simulatedColor.r),
+    g: Math.round(simulatedColor.g),
+    b: Math.round(simulatedColor.b),
+    a: simulatedColor.a,
   };
 }
