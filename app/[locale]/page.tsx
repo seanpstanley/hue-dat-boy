@@ -968,7 +968,6 @@ export default function ContrastChecker() {
                 background={background}
                 fgDisplayColor={fgDisplayColor}
                 bgDisplayColor={bgDisplayColor}
-                font={font}
                 colorBlindnessSimulation={colorBlindnessSimulation}
                 className="lg:col-span-2"
               />

@@ -24,7 +24,6 @@ interface SampleIconCardProps {
   background: RgbaColor;
   bgDisplayColor: string;
   fgDisplayColor: string;
-  font: string;
   colorBlindnessSimulation: ColorBlindnessType;
   className?: string;
 }
@@ -37,7 +36,6 @@ interface SampleIconCardProps {
  * @param   {RgbaColor}             background                  The RGBA color object representing the background color.
  * @param   {string}                bgDisplayColor              The background display color calculated by getDisplayColor.
  * @param   {string}                fgDisplayColor              The foreground display color calculated by getDisplayColor.
- * @param   {string}                font                        The current active font, selected by the "typeface" Drawer/Popover.
  * @param   {ColorBlindnessType}    colorBlindnessSimulation    The display color calculated by getDisplayColor, necessary for styling.
  * @param   {string}                className                   String of classes to apply to the component using cn.
  *
@@ -51,11 +49,9 @@ interface SampleIconCardProps {
  * const background = { r: 255, g: 255, b: 255, a: 1 };
  * const bgDisplayColor = "#000000";
  * const fgDisplayColor = "#ffffff";
- * const font = "Inter";
  * const colorBlindnessSimulation = "protanopia";
  *
  * <SampleIconCard
- *   copyColor="text"
  *   bgDisplayColor={bgDisplayColor}
  *   fgDisplayColor={fgDisplayColor}
  *   foreground={foreground}
@@ -70,7 +66,6 @@ const SampleIconCard = ({
   background,
   bgDisplayColor,
   fgDisplayColor,
-  font,
   colorBlindnessSimulation,
   className,
 }: SampleIconCardProps) => {
@@ -147,7 +142,6 @@ const SampleIconCard = ({
             style={{
               color: simulatedFgAlpha,
               backgroundColor: simulatedBgAlpha,
-              fontFamily: font,
             }}
           >
             <Rabbit className="size-8" />
@@ -190,7 +184,6 @@ const SampleIconCard = ({
             className="flex max-w-2xl gap-x-4 p-4 text-2xl"
             style={{
               color: simulatedFgAlpha,
-              fontFamily: font,
             }}
           >
             <Rabbit className="size-8" />
