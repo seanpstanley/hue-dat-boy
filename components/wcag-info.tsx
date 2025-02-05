@@ -194,7 +194,13 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
 
           <ul className="list-inside list-disc">
             <li>
-              <Button asChild variant="link" size="auto" className="text-base">
+              <Button
+                asChild
+                variant="link"
+                size="auto"
+                className="text-base"
+                style={{ color: displayColor }}
+              >
                 <a
                   href={t(
                     "content.attributions.more-info-list.wcag-overview.link-url",
@@ -209,7 +215,13 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
               </Button>
             </li>
             <li>
-              <Button asChild variant="link" size="auto" className="text-base">
+              <Button
+                asChild
+                variant="link"
+                size="auto"
+                className="text-base"
+                style={{ color: displayColor }}
+              >
                 <a
                   href={t(
                     "content.attributions.more-info-list.wcag-understanding.link-url",
@@ -248,7 +260,13 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
 
           <ul className="list-inside list-disc">
             <li>
-              <Button asChild variant="link" size="auto" className="text-base">
+              <Button
+                asChild
+                variant="link"
+                size="auto"
+                className="text-base"
+                style={{ color: displayColor }}
+              >
                 <a
                   href={t(
                     "content.further-reading.further-reading-list.wcag3-intro.link-url",
@@ -263,7 +281,13 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
               </Button>
             </li>
             <li>
-              <Button asChild variant="link" size="auto" className="text-base">
+              <Button
+                asChild
+                variant="link"
+                size="auto"
+                className="text-base"
+                style={{ color: displayColor }}
+              >
                 <a
                   href={t(
                     "content.further-reading.further-reading-list.color-contrast.link-url",

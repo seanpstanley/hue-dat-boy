@@ -97,5 +97,233 @@
       "github": { "alt": "Seano GitHub" },
       "linkedin": { "alt": "Seano LinkedIn" }
     }
+  },
+  "WcagInfo": {
+    "title": "Apie WCAG (Žiniatinklio turinio prieinamumo gaires)",
+    "sections": {
+      "background": "Kas yra WCAG?",
+      "calculation": "Kaip WCAG skaičiuoja kontrastą",
+      "levels": "WCAG lygiai",
+      "attributions": "Nuopelnai",
+      "disclaimer": "Atsakomybės apribojimas",
+      "further-reading": "Tolimesnis skaitymas"
+    },
+    "content": {
+      "background": {
+        "description": "Žiniatinklio turinio prieinamumo gairės (WCAG) yra tarptautiniu mastu pripažinti standartai, skirti padaryti interneto turinį prieinamą žmonėms su negalia. Šias gaires, kurias sukūrė Pasaulinis žiniatinklio konsorciumas (W3C), siekiama pagerinti interneto naudojimo patogumą asmenims, turintiems regos, klausos, kognityvinių ir motorinių sutrikimų.",
+        "ensures": "WCAG užtikrina, kad turinys yra",
+        "ensures-list": {
+          "perceivable": {
+            "title": "Suvokiamas",
+            "description": "Vartotojai gali atpažinti ir naudoti informaciją."
+          },
+          "operable": {
+            "title": "Veikiantis",
+            "description": "Sąsajos yra funkcionalios plačiam vartotojų ratui."
+          },
+          "understandable": {
+            "title": "Suprantamas",
+            "description": "Turinys yra aiškus ir nuspėjamas."
+          },
+          "robust": {
+            "title": "Patikimas",
+            "description": "Turinys gerai veikia su pagalbinėmis technologijomis."
+          }
+        },
+        "regulation-compliance": "Šios gairės yra daugelio šalių prieinamumo reguliavimo dalis, todėl jos yra labai svarbios atitikčiai ir įtrauktumui."
+      },
+      "calculation": {
+        "description": "Dabartinis WCAG 2.2 standartas apibrėžia kontrasto santykius kaip šviesumo skirtumą tarp teksto ir fono spalvų. Šis santykis svyruoja nuo 1:1 (be kontrasto) iki 21:1 (maksimalus kontrastas).",
+        "calculation-formula": "Skaičiavimo formulė",
+        "contrast-ratio": "Kontrasto santykis",
+        "where": "Kur",
+        "lighter-luminance": "yra šviesesnės spalvos santykinis šviesumas.",
+        "darker-luminance": "yra tamsesnės spalvos santykinis šviesumas.",
+        "relative-luminance": {
+          "title": "Santykinis šviesumas",
+          "description": "Atsižvelgia į spalvų suvokiamą ryškumą pagal žmogaus regą. Jis atsižvelgia į spalvos RGB reikšmes ir pritaiko jas naudojant svorio sistemą, kad apytiksliai atitiktų suvokimą."
+        }
+      },
+      "levels": {
+        "description": "WCAG kontrasto reikalavimai yra suskirstyti į lygius, kad atitiktų įvairius prieinamumo poreikius",
+        "levels-list": {
+          "aa": {
+            "title": "AA lygis",
+            "description": "Lc ≥ 75 skaitomumui.",
+            "text-sizes-list": {
+              "normal": {
+                "title": "Normalus tekstas (12–18px)",
+                "description": "4.5:1"
+              },
+              "large": {
+                "title": "Didelis tekstas (18px paryškintas arba 24px įprastas)",
+                "description": "3:1"
+              }
+            }
+          },
+          "aaa": {
+            "title": "AAA lygis",
+            "description": "Patobulintas kontrastas dideliam prieinamumui.",
+            "text-sizes-list": {
+              "normal": {
+                "title": "Normalus tekstas",
+                "description": "7:1"
+              },
+              "large": {
+                "title": "Didelis tekstas",
+                "description": "4.5:1"
+              }
+            }
+          }
+        }
+      },
+      "attributions": {
+        "description": "WCAG yra kuriamos ir prižiūrimos W3C Žiniatinklio prieinamumo iniciatyvos (WAI). Šios gairės yra nuolatinės pastangos užtikrinti, kad skaitmeninis turinys būtų prieinamas visiems.",
+        "more-info": "Daugiau informacijos rasite čia",
+        "more-info-list": {
+          "wcag-overview": {
+            "link-text": "WCAG 2 Apžvalga",
+            "link-url": "https://www.w3.org/WAI/standards-guidelines/wcag/"
+          },
+          "wcag-understanding": {
+            "link-text": "WCAG 2.2 Supratimo dokumentai",
+            "link-url": "https://www.w3.org/WAI/WCAG22/Understanding/"
+          }
+        }
+      },
+      "disclaimer": {
+        "description": "Šio įrankio WCAG atitikties skaičiavimai siekia pateikti tikslius ir patikimus kontrasto rezultatus. Tačiau",
+        "disclaimer-list": {
+          "thresholds": "Rodomos reikšmės ir ribos gali šiek tiek skirtis priklausomai nuo spalvų tikslumo ir taikomų skaičiavimo metodų.",
+          "educational": "Šis įrankis skirtas švietimo ir informacijos tikslais ir neturėtų pakeisti išsamios prieinamumo audito, atlikto kvalifikuoto specialisto."
+        }
+      },
+      "further-reading": {
+        "description": "Sužinokite daugiau apie WCAG ir spalvų kontrastą",
+        "further-reading-list": {
+          "wcag3-intro": {
+            "link-text": "WCAG 3 Įvadas",
+            "link-url": "https://www.w3.org/WAI/standards-guidelines/wcag/wcag3-intro/"
+          },
+          "color-contrast": {
+            "link-text": "Spalvų kontrastas - Prieinamumas",
+            "link-url": "https://developer.mozilla.org/en-US/docs/Web/Accessibility/Understanding_WCAG/Perceivable/Color_contrast"
+          }
+        }
+      }
+    }
+  },
+  "ApcaInfo": {
+    "title": "Apie APCA (Išplėstinis suvokimo kontrasto algoritmas)",
+    "sections": {
+      "background": "Kas yra APCA?",
+      "calculation": "Kaip APCA skaičiuoja kontrastą",
+      "levels": "APCA lygiai",
+      "attributions": "Nuopelnai",
+      "disclaimer": "Atsakomybės apribojimas",
+      "further-reading": "Tolimesnis skaitymas"
+    },
+    "content": {
+      "background": {
+        "description": "Išplėstinis suvokimo kontrasto algoritmas (APCA) yra modernus standartas, skirtas įvertinti teksto skaitomumą ir vizualinį prieinamumą pagal žmogaus suvokimą. Skirtingai nei tradiciniai kontrasto santykiai, APCA remiasi pažangiąja suvokimo mokslu, siekiant įvertinti, kaip žmonės suvokia kontrastą tarp skirtingų spalvų, šviesumo lygių ir teksto dydžių.",
+        "shift": "APCA reiškia perėjimą nuo fiksuotų ribų prie labiau niuansuoto požiūrio, kuris atsižvelgia į",
+        "considerations-list": {
+          "text-size": "Teksto dydį ir svorį",
+          "display-env": "Ekrano aplinką (šviesus arba tamsus režimas)",
+          "color-impact": "Fono ir pirmojo plano spalvų įtaką skaitomumui"
+        },
+        "real-world": "Šis metodas užtikrina prieinamą dizainą, pritaikytą realioms peržiūros sąlygoms, todėl jis ypač vertingas šiuolaikinėms skaitmeninėms sąsajoms."
+      },
+      "calculation": {
+        "description": "Išplėstinis suvokimo kontrasto algoritmas (APCA) yra modernus standartas, skirtas įvertinti teksto skaitomumą ir vizualinį prieinamumą pagal žmogaus suvokimą. Skirtingai nei tradiciniai kontrasto santykiai, APCA remiasi pažangiąja suvokimo mokslu, siekiant įvertinti, kaip žmonės suvokia kontrastą tarp skirtingų spalvų, šviesumo lygių ir teksto dydžių.",
+        "overview": "APCA skaičiuoja kontrastą naudodamas formulę, pagrįstą pirmojo plano ir fono spalvų santykiniu šviesumu. Rezultatas yra įvertinimas, matuojamas šviesumo kontrasto (Lc) vienetais, kuris nustato, ar derinys yra įskaitomas. Trumpa apžvalga:",
+        "overview-list": {
+          "relative-luminance": {
+            "title": "Santykinis šviesumas",
+            "description": "APCA vertina suvokiamą spalvų ryškumą, atsižvelgiant į tai, kaip žmonės nevienodai suvokia šviesą."
+          },
+          "directional-contrast": {
+            "title": "Kryptinis kontrastas",
+            "description": "Rezultatas rodo, ar pirmojo plano tekstas yra tamsesnis ar šviesesnis už foną."
+          },
+          "dynamic-thresholds": {
+            "title": "Dinaminės ribos",
+            "description": "Skirtingi teksto dydžiai ir svoriai turi skirtingas prieinamumo ribas."
+          }
+        },
+        "example": "Pavyzdžiui",
+        "example-list": {
+          "body-text": "Mažas, pagrindinis tekstas reikalauja Lc vertės 75 arba didesnės.",
+          "large-text": "Didelis arba paryškintas tekstas gali būti skaitomas esant mažesniam kontrastui, kai riba yra 60 ar daugiau."
+        },
+        "replaces": "Algoritmas pakeičia tradicinį \"kontrasto santykį\" ir koncentruojasi į vizualinį aiškumą, suderintą su natūraliu kontrasto suvokimu."
+      },
+      "levels": {
+        "description": "APCA nenaudoja fiksuotų \"išlaikymo/neišlaikymo\" ribų, o vietoje to teikia dinaminį vadovavimą, pagrįstą teksto charakteristikomis, tokiomis kaip šriftas, šrifto dydis ir šrifto svoris. Šis įrankis naudoja supaprastintą vertinimo sistemą pagal APCA skaitomumo kriterijų (ARC) Bronzos paprastąjį režimą.",
+        "levels-list": {
+          "normal-text": {
+            "title": "Paprastas pagrindinis tekstas (14px)",
+            "description": "Lc ≥ 75 skaitomumui."
+          },
+          "large-text": {
+            "title": "Vidutinis tekstas (ne mažiau kaip 24px) arba Paryškintas tekstas (16px)",
+            "description": "Lc ≥ 60 priimtinam įskaitomumui."
+          },
+          "non-text": {
+            "title": "Didelis tekstas (ne mažiau kaip 36px), Paryškintas tekstas (24px) arba Ne teksto elementai",
+            "description": "Lc ≥ 45 UI elementams, tokiems kaip piktogramos ir skyrikliai."
+          }
+        }
+      },
+      "attributions": {
+        "description": "APCA algoritmą sukūrė Andrew Somers iš Myndex Technologies.",
+        "more-info": "Daugiau informacijos rasite čia",
+        "more-info-list": {
+          "contrast-calculator": {
+            "link-text": "APCA kontrasto skaičiuoklė",
+            "link-url": "https://www.myndex.com/APCA/"
+          },
+          "readability-criterion": {
+            "link-text": "APCA skaitomumo kriterijus",
+            "link-url": "https://readtech.org/ARC/"
+          },
+          "apca-github": {
+            "link-text": "APCA W3C ir WCAG3 GitHub",
+            "link-url": "https://github.com/Myndex/apca-w3/?tab=readme-ov-file"
+          },
+          "w3c-draft": {
+            "link-text": "W3C darbo juodraštis",
+            "link-url": "https://www.w3.org/TR/wcag-3.0/"
+          }
+        }
+      },
+      "disclaimer": {
+        "description": "Ši svetainė beta testuoja APCA gaires tekstų ir netekstinių elementų kontrastui nustatyti. Yra gerai žinoma, kad WCAG 2 kontrasto skaičiavimai nėra tikslūs žmogaus suvokimo atžvilgiu, todėl automatiniai testai, naudojant WCAG 2 metodus, gali klaidingai rodyti tam tikrų spalvų porų klaidas. APCA gairės yra reikšmingas prieinamumo patobulinimas, palyginti su WCAG 2 kontrasto kriterijais, todėl jos atitinka ADA ir 508 taisykles pagal alternatyvių metodų skyrių. Bet koks automatizuotas ar rankinis šios svetainės atitikties testavimas turi būti atliktas naudojant suvokimo tikslumo metodą, pavyzdžiui, APCA.",
+        "accuracy-disclaimer": "Šio įrankio APCA įgyvendinimas siekia pateikti tikslius ir patikimus kontrasto rezultatus. Tačiau",
+        "accuracy-disclaimer-list": {
+          "thresholds": {
+            "description": "Rodomos reikšmės ir ribos gali šiek tiek skirtis priklausomai nuo spalvų tikslumo ir taikomų skaičiavimo metodų. Šis įrankis naudoja algoritmą iš",
+            "link-text": "apca-w3",
+            "link-url": "https://www.npmjs.com/package/apca-w3"
+          },
+          "package": "paketo.",
+          "educational": "Šis įrankis skirtas švietimo ir informacijos tikslais ir neturėtų pakeisti išsamios prieinamumo audito, atlikto kvalifikuoto specialisto.",
+          "production": "APCA dar nėra integruota į jokį galiojantį standartą, todėl jis neturėtų būti naudojamas kaip vienintelis tiesos šaltinis gamybos aplinkoje."
+        }
+      },
+      "further-reading": {
+        "description": "Sužinokite daugiau apie spalvų kontrastą ir jo vaidmenį prieinamume",
+        "further-reading-list": {
+          "accessibility-principles": {
+            "link-text": "Prieinamumo principai",
+            "link-url": "https://www.w3.org/WAI/fundamentals/accessibility-principles/"
+          },
+          "understanding-colors": {
+            "link-text": "Žiniatinklio prieinamumas: spalvų ir šviesumo supratimas",
+            "link-url": "https://developer.mozilla.org/en-US/docs/Web/Accessibility/Understanding_Colors_and_Luminance"
+          }
+        }
+      }
+    }
   }
 }

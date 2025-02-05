@@ -187,7 +187,7 @@ const FontPicker = ({
         }}
       >
         <div
-          className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-white/50"
+          className="mx-auto mt-4 h-2 w-[100px] rounded-full opacity-80"
           style={{
             backgroundColor: displayColor,
           }}
@@ -238,9 +238,6 @@ const FontList = ({
   placeholder,
   emptyText,
 }: FontListProps) => {
-  const borderColor = `border-[${displayColor}]/0`;
-  const hoverBorderColor = `data-[selected='true']:border-[${displayColor}]/100 hover:border-[${displayColor}]/100`;
-
   return (
     <Command>
       <CommandInput
@@ -248,7 +245,6 @@ const FontList = ({
           color: displayColor,
           borderColor: displayColor,
         }}
-        className="text-fg-diplay border-fg-display"
         placeholder={`${placeholder}...`}
       />
       <CommandList>
@@ -256,7 +252,7 @@ const FontList = ({
           style={{
             color: displayColor,
           }}
-          className="text-fg-display p-3 text-lg md:text-2xl"
+          className="p-3 text-lg md:text-2xl"
         >
           {emptyText}.
         </CommandEmpty>
@@ -275,7 +271,6 @@ const FontList = ({
               style={{
                 color: displayColor,
               }}
-              className={`${borderColor} ${hoverBorderColor}`}
             >
               <Check
                 className={cn(

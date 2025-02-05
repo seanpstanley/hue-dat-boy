@@ -133,7 +133,13 @@ const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
 
         <ul className="list-inside list-disc">
           <li>
-            <Button asChild variant="link" size="auto" className="text-base">
+            <Button
+              asChild
+              variant="link"
+              size="auto"
+              className="text-base"
+              style={{ color: displayColor }}
+            >
               <a
                 href={t(
                   "content.attributions.more-info-list.contrast-calculator.link-url",
@@ -148,7 +154,13 @@ const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
             </Button>
           </li>
           <li>
-            <Button asChild variant="link" size="auto" className="text-base">
+            <Button
+              asChild
+              variant="link"
+              size="auto"
+              className="text-base"
+              style={{ color: displayColor }}
+            >
               <a
                 href={t(
                   "content.attributions.more-info-list.readability-criterion.link-url",
@@ -163,7 +175,13 @@ const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
             </Button>
           </li>
           <li>
-            <Button asChild variant="link" size="auto" className="text-base">
+            <Button
+              asChild
+              variant="link"
+              size="auto"
+              className="text-base"
+              style={{ color: displayColor }}
+            >
               <a
                 href={t(
                   "content.attributions.more-info-list.apca-github.link-url",
@@ -176,7 +194,13 @@ const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
             </Button>
           </li>
           <li>
-            <Button asChild variant="link" size="auto" className="text-base">
+            <Button
+              asChild
+              variant="link"
+              size="auto"
+              className="text-base"
+              style={{ color: displayColor }}
+            >
               <a
                 href={t(
                   "content.attributions.more-info-list.w3c-draft.link-url",
@@ -204,7 +228,13 @@ const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
             {t(
               "content.disclaimer.accuracy-disclaimer-list.thresholds.description",
             )}{" "}
-            <Button asChild variant="link" size="auto" className="text-base">
+            <Button
+              asChild
+              variant="link"
+              size="auto"
+              className="text-base"
+              style={{ color: displayColor }}
+            >
               <a
                 href={t(
                   "content.disclaimer.accuracy-disclaimer-list.thresholds.link-url",
@@ -235,7 +265,13 @@ const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
 
         <ul className="list-inside list-disc">
           <li>
-            <Button asChild variant="link" size="auto" className="text-base">
+            <Button
+              asChild
+              variant="link"
+              size="auto"
+              className="text-base"
+              style={{ color: displayColor }}
+            >
               <a
                 href={t(
                   "content.further-reading.further-reading-list.accessibility-principles.link-url",
@@ -250,7 +286,13 @@ const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
             </Button>
           </li>
           <li>
-            <Button asChild variant="link" size="auto" className="text-base">
+            <Button
+              asChild
+              variant="link"
+              size="auto"
+              className="text-base"
+              style={{ color: displayColor }}
+            >
               <a
                 href={t(
                   "content.further-reading.further-reading-list.understanding-colors.link-url",
