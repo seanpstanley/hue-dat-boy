@@ -1,0 +1,99 @@
+{
+  "ContrastChecker": {
+    "title": "spalvų kontrasto tikrintuvas (& daugiau!)",
+    "sections": {
+      "sample-text": "pavyzdinis tekstas"
+    },
+    "buttons": {
+      "enhance": {
+        "title": "pagerinti kontrastą",
+        "popover": {
+          "text": "tekstas",
+          "background": "fonas",
+          "both": "abu"
+        }
+      },
+      "share": {
+        "title": "dalintis šiomis spalvomis",
+        "popover": "nukopijuotas URL!"
+      },
+      "swap": {
+        "alt": "Sukeisti spalvas",
+        "tooltip": "sukeisti spalvas"
+      }
+    },
+    "selects": {
+      "color-blindness": {
+        "normal-vision": "normali rega"
+      }
+    },
+    "badges": {
+      "wcag": {
+        "aa_large": "AA didelis",
+        "aaa_large": "AAA didelis",
+        "aa_normal": "AA normalus",
+        "aaa_normal": "AAA normalus"
+      },
+      "apca": {
+        "normal_text": "normalus tekstas",
+        "large_text": "didelis tekstas",
+        "non_text": "piktogramos"
+      }
+    },
+    "labels": {
+      "contrast": "kontrasto vertė",
+      "badges": {
+        "wcag": "wcag lygiai",
+        "apca": "apca lygiai"
+      },
+      "inputs": {
+        "text": "teksto spalva",
+        "background": "fono spalva"
+      },
+      "selects": {
+        "typeface": "šriftas",
+        "color-blindness": "simuliuoti spalvų aklumą"
+      }
+    }
+  },
+  "FontPicker": {
+    "placeholder": "pasirinkti šriftą...",
+    "empty": "šriftas nerastas.",
+    "loading": "kraunama...",
+    "error": "šrifto parinkiklis nepasiekiamas",
+    "search": "ieškoti šriftų"
+  },
+  "CopyColorButton": {
+    "alt": "Kopijuoti spalvą",
+    "tooltip": "kopijuoti spalvą",
+    "popover": "nukopijuota!"
+  },
+  "SampleTextCard": {
+    "title": {
+      "normal": "normalus tekstas",
+      "large": "didelis tekstas"
+    },
+    "error": "nepavyko įkelti ištekliaus.",
+    "loading": "kraunama...",
+    "buttons": {
+      "expand": {
+        "alt": "Viso ekrano rodinys",
+        "tooltip": "žiūrėti visame ekrane"
+      },
+      "close": {
+        "alt": "Uždaryti"
+      }
+    },
+    "sheet-title": {
+      "normal": "Viso ekrano normalus tekstas",
+      "large": "Viso ekrano didelis tekstas"
+    }
+  },
+  "Footer": {
+    "text": "© {year} Sean Stanley. Sukurta naudojant {tech}.",
+    "links": {
+      "github": { "alt": "Seano GitHub" },
+      "linkedin": { "alt": "Seano LinkedIn" }
+    }
+  }
+}
