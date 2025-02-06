@@ -159,7 +159,7 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
                 <li>
                   <strong>
                     {t(
-                      "content.levels.levels-list.aaa.text-sizes-list.normal.description",
+                      "content.levels.levels-list.aaa.text-sizes-list.normal.title",
                     )}
                   </strong>
                   :{" "}
