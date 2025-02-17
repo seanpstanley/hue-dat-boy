@@ -1,5 +1,3 @@
-import { useEffect } from "react";
-
 import { MathJax, MathJaxContext } from "better-react-mathjax";
 import { useTranslations } from "next-intl";
 
