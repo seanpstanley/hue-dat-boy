@@ -82,6 +82,10 @@ body {
   }
 }
 
+.focus {
+  @apply focus-visible:outline-none focus-visible:ring focus-visible:ring-[--fg-display] focus-visible:ring-offset-4 focus-visible:ring-offset-[--bg-display];
+}
+
 .bg-dynamic {
   background-color: rgba(255, 255, 255, 0);
   background-clip: padding-box;

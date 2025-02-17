@@ -84,7 +84,7 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
           <h5 className="font-bold">
             {t("content.calculation.calculation-formula")}:
           </h5>
-          <MathJax>
+          <MathJax tabIndex={-1}>
             <p>
               <i>{t("content.calculation.contrast-ratio")}</i> =
               <span
@@ -96,13 +96,13 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
           <p>{t("content.calculation.where")}</p>
           <ul className="list-inside list-disc" suppressHydrationWarning>
             <li>
-              <MathJax inline suppressHydrationWarning>
+              <MathJax inline suppressHydrationWarning hideUntilTypeset="first">
                 {"\\({L_{1}}\\)"}
               </MathJax>{" "}
               {t("content.calculation.lighter-luminance")}
             </li>
             <li>
-              <MathJax inline suppressHydrationWarning>
+              <MathJax inline suppressHydrationWarning hideUntilTypeset="first">
                 {"\\({L_{2}}\\)"}
               </MathJax>{" "}
               {t("content.calculation.darker-luminance")}

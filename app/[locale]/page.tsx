@@ -499,7 +499,9 @@ export default function ContrastChecker() {
     setBackgroundInputValue(newBackgroundHex);
   }, [foreground, background]);
 
-  // Update CSS variables for the foreground and background colors
+  // Update CSS variables for the foreground and background colors. Please forgive me for manuplating the document but
+  // it's the only way I found to get around Tailwind needing to have all of the colors set at build time. Since the
+  // colors used for foreground, background, etc. are dynamic (picked by the user), I need to update them during runtime.
   useEffect(() => {
     document.documentElement.style.setProperty("--fg", foregroundHex);
     document.documentElement.style.setProperty("--bg", backgroundHex);
@@ -701,6 +703,7 @@ export default function ContrastChecker() {
               <PopoverContent
                 className="w-fit border-3 p-0"
                 style={{
+                  color: fgDisplayColor,
                   borderColor: fgDisplayColor,
                   backgroundColor: rgbToHex(background),
                 }}
@@ -815,7 +818,7 @@ export default function ContrastChecker() {
               <Button
                 variant="ghost-outline"
                 size="auto"
-                className={`border-ghost size-12 shrink-0 p-2`}
+                className="border-ghost size-12 shrink-0 p-2"
                 onClick={handleReverseColors}
               >
                 <span className="sr-only">{t("buttons.swap.alt")}</span>

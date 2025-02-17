@@ -125,7 +125,7 @@ const SampleIconCard = ({
               <Button
                 variant="ghost-outline"
                 size="icon"
-                className={`border-ghost-blind absolute right-0.5 top-1/2 size-8 -translate-y-1/2 p-1 md:right-1 md:size-10 md:p-2`}
+                className="border-ghost-blind absolute right-0.5 top-1/2 size-8 -translate-y-1/2 p-1 focus-visible:ring-offset-[--fg-display] md:right-1 md:size-10 md:p-2"
                 style={{ color: bgDisplayColor }}
               >
                 <AccessibleIcon label={t("buttons.expand.alt")}>
