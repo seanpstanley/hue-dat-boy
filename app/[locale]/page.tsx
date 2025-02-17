@@ -297,8 +297,7 @@ export default function ContrastChecker() {
       ? hexToRgba(searchParamsInitText)
       : hexToRgba("#322e2b"),
   );
-  const [backgroundHex, setBackgroundHex] = useState(rgbaToHex(background));
-  const [foregroundHex, setForegroundHex] = useState(rgbaToHex(foreground));
+
   const [backgroundInputValue, setBackgroundInputValue] = useState(
     rgbaToHex(background),
   );
@@ -439,16 +438,16 @@ export default function ContrastChecker() {
   const updateUrl = useCallback(() => {
     const newParams = new URLSearchParams();
 
-    newParams.set("text", foregroundHex.replace("#", ""));
-    newParams.set("background", backgroundHex.replace("#", ""));
+    newParams.set("text", rgbaToHex(foreground).replace("#", ""));
+    newParams.set("background", rgbaToHex(background).replace("#", ""));
     newParams.set("standard", useAPCA ? "apca" : "wcag");
     if (font !== "") newParams.set("font", font);
     newParams.set("simulation", colorBlindnessSimulation);
     replace(`?${newParams.toString()}`, { scroll: false });
   }, [
     replace,
-    foregroundHex,
-    backgroundHex,
+    foreground,
+    background,
     useAPCA,
     font,
     colorBlindnessSimulation,
@@ -489,25 +488,15 @@ export default function ContrastChecker() {
     updateUrl();
   }, [updateUrl]);
 
-  // Keep the hex conversion of the fg/bg colors and inputs up to date
-  useEffect(() => {
-    const newForegroundHex = rgbaToHex(foreground);
-    const newBackgroundHex = rgbaToHex(background);
-    setForegroundHex(newForegroundHex);
-    setBackgroundHex(newBackgroundHex);
-    setForegroundInputValue(newForegroundHex);
-    setBackgroundInputValue(newBackgroundHex);
-  }, [foreground, background]);
-
   // Update CSS variables for the foreground and background colors. Please forgive me for manuplating the document but
   // it's the only way I found to get around Tailwind needing to have all of the colors set at build time. Since the
   // colors used for foreground, background, etc. are dynamic (picked by the user), I need to update them during runtime.
   useEffect(() => {
-    document.documentElement.style.setProperty("--fg", foregroundHex);
-    document.documentElement.style.setProperty("--bg", backgroundHex);
+    document.documentElement.style.setProperty("--fg", rgbaToHex(foreground));
+    document.documentElement.style.setProperty("--bg", rgbaToHex(background));
     document.documentElement.style.setProperty("--fg-display", fgDisplayColor);
     document.documentElement.style.setProperty("--bg-display", bgDisplayColor);
-  }, [foregroundHex, backgroundHex, fgDisplayColor, bgDisplayColor]);
+  }, [foreground, background, fgDisplayColor, bgDisplayColor]);
 
   const {
     data: quoteData,
@@ -671,7 +660,7 @@ export default function ContrastChecker() {
                 onCheckedChange={setUseAPCA}
                 style={{
                   borderColor: fgDisplayColor,
-                  backgroundColor: backgroundHex,
+                  backgroundColor: rgbaToHex(background),
                 }}
                 color={fgDisplayColor}
               />
@@ -996,7 +985,7 @@ export default function ContrastChecker() {
       <style jsx global>{`
         ::selection {
           background-color: var(--selection-color, ${fgDisplayColor});
-          color: var(--selection-text-color, ${backgroundHex});
+          color: var(--selection-text-color, ${rgbaToHex(background)});
         }
       `}</style>
 

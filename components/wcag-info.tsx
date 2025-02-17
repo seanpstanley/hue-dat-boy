@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 import { MathJax, MathJaxContext } from "better-react-mathjax";
 import { useTranslations } from "next-intl";
 
@@ -26,7 +28,17 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
   const t = useTranslations("WcagInfo");
 
   return (
-    <MathJaxContext>
+    // Config disables MathJax's built-in interaction elements, which was causing extra focusable elements in Safari.
+    <MathJaxContext
+      config={{
+        options: {
+          enableMenu: false, // Disables right-click MathJax menu
+          renderActions: {
+            addMenu: [], // Prevents menu elements from being injected
+          },
+        },
+      }}
+    >
       <section
         id="wcag-info"
         className="flex flex-col gap-y-6"
@@ -84,7 +96,7 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
           <h5 className="font-bold">
             {t("content.calculation.calculation-formula")}:
           </h5>
-          <MathJax tabIndex={-1}>
+          <MathJax suppressHydrationWarning hideUntilTypeset="first">
             <p>
               <i>{t("content.calculation.contrast-ratio")}</i> =
               <span
