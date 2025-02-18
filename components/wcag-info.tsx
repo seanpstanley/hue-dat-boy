@@ -1,5 +1,3 @@
-import { useEffect } from "react";
-
 import { MathJax, MathJaxContext } from "better-react-mathjax";
 import { useTranslations } from "next-intl";
 
@@ -36,14 +34,6 @@ declare global {
 const WcagInfo = ({ displayColor }: { displayColor: string }) => {
   const t = useTranslations("WcagInfo");
 
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.MathJax?.typesetPromise) {
-      window.MathJax.typesetPromise().catch((err) =>
-        console.error("MathJax typesetting error:", err),
-      );
-    }
-  }, []);
-
   return (
     // Config disables MathJax's built-in interaction elements, which was causing extra focusable elements in Safari.
     // It also uses startup.pageReady to ensure MathJax typesets immediately after the page loads. Sometimes on initial load,
@@ -56,20 +46,20 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
             addMenu: [], // Prevents menu elements from being injected
           },
         },
-        loader: { load: ["input/tex", "output/chtml"] },
-        startup: {
-          pageReady: () => {
-            if (
-              typeof window !== "undefined" &&
-              window.MathJax?.typesetPromise
-            ) {
-              return window.MathJax.typesetPromise().catch((err) =>
-                console.error("MathJax typesetting error:", err),
-              );
-            }
-            return Promise.resolve();
-          },
-        },
+        // loader: { load: ["input/tex", "output/chtml"] },
+        // startup: {
+        //   pageReady: () => {
+        //     if (
+        //       typeof window !== "undefined" &&
+        //       window.MathJax?.typesetPromise
+        //     ) {
+        //       return window.MathJax.typesetPromise().catch((err) =>
+        //         console.error("MathJax typesetting error:", err),
+        //       );
+        //     }
+        //     return Promise.resolve();
+        //   },
+        // },
       }}
     >
       <section
@@ -129,14 +119,12 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
           <h5 className="font-bold">
             {t("content.calculation.calculation-formula")}:
           </h5>
-          <MathJax suppressHydrationWarning hideUntilTypeset="first">
-            <p>
-              <i>{t("content.calculation.contrast-ratio")}</i> =
-              <span
-                suppressHydrationWarning
-              >{`\\(\\frac{L_{1} + 0.05}{L_{2} + 0.05}\\)`}</span>
-            </p>
-          </MathJax>
+          <p>
+            <i>{t("content.calculation.contrast-ratio")}</i> =
+            <MathJax inline suppressHydrationWarning hideUntilTypeset="first">
+              {`\\(\\frac{L_{1} + 0.05}{L_{2} + 0.05}\\)`}
+            </MathJax>{" "}
+          </p>
 
           <p>{t("content.calculation.where")}</p>
           <ul className="list-inside list-disc">
