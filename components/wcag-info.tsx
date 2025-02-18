@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 import { MathJax, MathJaxContext } from "better-react-mathjax";
 import { useTranslations } from "next-intl";
 
@@ -33,6 +35,14 @@ declare global {
  */
 const WcagInfo = ({ displayColor }: { displayColor: string }) => {
   const t = useTranslations("WcagInfo");
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.MathJax?.typesetPromise) {
+      window.MathJax.typesetPromise().catch((err) =>
+        console.error("MathJax typesetting error:", err),
+      );
+    }
+  }, []);
 
   return (
     // Config disables MathJax's built-in interaction elements, which was causing extra focusable elements in Safari.
