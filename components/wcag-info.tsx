@@ -3,6 +3,15 @@ import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 
+// Declare MathJax globally to avoid TypeScript errors
+declare global {
+  interface Window {
+    MathJax?: {
+      typesetPromise?: () => Promise<void>;
+    };
+  }
+}
+
 /**
  * A section with information and links related to the WCAG standard.
  *
@@ -27,12 +36,28 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
 
   return (
     // Config disables MathJax's built-in interaction elements, which was causing extra focusable elements in Safari.
+    // It also uses startup.pageReady to ensure MathJax typesets immediately after the page loads. Sometimes on initial load,
+    // the contrast ratio formula would render without being typeset, despite using hideUntilTypeset="first".
     <MathJaxContext
       config={{
         options: {
           enableMenu: false, // Disables right-click MathJax menu
           renderActions: {
             addMenu: [], // Prevents menu elements from being injected
+          },
+        },
+        loader: { load: ["input/tex", "output/chtml"] },
+        startup: {
+          pageReady: () => {
+            if (
+              typeof window !== "undefined" &&
+              window.MathJax?.typesetPromise
+            ) {
+              return window.MathJax.typesetPromise().catch((err) =>
+                console.error("MathJax typesetting error:", err),
+              );
+            }
+            return Promise.resolve();
           },
         },
       }}
@@ -104,7 +129,7 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
           </MathJax>
 
           <p>{t("content.calculation.where")}</p>
-          <ul className="list-inside list-disc" suppressHydrationWarning>
+          <ul className="list-inside list-disc">
             <li>
               <MathJax inline suppressHydrationWarning hideUntilTypeset="first">
                 {"\\({L_{1}}\\)"}
