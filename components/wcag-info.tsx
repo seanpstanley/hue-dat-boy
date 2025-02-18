@@ -46,20 +46,20 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
             addMenu: [], // Prevents menu elements from being injected
           },
         },
-        // loader: { load: ["input/tex", "output/chtml"] },
-        // startup: {
-        //   pageReady: () => {
-        //     if (
-        //       typeof window !== "undefined" &&
-        //       window.MathJax?.typesetPromise
-        //     ) {
-        //       return window.MathJax.typesetPromise().catch((err) =>
-        //         console.error("MathJax typesetting error:", err),
-        //       );
-        //     }
-        //     return Promise.resolve();
-        //   },
-        // },
+        loader: { load: ["input/tex", "output/chtml"] },
+        startup: {
+          pageReady: () => {
+            if (
+              typeof window !== "undefined" &&
+              window.MathJax?.typesetPromise
+            ) {
+              return window.MathJax.typesetPromise().catch((err) =>
+                console.error("MathJax typesetting error:", err),
+              );
+            }
+            return Promise.resolve();
+          },
+        },
       }}
     >
       <section
@@ -123,7 +123,7 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
             <i>{t("content.calculation.contrast-ratio")}</i> =
             <MathJax inline suppressHydrationWarning hideUntilTypeset="first">
               {`\\(\\frac{L_{1} + 0.05}{L_{2} + 0.05}\\)`}
-            </MathJax>{" "}
+            </MathJax>
           </p>
 
           <p>{t("content.calculation.where")}</p>
