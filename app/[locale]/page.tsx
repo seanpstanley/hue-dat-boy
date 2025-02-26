@@ -496,6 +496,10 @@ export default function ContrastChecker() {
     document.documentElement.style.setProperty("--bg", rgbaToHex(background));
     document.documentElement.style.setProperty("--fg-display", fgDisplayColor);
     document.documentElement.style.setProperty("--bg-display", bgDisplayColor);
+    document.documentElement.style.setProperty(
+      "--fg-display-hover",
+      rgbaToHex(background),
+    );
   }, [foreground, background, fgDisplayColor, bgDisplayColor]);
 
   const {

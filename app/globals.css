@@ -83,7 +83,7 @@ body {
 }
 
 .focus {
-  @apply focus-visible:outline-none focus-visible:ring focus-visible:ring-[--fg-display] focus-visible:ring-offset-4 focus-visible:ring-offset-[--bg-display];
+  @apply focus-visible:outline-none focus-visible:ring focus-visible:ring-[--fg-display] focus-visible:ring-offset-4 focus-visible:ring-offset-[--bg];
 }
 
 .bg-dynamic {
@@ -96,7 +96,7 @@ body {
 .bg-dynamic:hover,
 .bg-dynamic:focus {
   background-color: var(--fg-display);
-  color: var(--bg-display);
+  color: var(--fg-display-hover);
 }
 
 .bg-fg-display {
@@ -122,6 +122,11 @@ body {
 }
 
 .border-ghost-select {
+  border-color: rgba(255, 255, 255, 0);
+  background-clip: padding-box;
+}
+
+.border-ghost-command {
   border-color: rgba(255, 255, 255, 0);
   background-clip: padding-box;
 }
