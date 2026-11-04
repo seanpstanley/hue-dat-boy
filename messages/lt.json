@@ -58,7 +58,10 @@
         "typeface": "šriftas",
         "color-blindness": "simuliuoti spalvų aklumą"
       },
-      "standard": "kontrasto standartas"
+      "standard": "kontrasto standartas",
+      "pass": "atitinka",
+      "fail": "neatitinka",
+      "range-to": "iki"
     },
     "notice": {
       "low-contrast": {
@@ -345,5 +348,14 @@
     "hex": "hex reikšmė",
     "eyedropper": "paimti spalvą iš ekrano",
     "recent": "naujausios spalvos"
+  },
+  "Metadata": {
+    "title": "Spalvų kontrasto tikrintuvas WCAG ir APCA",
+    "description": "Apskaičiuokite teksto ir fono spalvų kontrasto santykį ir patikrinkite pagal WCAG ir APCA prieinamumo standartus."
+  },
+  "NotFound": {
+    "title": "404",
+    "description": "Nepavyko rasti prašomo puslapio.",
+    "home": "Grįžti į pradžią"
   }
 }

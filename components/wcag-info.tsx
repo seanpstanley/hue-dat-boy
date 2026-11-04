@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 
-// Declare MathJax globally to avoid TypeScript errors
+// The MathJax global that better-react-mathjax loads (only the part used below)
 declare global {
   interface Window {
     MathJax?: {
@@ -15,16 +15,12 @@ declare global {
 }
 
 /**
- * A section with information and links related to the WCAG standard.
- *
- *
- * @returns                             The 'WcagInfo' component, containing details and links related to the WCAG standard.
+ * Background on the WCAG standard: what it is, how it calculates contrast (with the formula typeset by MathJax), its
+ * levels, and further reading. Shown below the checker while WCAG is selected.
  *
  * @example
  * ```tsx
- * import { WcagInfo } from "@/components/wcag-info";
- *
- * <WcagInfo />
+ * {standard === "wcag" && <WcagInfo />}
  * ```
  */
 const WcagInfo = memo(() => {

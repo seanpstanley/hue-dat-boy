@@ -12,10 +12,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { addRecentColor, useRecentColors } from "@/lib/recent-colors";
+import { addRecentColor, useRecentColors } from "@/hooks/use-recent-colors";
+import { parseHex, rgbaToHex } from "@/lib/color";
 import { RgbaColor } from "@/lib/types";
 import { cn } from "@/lib/utils/cn";
-import { parseHex, rgbaToHex } from "@/lib/utils/color";
 
 // The EyeDropper API isn't in TypeScript's DOM lib yet (Chromium only)
 declare global {
@@ -25,9 +25,13 @@ declare global {
 }
 
 interface ColorPickerProps {
+  /** The current color. */
   color: RgbaColor;
+  /** Called with each new color. Store the object as-is (see the component docs). */
   onChange: (color: RgbaColor) => void;
+  /** Accessible name for the swatch button. */
   label: string;
+  /** Classes for the swatch button, e.g. its size. */
   className?: string;
 }
 

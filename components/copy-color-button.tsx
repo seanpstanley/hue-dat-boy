@@ -10,21 +10,23 @@ import { TooltipButton } from "@/components/tooltip-button";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils/cn";
 
-interface CopyButtonProps {
-  /** The text to copy. */
+interface CopyColorButtonProps {
+  /** The text to copy, e.g. a hex color. */
   value: string;
+  /** Classes for the button, e.g. its size and position. */
   className?: string;
 }
 
 /**
- * An icon button with a tooltip that copies `value` to the clipboard, briefly swapping to a check mark on success.
+ * An icon button with a tooltip that copies `value` to the clipboard. On success it shows a check mark for 2 seconds
+ * and holds its hovered (outlined) look, so the confirmation reads as one state.
  *
  * @example
  * ```tsx
  * <CopyColorButton value={rgbaToHex(foreground)} />
  * ```
  */
-const CopyColorButton = ({ value, className }: CopyButtonProps) => {
+const CopyColorButton = ({ value, className }: CopyColorButtonProps) => {
   const [copied, setCopied] = useState(false);
   const t = useTranslations("CopyColorButton");
 
@@ -48,7 +50,12 @@ const CopyColorButton = ({ value, className }: CopyButtonProps) => {
       <Button
         size="auto"
         variant="ghost-outline"
-        className={cn("p-1 text-ink lg:p-2", className)}
+        className={cn(
+          "p-1 text-ink lg:p-2",
+          // Hold the hovered look while the check mark shows, so the confirmation reads as one state
+          copied && "border-ink",
+          className,
+        )}
         onClick={handleCopy}
       >
         <AccessibleIcon label={copied ? t("popover") : t("alt")}>

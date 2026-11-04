@@ -1,6 +1,10 @@
+/**
+ * A tiny shared store for recently used colors: every color picker reads and writes the same list, which is persisted
+ * in localStorage when it's available.
+ */
 import { useSyncExternalStore } from "react";
 
-import { parseHex } from "@/lib/utils/color";
+import { parseHex } from "@/lib/color";
 
 const STORAGE_KEY = "hue-dat-boy:recent-colors";
 const MAX_COLORS = 8;
@@ -33,7 +37,12 @@ function subscribe(listener: () => void) {
   return () => listeners.delete(listener);
 }
 
-/** Adds a hex color to the front of the recent colors list (shared by every picker, kept in localStorage). */
+/**
+ * Adds a color to the front of the recent colors list, moving it there if it's already in the list. The list keeps
+ * the 8 most recent colors.
+ *
+ * @param hex - The color, as a hex string.
+ */
 export function addRecentColor(hex: string) {
   colors = [hex, ...getSnapshot().filter((c) => c !== hex)].slice(
     0,
@@ -47,7 +56,17 @@ export function addRecentColor(hex: string) {
   listeners.forEach((listener) => listener());
 }
 
-/** The most recently used colors, newest first. Always empty during server rendering. */
+/**
+ * Subscribes to the recent colors list.
+ *
+ * @returns Hex colors, newest first. Always empty during server rendering.
+ *
+ * @example
+ * ```tsx
+ * const recent = useRecentColors();
+ * recent.map((hex) => <Swatch key={hex} color={hex} />);
+ * ```
+ */
 export function useRecentColors() {
   return useSyncExternalStore(subscribe, getSnapshot, () => EMPTY);
 }

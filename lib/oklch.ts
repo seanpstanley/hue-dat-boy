@@ -1,17 +1,17 @@
 import { RgbaColor } from "@/lib/types";
 
 /**
- * OKLCH: a perceptual color space (Björn Ottosson's OKLab, in polar form). Unlike HSL, changing L here changes only
- * perceived lightness, so a color keeps its hue and colorfulness as it gets lighter or darker.
- *
- *   l   lightness, 0 (black) to 1 (white)
- *   c   chroma (colorfulness), 0 to ~0.37 for sRGB
- *   h   hue angle in degrees
+ * A color in OKLCH: a perceptual color space (Björn Ottosson's OKLab, in polar form). Unlike HSL, changing `l` here
+ * changes only perceived lightness, so a color keeps its hue and colorfulness as it gets lighter or darker.
  */
 export interface OklchColor {
+  /** Perceived lightness, from 0 (black) to 1 (white). */
   l: number;
+  /** Chroma (colorfulness), from 0 (gray) to about 0.37 for the most vivid sRGB colors. */
   c: number;
+  /** Hue angle in degrees, 0–360. */
   h: number;
+  /** Opacity, from 0 (transparent) to 1 (opaque). Carried through unchanged. */
   a: number;
 }
 
@@ -21,7 +21,12 @@ const toLinear = (c: number) =>
 const fromLinear = (c: number) =>
   c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1 / 2.4) - 0.055;
 
-/** OKLab components, before converting to polar form. */
+/**
+ * Converts a color to OKLab (the rectangular form of OKLCH).
+ *
+ * @param color - The color to convert. Alpha is ignored.
+ * @returns `L` is lightness (0–1); `A` (green–red) and `B` (blue–yellow) are the color axes.
+ */
 export function rgbaToOklab({ r, g, b }: RgbaColor) {
   const [lr, lg, lb] = [r, g, b].map((v) => toLinear(v / 255));
 
@@ -42,6 +47,11 @@ export function rgbaToOklab({ r, g, b }: RgbaColor) {
   };
 }
 
+/**
+ * Converts a color to OKLCH.
+ *
+ * @param color - The color to convert. Alpha is carried through.
+ */
 export function rgbaToOklch(color: RgbaColor): OklchColor {
   const { L, A, B } = rgbaToOklab(color);
   const c = Math.sqrt(A * A + B * B);
@@ -75,7 +85,7 @@ const inGamut = (rgb: number[]) =>
   rgb.every((v) => v >= -EPSILON && v <= 1 + EPSILON);
 
 /**
- * Converts OKLCH to an 8-bit RGBA color. Out-of-gamut colors (common when a saturated color is made much lighter or
+ * Converts an OKLCH color to 8-bit sRGB. Out-of-gamut colors (common when a saturated color is made much lighter or
  * darker) are mapped into sRGB by reducing chroma while keeping lightness and hue, which is the least noticeable way
  * to make a color displayable.
  */
@@ -101,7 +111,13 @@ export function oklchToRgba(color: OklchColor): RgbaColor {
   return { r, g, b, a: color.a };
 }
 
-/** Perceived difference between two colors (Euclidean distance in OKLab, "ΔEOK"). ~0.02 is a just-noticeable change. */
+/**
+ * The perceived difference between two colors: Euclidean distance in OKLab ("ΔEOK"). About 0.02 is a
+ * just-noticeable difference.
+ *
+ * @param x - One color (alpha ignored).
+ * @param y - The other color (alpha ignored).
+ */
 export function deltaEOK(x: RgbaColor, y: RgbaColor): number {
   const p = rgbaToOklab(x);
   const q = rgbaToOklab(y);

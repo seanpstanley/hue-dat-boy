@@ -18,9 +18,7 @@ const LinkedinIcon = (props: SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-/**
- * A footer with the current year and personal links.
- */
+/** The page footer: copyright line and links to the repo and LinkedIn. */
 const Footer = memo(() => {
   const t = useTranslations("Footer");
 

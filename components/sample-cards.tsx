@@ -21,9 +21,13 @@ import { AnimechanQuote } from "@/lib/types";
 import { cn } from "@/lib/utils/cn";
 
 interface SampleCardProps {
+  /** Shown in the card's header. */
   title: string;
+  /** Accessible title for the fullscreen sheet (visually hidden). */
   sheetTitle: string;
+  /** The sample content, rendered in both the card and the fullscreen sheet. */
   children: ReactNode;
+  /** Classes for the card, e.g. its grid span. */
   className?: string;
 }
 
@@ -104,10 +108,15 @@ const FALLBACK_QUOTE: AnimechanQuote = {
 };
 
 interface SampleTextCardProps {
+  /** Which WCAG text size to preview. Large is 24px (WCAG's large text threshold for regular weight). */
   textSize: "normal" | "large";
+  /** The Google Font family to render in, or `""` for the default font. */
   font: string;
+  /** Whether the quote is still loading. */
   isLoading: boolean;
+  /** The quote to show. While it's `undefined` after loading (e.g. the API failed), a pangram is shown instead. */
   quote: AnimechanQuote | undefined;
+  /** Classes for the card, e.g. its grid span. */
   className?: string;
 }
 
@@ -172,8 +181,20 @@ const SampleTextCard = memo(
 );
 SampleTextCard.displayName = "SampleTextCard";
 
-/** A sample card showing icons, for checking non-text contrast. */
-const SampleIconCard = memo(({ className }: { className?: string }) => {
+interface SampleIconCardProps {
+  /** Classes for the card, e.g. its grid span. */
+  className?: string;
+}
+
+/**
+ * A sample card showing icons, for checking non-text contrast.
+ *
+ * @example
+ * ```tsx
+ * <SampleIconCard className="lg:col-span-2" />
+ * ```
+ */
+const SampleIconCard = memo(({ className }: SampleIconCardProps) => {
   const t = useTranslations("SampleTextCard");
 
   return (

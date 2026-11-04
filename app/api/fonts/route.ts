@@ -1,4 +1,4 @@
-import { GoogleFont } from "@/lib/types";
+import { FontListResponse, GoogleFont } from "@/lib/types";
 
 const GOOGLE_FONTS_API = "https://www.googleapis.com/webfonts/v1/webfonts";
 
@@ -34,10 +34,9 @@ export async function GET() {
     const data: { items?: GoogleFont[] } = await res.json();
 
     // The full response includes every file URL for every font (well over 1MB); the picker only needs names
-    const items = (data.items ?? []).map(({ family, category }) => ({
-      family,
-      category,
-    }));
+    const items: FontListResponse["items"] = (data.items ?? []).map(
+      ({ family, category }) => ({ family, category }),
+    );
 
     return Response.json(
       { items },

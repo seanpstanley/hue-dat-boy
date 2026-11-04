@@ -1,7 +1,8 @@
+import { parseHex, rgbaToHex } from "@/lib/color";
+import { ContrastStandard } from "@/lib/contrast";
 import { ColorBlindnessType, RgbaColor } from "@/lib/types";
-import { parseHex, rgbaToHex } from "@/lib/utils/color";
-import { ContrastStandard } from "@/lib/utils/contrast";
 
+/** Every color vision type, in the order the simulation select lists them. */
 export const COLOR_BLINDNESS_TYPES: ColorBlindnessType[] = [
   "normal vision",
   "protanopia",
@@ -10,14 +11,21 @@ export const COLOR_BLINDNESS_TYPES: ColorBlindnessType[] = [
   "achromatopsia",
 ];
 
+/** Everything that's shareable through the URL. */
 export interface CheckerState {
+  /** The text color (`text` param, hex without the `#`). */
   foreground: RgbaColor;
+  /** The background color (`background` param, hex without the `#`). */
   background: RgbaColor;
+  /** The contrast standard (`standard` param). */
   standard: ContrastStandard;
+  /** The Google Font family for the samples, or `""` for the default font (`font` param, omitted when empty). */
   font: string;
+  /** The color blindness simulation (`simulation` param, omitted for normal vision). */
   simulation: ColorBlindnessType;
 }
 
+/** What a visit with no (or invalid) URL params starts with. */
 export const DEFAULT_STATE: CheckerState = {
   foreground: { r: 50, g: 46, b: 43, a: 1 }, // #322e2b
   background: { r: 245, g: 180, b: 197, a: 1 }, // #f5b4c5
@@ -29,12 +37,23 @@ export const DEFAULT_STATE: CheckerState = {
 /** Google Font family names are letters, digits, spaces and hyphens. Anything else is rejected. */
 const FONT_FAMILY_PATTERN = /^[\w\s-]{1,64}$/;
 
+/** Search params as Next.js passes them to pages (a repeated param arrives as an array). */
 type SearchParams = Record<string, string | string[] | undefined>;
 
 const first = (value: string | string[] | undefined) =>
   Array.isArray(value) ? value[0] : value;
 
-/** Parses (and validates) the checker state from URL search params, falling back to defaults for anything invalid. */
+/**
+ * Parses and validates the checker state from URL search params. Each param falls back to its default on its own, so
+ * one bad value doesn't reset the rest.
+ *
+ * @param params - The page's search params.
+ *
+ * @example
+ * ```ts
+ * parseUrlState({ text: "000000", background: "ffffff", standard: "apca" });
+ * ```
+ */
 export function parseUrlState(params: SearchParams): CheckerState {
   const text = first(params.text);
   const background = first(params.background);
@@ -54,7 +73,12 @@ export function parseUrlState(params: SearchParams): CheckerState {
   };
 }
 
-/** Serializes the checker state into a query string (without the leading "?"). */
+/**
+ * Serializes the checker state into a query string, the inverse of {@link parseUrlState}.
+ *
+ * @param state - The state to serialize.
+ * @returns The query string, without the leading `?`. Default-valued `font` and `simulation` params are omitted.
+ */
 export function serializeUrlState(state: CheckerState): string {
   const params = new URLSearchParams();
 

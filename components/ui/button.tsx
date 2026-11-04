@@ -43,9 +43,24 @@ const buttonVariants = cva(
 
 export interface ButtonProps
   extends React.ComponentProps<"button">, VariantProps<typeof buttonVariants> {
+  /** Render the child element (e.g. an `<a>`) with button styles instead of a `<button>`. */
   asChild?: boolean;
 }
 
+/**
+ * A themed button. Variants: `outline` (default), `primary` (filled), `ghost-outline` (border on hover), `ghost` (menu
+ * item) and `link`; `naked` has no styles beyond focus and disabled. Disabled buttons keep full contrast and get a
+ * dashed border instead of fading out.
+ *
+ * @example
+ * ```tsx
+ * <Button variant="primary" size="xl" onClick={share}>share these colors</Button>
+ *
+ * <Button asChild variant="link">
+ *   <a href="https://www.w3.org/WAI/WCAG22/">WCAG 2.2</a>
+ * </Button>
+ * ```
+ */
 function Button({
   className,
   variant,

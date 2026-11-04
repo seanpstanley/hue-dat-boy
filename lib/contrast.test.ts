@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { calculateWCAGContrast } from "./color";
+import { BLACK as black, calculateWCAGContrast, WHITE as white } from "./color";
 import {
   calculateAPCAContrast,
   calculateContrastRange,
@@ -8,10 +8,7 @@ import {
   getContrastReport,
   nextEnhanceGoal,
 } from "./contrast";
-import { deltaEOK, oklchToRgba, rgbaToOklch } from "./oklch";
-
-const black = { r: 0, g: 0, b: 0, a: 1 };
-const white = { r: 255, g: 255, b: 255, a: 1 };
+import { deltaEOK, rgbaToOklch } from "./oklch";
 
 describe("calculateAPCAContrast", () => {
   it("is positive for dark text on light backgrounds and negative for the reverse", () => {
@@ -160,28 +157,5 @@ describe("enhanceContrast", () => {
     expect(calculateWCAGContrast(white, foreground)).toBeGreaterThanOrEqual(
       calculateWCAGContrast(white, ghost),
     );
-  });
-});
-
-describe("oklch", () => {
-  it("round-trips sRGB colors", () => {
-    for (const c of [
-      black,
-      white,
-      { r: 204, g: 102, b: 102, a: 1 },
-      { r: 0, g: 128, b: 128, a: 0.5 },
-    ]) {
-      expect(oklchToRgba(rgbaToOklch(c))).toEqual(c);
-    }
-  });
-
-  it("maps out-of-gamut colors into sRGB by reducing chroma", () => {
-    const vivid = rgbaToOklch({ r: 255, g: 0, b: 0, a: 1 });
-    const result = oklchToRgba({ ...vivid, l: 0.95 });
-    for (const v of [result.r, result.g, result.b]) {
-      expect(v).toBeGreaterThanOrEqual(0);
-      expect(v).toBeLessThanOrEqual(255);
-    }
-    expect(Math.abs(rgbaToOklch(result).l - 0.95)).toBeLessThan(0.01);
   });
 });

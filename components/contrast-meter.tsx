@@ -2,12 +2,12 @@
 
 import { useTranslations } from "next-intl";
 
-import { cn } from "@/lib/utils/cn";
 import {
   APCA_THRESHOLDS,
   ContrastReport,
   WCAG_THRESHOLDS,
-} from "@/lib/utils/contrast";
+} from "@/lib/contrast";
+import { cn } from "@/lib/utils/cn";
 
 /** WCAG ratios run 1–21 and are spread out on a log scale; APCA Lc runs roughly 0–108 and is linear. */
 const SCALES = {
@@ -31,11 +31,22 @@ const SCALES = {
   },
 } as const;
 
+interface ContrastMeterProps {
+  /** The contrast report to chart. Its standard picks the scale and thresholds. */
+  report: ContrastReport;
+}
+
 /**
- * A bar showing where the current contrast sits relative to each level's threshold. Purely visual: the pass/fail
- * badges carry the same information for assistive tech, so this is hidden from screen readers.
+ * A bar showing where the current contrast sits relative to each level's threshold, with a lighter band for the
+ * possible range when the background is semi-transparent. Purely visual: the pass/fail tickets carry the same
+ * information for assistive tech, so this is hidden from screen readers.
+ *
+ * @example
+ * ```tsx
+ * <ContrastMeter report={getContrastReport(background, foreground, "apca")} />
+ * ```
  */
-export function ContrastMeter({ report }: { report: ContrastReport }) {
+export function ContrastMeter({ report }: ContrastMeterProps) {
   const t = useTranslations("ContrastChecker");
   const scale = SCALES[report.standard];
   const min = scale.position(report.score);

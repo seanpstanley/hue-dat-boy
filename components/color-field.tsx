@@ -4,13 +4,17 @@ import { memo, useState } from "react";
 
 import { ColorPicker } from "@/components/color-picker";
 import { CopyColorButton } from "@/components/copy-color-button";
+import { parseHex, rgbaToHex, rgbaToHsla } from "@/lib/color";
 import { RgbaColor } from "@/lib/types";
-import { parseHex, rgbaToHex, rgbaToHsla } from "@/lib/utils/color";
 
 interface ColorFieldProps {
+  /** `id` for the hex input. Also used as its `name`. */
   id: string;
+  /** The visible label, also used as the picker button's accessible name. */
   label: string;
+  /** The current color. */
   color: RgbaColor;
+  /** Called with each new color, from the picker or a valid typed hex value. */
   onChange: (color: RgbaColor) => void;
 }
 
@@ -32,6 +36,13 @@ function describe(color: RgbaColor) {
  * The hex input shows the current color, except while the user is typing: then it shows their in-progress text (a
  * "draft"), and only commits it once it's a valid hex color. Because the displayed value is otherwise derived from
  * `color`, it can never get out of sync with the picker, the swap button, or "enhance contrast".
+ *
+ * @example
+ * ```tsx
+ * const [foreground, setForeground] = useState<RgbaColor>({ r: 50, g: 46, b: 43, a: 1 });
+ *
+ * <ColorField id="foreground-color" label="text color" color={foreground} onChange={setForeground} />
+ * ```
  */
 const ColorField = memo(({ id, label, color, onChange }: ColorFieldProps) => {
   const [draft, setDraft] = useState<string | null>(null);

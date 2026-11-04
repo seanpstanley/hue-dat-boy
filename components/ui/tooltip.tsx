@@ -6,8 +6,22 @@ import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 
 import { cn } from "@/lib/utils/cn";
 
+/** Shares tooltip timing across the app. Render once near the root. */
 const TooltipProvider = TooltipPrimitive.Provider;
 
+/**
+ * A tooltip (Radix Tooltip). For the common case of a tooltip on a button, use `TooltipButton` instead.
+ *
+ * @example
+ * ```tsx
+ * <Tooltip>
+ *   <TooltipTrigger asChild>
+ *     <Button aria-label="Swap colors">⇄</Button>
+ *   </TooltipTrigger>
+ *   <TooltipContent>swap colors</TooltipContent>
+ * </Tooltip>
+ * ```
+ */
 const Tooltip = TooltipPrimitive.Root;
 
 const TooltipTrigger = TooltipPrimitive.Trigger;

@@ -6,7 +6,7 @@ import {
 } from "next/font/google";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { routing } from "@/i18n/routing";
 
@@ -26,11 +26,16 @@ const mono = JetBrains_Mono({
   variable: "--font-jetbrains",
 });
 
-export const metadata: Metadata = {
-  title: "Color Contrast Checker for WCAG & APCA",
-  description:
-    "Calculate the contrast ratio of text and background colors to test against WCAG and APCA accessibility standards.",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Metadata" });
+
+  return { title: t("title"), description: t("description") };
+}
 
 export const viewport: Viewport = {
   themeColor: "#f5b4c5",

@@ -5,16 +5,12 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 
 /**
- * A section with information and links related to the APCA standard.
- *
- *
- * @returns                             The 'APCA' component, containing details and links related to the WCAG standard.
+ * Background on the APCA standard: what it is, how it calculates contrast, its levels, and further reading. Shown
+ * below the checker while APCA is selected.
  *
  * @example
  * ```tsx
- * import { ApcaInfo } from "@/components/apca-info";
- *
- * <ApcaInfo />
+ * {standard === "apca" && <ApcaInfo />}
  * ```
  */
 const ApcaInfo = memo(() => {
