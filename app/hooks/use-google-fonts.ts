@@ -1,30 +1,20 @@
 import useSWR from "swr";
 
+import { GoogleFontFamily } from "@/lib/types";
 import { fetcher } from "@/lib/utils/api";
 
+const options = {
+  revalidateIfStale: false,
+  revalidateOnFocus: false,
+  revalidateOnReconnect: false,
+};
+
 /**
- * Hook for fetching Google Fonts data from a route handler using SWR.
- *
- * @returns   {Object}    An object containing the fetched data, error, and loading state.
+ * Fetches the list of Google Fonts families from the `/api/fonts` route handler.
  *
  * @example
- * import { useGoogleFonts } from "@/app/hooks/use-google-fonts";
- *
  * const { data, error, isLoading } = useGoogleFonts();
- * if (isLoading) return <p>Loading...</p>;
- * if (error) return <p>Error loading fonts.</p>;
- * return <FontList fonts={data} />;
+ * data?.items.map((font) => font.family);
  */
-export const useGoogleFonts = () => {
-  const { data, error, isLoading } = useSWR("/api/fonts", fetcher, {
-    revalidateIfStale: false,
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-  });
-
-  return {
-    data,
-    error,
-    isLoading,
-  };
-};
+export const useGoogleFonts = () =>
+  useSWR<{ items: GoogleFontFamily[] }>("/api/fonts", fetcher, options);

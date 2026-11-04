@@ -1,14 +1,14 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { notFound } from "next/navigation";
-import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
+import { hasLocale, NextIntlClientProvider } from "next-intl";
+import { setRequestLocale } from "next-intl/server";
 
 import { routing } from "@/i18n/routing";
 
 import "../globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
   title: "Color Contrast Checker for WCAG & APCA",
@@ -16,27 +16,34 @@ export const metadata: Metadata = {
     "Calculate the contrast ratio of text and background colors to test against WCAG and APCA accessibility standards.",
 };
 
-export default async function RootLayout({
+export const viewport: Viewport = {
+  themeColor: "#f5b4c5",
+};
+
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
+export default async function LocaleLayout({
   children,
-  params: { locale },
+  params,
 }: Readonly<{
   children: React.ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }>) {
-  // Ensure that the incoming `locale` is valid
-  if (!routing.locales.includes(locale as any)) {
+  const { locale } = await params;
+
+  if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
 
-  // Providing all messages to the client
-  // side is the easiest way to get started
-  const messages = await getMessages();
+  setRequestLocale(locale);
 
   return (
-    <html lang={locale}>
-      <NextIntlClientProvider messages={messages}>
-        <body className={` ${inter.className} antialiased`}>{children}</body>
-      </NextIntlClientProvider>
+    <html lang={locale} className={inter.variable}>
+      <body>
+        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+      </body>
     </html>
   );
 }

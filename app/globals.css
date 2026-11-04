@@ -1,172 +1,121 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@import "tw-animate-css";
 
-body {
-  font-family: Arial, Helvetica, sans-serif;
+/*
+ * Dynamic theme
+ * ----------------------------------------------------------------------------
+ * The user picks the colors at runtime, so they can't be baked into Tailwind at
+ * build time. Instead, <ThemeStyle /> writes these custom properties to :root and
+ * `@theme inline` exposes them as regular Tailwind colors, which means classes
+ * like `bg-ink`, `hover:text-on-ink`, `outline-ink/50` all "just work" with the
+ * user's colors (including in portaled popovers, tooltips and drawers).
+ *
+ *   --surface        the background color, fully opaque (what the page is painted with)
+ *   --ink            readable color on --surface: the text color, or black/white when
+ *                    the text color is too low-contrast to build UI with
+ *   --on-ink         readable color on --ink (always the surface color)
+ *   --fg / --bg      the exact user colors, alpha included
+ *   --sim-*          the same, run through the selected color blindness simulation
+ */
+:root {
+  --surface: #f5b4c5;
+  --ink: #322e2b;
+  --on-ink: #f5b4c5;
+  --fg: #322e2b;
+  --bg: #f5b4c5;
+  --sim-fg: #322e2b;
+  --sim-bg: #f5b4c5;
+  --sim-frame: #322e2b;
+  --sim-on-frame: #f5b4c5;
+
+  --checkerboard-color-light: #fefefe;
+  --checkerboard-color-dark: #ebebeb;
+  --radius: 0.5rem;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-}
+@theme inline {
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-on-ink: var(--on-ink);
+  --color-fg: var(--fg);
+  --color-bg: var(--bg);
+  --color-sim-fg: var(--sim-fg);
+  --color-sim-bg: var(--sim-bg);
+  --color-sim-frame: var(--sim-frame);
+  --color-sim-on-frame: var(--sim-on-frame);
 
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 224 71.4% 4.1%;
-    --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
-    --primary: 220.9 39.3% 11%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 220 14.3% 95.9%;
-    --secondary-foreground: 220.9 39.3% 11%;
-    --muted: 220 14.3% 95.9%;
-    --muted-foreground: 220 8.9% 46.1%;
-    --accent: 220 14.3% 95.9%;
-    --accent-foreground: 220.9 39.3% 11%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 224 71.4% 4.1%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
-    --checkerboard-color-light: #fefefe;
-    --checkerboard-color-dark: #ebebeb;
-    --checkerboard-size-sm: 1rem;
-    --checkerboard-size-md: 3rem;
-    --checkerboard-size-lg: 5rem;
-  }
-  .dark {
-    --background: 224 71.4% 4.1%;
-    --foreground: 210 20% 98%;
-    --card: 224 71.4% 4.1%;
-    --card-foreground: 210 20% 98%;
-    --popover: 224 71.4% 4.1%;
-    --popover-foreground: 210 20% 98%;
-    --primary: 210 20% 98%;
-    --primary-foreground: 220.9 39.3% 11%;
-    --secondary: 215 27.9% 16.9%;
-    --secondary-foreground: 210 20% 98%;
-    --muted: 215 27.9% 16.9%;
-    --muted-foreground: 217.9 10.6% 64.9%;
-    --accent: 215 27.9% 16.9%;
-    --accent-foreground: 210 20% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 215 27.9% 16.9%;
-    --input: 215 27.9% 16.9%;
-    --ring: 216 12.2% 83.9%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-  }
+  /* shadcn/ui token aliases, so stock components inherit the dynamic theme */
+  --color-background: var(--surface);
+  --color-foreground: var(--ink);
+  --color-popover: var(--surface);
+  --color-popover-foreground: var(--ink);
+  --color-card: var(--surface);
+  --color-card-foreground: var(--ink);
+  --color-primary: var(--ink);
+  --color-primary-foreground: var(--on-ink);
+  --color-muted-foreground: color-mix(in srgb, var(--ink) 70%, transparent);
+  --color-border: var(--ink);
+  --color-input: var(--ink);
+  --color-ring: var(--ink);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
 }
 
 @layer base {
-  * {
-    @apply border-border;
+  html {
+    background-color: var(--surface);
+    color: var(--ink);
+    color-scheme: light dark;
   }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-surface font-sans text-ink antialiased;
+  }
+
+  ::selection {
+    background-color: var(--ink);
+    color: var(--on-ink);
+  }
+
+  * {
+    border-color: var(--ink);
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
   }
 }
 
-.focus {
-  @apply focus-visible:outline-none focus-visible:ring focus-visible:ring-[--fg-display] focus-visible:ring-offset-4 focus-visible:ring-offset-[--bg];
+/* Consistent, high-visibility focus ring that follows the dynamic theme */
+@utility focus-ring {
+  @apply outline-offset-4 focus-visible:outline-3 focus-visible:outline-ink focus-visible:outline-solid;
 }
 
-.bg-dynamic {
-  background-color: rgba(255, 255, 255, 0);
-  background-clip: padding-box;
-  color: var(--fg-display);
-  border-color: var(--fg-display);
-}
-
-.bg-dynamic:hover,
-.bg-dynamic:focus {
-  background-color: var(--fg-display);
-  color: var(--fg-display-hover);
-}
-
-.bg-fg-display {
-  background-color: var(--fg-display);
-}
-
-.text-fg-display {
-  color: var(--fg-display);
-}
-
-.border-fg-display {
-  border-color: var(--fg-display);
-}
-
-.border-ghost {
-  border-color: rgba(255, 255, 255, 0);
-  background-clip: padding-box;
-}
-
-.border-ghost:hover,
-.border-ghost:focus {
-  border-color: var(--fg-display);
-}
-
-.border-ghost-select {
-  border-color: rgba(255, 255, 255, 0);
-  background-clip: padding-box;
-}
-
-.border-ghost-command {
-  border-color: rgba(255, 255, 255, 0);
-  background-clip: padding-box;
-}
-
-.ring-ghost-select {
-  box-shadow: 0 0 0 2px var(--fg-display);
-}
-
-.border-ghost-select:focus {
-  border-color: var(--fg-display);
-}
-
-.border-ghost-blind {
-  border-color: rgba(255, 255, 255, 0);
-  background-clip: padding-box;
-}
-.border-ghost-blind:hover,
-.border-ghost-blind:focus {
-  border-color: var(--bg-display);
-}
-
-.checkerboard-lg {
+@utility checkerboard-sm {
   background: repeating-conic-gradient(
       var(--checkerboard-color-light) 0 90deg,
       var(--checkerboard-color-dark) 0 180deg
     )
-    0 0 / var(--checkerboard-size-lg) var(--checkerboard-size-lg) round;
+    0 0 / 1rem 1rem round;
 }
 
-.checkerboard-md {
+@utility checkerboard-md {
   background: repeating-conic-gradient(
       var(--checkerboard-color-light) 0 90deg,
       var(--checkerboard-color-dark) 0 180deg
     )
-    0 0 / var(--checkerboard-size-md) var(--checkerboard-size-md) round;
+    0 0 / 3rem 3rem round;
 }
-.checkerboard-sm {
+
+@utility checkerboard-lg {
   background: repeating-conic-gradient(
       var(--checkerboard-color-light) 0 90deg,
       var(--checkerboard-color-dark) 0 180deg
     )
-    0 0 / var(--checkerboard-size-sm) var(--checkerboard-size-sm) round;
+    0 0 / 5rem 5rem round;
 }

@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
@@ -5,8 +7,6 @@ import { Button } from "@/components/ui/button";
 /**
  * A section with information and links related to the APCA standard.
  *
- * @param   {string}      displayColor  The display color calculated by getDisplayColor, necessary for styling
- *                                      the tooltip's border and text color.
  *
  * @returns                             The 'APCA' component, containing details and links related to the WCAG standard.
  *
@@ -14,22 +14,14 @@ import { Button } from "@/components/ui/button";
  * ```tsx
  * import { ApcaInfo } from "@/components/apca-info";
  *
- * const displayColor = "#000000";
- *
- * <ApcaInfo
- *   displayColor={displayColor}
- * />
+ * <ApcaInfo />
  * ```
  */
-const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
+const ApcaInfo = memo(() => {
   const t = useTranslations("ApcaInfo");
 
   return (
-    <section
-      id="apca-info"
-      className="flex flex-col gap-y-6"
-      style={{ color: displayColor }}
-    >
+    <section id="apca-info" className="flex flex-col gap-y-6">
       <h3 className="mb-0 text-xl font-bold md:text-2xl">{t("title")}</h3>
 
       <div className="flex flex-col gap-y-2">
@@ -133,13 +125,7 @@ const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
 
         <ul className="list-inside list-disc">
           <li>
-            <Button
-              asChild
-              variant="link"
-              size="auto"
-              className="text-base"
-              style={{ color: displayColor }}
-            >
+            <Button asChild variant="link" size="auto" className="text-base">
               <a
                 href={t(
                   "content.attributions.more-info-list.contrast-calculator.link-url",
@@ -154,13 +140,7 @@ const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
             </Button>
           </li>
           <li>
-            <Button
-              asChild
-              variant="link"
-              size="auto"
-              className="text-base"
-              style={{ color: displayColor }}
-            >
+            <Button asChild variant="link" size="auto" className="text-base">
               <a
                 href={t(
                   "content.attributions.more-info-list.readability-criterion.link-url",
@@ -175,13 +155,7 @@ const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
             </Button>
           </li>
           <li>
-            <Button
-              asChild
-              variant="link"
-              size="auto"
-              className="text-base"
-              style={{ color: displayColor }}
-            >
+            <Button asChild variant="link" size="auto" className="text-base">
               <a
                 href={t(
                   "content.attributions.more-info-list.apca-github.link-url",
@@ -194,13 +168,7 @@ const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
             </Button>
           </li>
           <li>
-            <Button
-              asChild
-              variant="link"
-              size="auto"
-              className="text-base"
-              style={{ color: displayColor }}
-            >
+            <Button asChild variant="link" size="auto" className="text-base">
               <a
                 href={t(
                   "content.attributions.more-info-list.w3c-draft.link-url",
@@ -228,13 +196,7 @@ const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
             {t(
               "content.disclaimer.accuracy-disclaimer-list.thresholds.description",
             )}{" "}
-            <Button
-              asChild
-              variant="link"
-              size="auto"
-              className="text-base"
-              style={{ color: displayColor }}
-            >
+            <Button asChild variant="link" size="auto" className="text-base">
               <a
                 href={t(
                   "content.disclaimer.accuracy-disclaimer-list.thresholds.link-url",
@@ -265,13 +227,7 @@ const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
 
         <ul className="list-inside list-disc">
           <li>
-            <Button
-              asChild
-              variant="link"
-              size="auto"
-              className="text-base"
-              style={{ color: displayColor }}
-            >
+            <Button asChild variant="link" size="auto" className="text-base">
               <a
                 href={t(
                   "content.further-reading.further-reading-list.accessibility-principles.link-url",
@@ -286,13 +242,7 @@ const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
             </Button>
           </li>
           <li>
-            <Button
-              asChild
-              variant="link"
-              size="auto"
-              className="text-base"
-              style={{ color: displayColor }}
-            >
+            <Button asChild variant="link" size="auto" className="text-base">
               <a
                 href={t(
                   "content.further-reading.further-reading-list.understanding-colors.link-url",
@@ -310,7 +260,7 @@ const ApcaInfo = ({ displayColor }: { displayColor: string }) => {
       </div>
     </section>
   );
-};
+});
 
 ApcaInfo.displayName = "ApcaInfo";
 
