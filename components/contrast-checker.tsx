@@ -31,6 +31,7 @@ import { Separator } from "@/components/ui/separator";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { WcagInfo } from "@/components/wcag-info";
 import {
+  buildFaviconHref,
   buildThemeVars,
   getLowContrastFallback,
   themeVarsToCss,
@@ -99,6 +100,25 @@ export function ContrastChecker({ initial }: { initial: CheckerState }) {
     }, URL_UPDATE_DELAY);
     return () => clearTimeout(timeout);
   }, [queryString]);
+
+  // Repaint the tab's favicon in the current colors. Next renders the static icon links (favicon.ico, icon.svg) on
+  // the server; pointing all of them at one generated SVG means the browser can't fall back to the static pink icon.
+  // Debounced like the URL so dragging the picker doesn't regenerate it every frame.
+  const faviconHref = useMemo(
+    () => buildFaviconHref(foreground, background),
+    [foreground, background],
+  );
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      document
+        .querySelectorAll<HTMLLinkElement>('link[rel="icon"]')
+        .forEach((link) => {
+          link.type = "image/svg+xml";
+          link.href = faviconHref;
+        });
+    }, URL_UPDATE_DELAY);
+    return () => clearTimeout(timeout);
+  }, [faviconHref]);
 
   useEffect(() => {
     if (!urlCopied) return;
