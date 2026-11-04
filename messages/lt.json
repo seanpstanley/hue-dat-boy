@@ -54,6 +54,12 @@
         "typeface": "šriftas",
         "color-blindness": "simuliuoti spalvų aklumą"
       }
+    },
+    "notice": {
+      "low-contrast": {
+        "black": "Šios spalvos per panašios sąsajai kurti, todėl ji perjungta į juodą. Žemiau esantys pavyzdžiai vis tiek rodo tikras jūsų spalvas.",
+        "white": "Šios spalvos per panašios sąsajai kurti, todėl ji perjungta į baltą. Žemiau esantys pavyzdžiai vis tiek rodo tikras jūsų spalvas."
+      }
     }
   },
   "FontPicker": {
@@ -94,8 +100,12 @@
   "Footer": {
     "text": "© {year} Sean Stanley. Sukurta naudojant {tech}.",
     "links": {
-      "github": { "alt": "Seano GitHub" },
-      "linkedin": { "alt": "Seano LinkedIn" }
+      "github": {
+        "alt": "Seano GitHub"
+      },
+      "linkedin": {
+        "alt": "Seano LinkedIn"
+      }
     }
   },
   "WcagInfo": {

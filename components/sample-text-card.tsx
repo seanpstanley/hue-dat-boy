@@ -137,6 +137,19 @@ const SampleTextCard = memo(
           className={cn({ "text-2xl": textSize === "large" })}
           style={font ? { fontFamily: `"${font}", sans-serif` } : undefined}
         >
+          {/* Type specimen: a big "Aa" in the chosen typeface makes the font (and large-text contrast) obvious */}
+          <span
+            aria-hidden
+            className={cn(
+              "mb-3 block leading-[0.85] font-extrabold tracking-tight",
+              font ? "" : "font-display-tight",
+              textSize === "large"
+                ? "text-7xl md:text-8xl"
+                : "text-5xl md:text-6xl",
+            )}
+          >
+            Aa
+          </span>
           {isLoading ? (
             <span>{t("loading")}</span>
           ) : (
