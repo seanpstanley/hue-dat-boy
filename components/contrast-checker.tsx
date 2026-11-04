@@ -3,12 +3,13 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { AccessibleIcon } from "@radix-ui/react-accessible-icon";
-import { ArrowLeftRight, Check, Clipboard, X } from "lucide-react";
+import { ArrowLeftRight, Check, Clipboard, Info, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { useAnimeQuote } from "@/app/hooks/use-anime-quote";
 import { ApcaInfo } from "@/components/apca-info";
 import { ColorField } from "@/components/color-field";
+import { ContrastMeter } from "@/components/contrast-meter";
 import { FontPicker } from "@/components/font-picker";
 import { Footer } from "@/components/footer";
 import { SampleIconCard, SampleTextCard } from "@/components/sample-text-card";
@@ -29,7 +30,11 @@ import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { WcagInfo } from "@/components/wcag-info";
-import { buildThemeVars, themeVarsToCss } from "@/lib/theme";
+import {
+  buildThemeVars,
+  getLowContrastFallback,
+  themeVarsToCss,
+} from "@/lib/theme";
 import { ColorBlindnessType } from "@/lib/types";
 import {
   CheckerState,
@@ -69,6 +74,8 @@ export function ContrastChecker({ initial }: { initial: CheckerState }) {
     () => themeVarsToCss(buildThemeVars(foreground, background, simulation)),
     [foreground, background, simulation],
   );
+
+  const lowContrastFallback = getLowContrastFallback(foreground, background);
 
   const queryString = serializeUrlState({
     foreground,
@@ -135,15 +142,39 @@ export function ContrastChecker({ initial }: { initial: CheckerState }) {
         />
       )}
 
-      <div className="min-h-screen bg-surface p-4 text-ink transition-colors">
-        <header className="mb-4 text-center md:mt-4 md:mb-6">
-          <span className="text-sm font-medium md:text-base">hue dat boy.</span>
+      <div className="relative isolate min-h-screen overflow-hidden bg-surface p-4 text-ink transition-colors">
+        {/* Decorative hatch behind the right side of the page */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 right-0 -z-10 w-[38%] hatch"
+        />
+
+        <header className="container mx-auto mb-6 md:mt-2 md:mb-10">
+          <span className="font-display-tight text-lg font-extrabold tracking-tight md:text-xl">
+            hue dat boy
+            <span
+              aria-hidden
+              className="ml-0.5 inline-block size-[0.55em] rounded-full border-2 border-ink bg-fg"
+            />
+          </span>
         </header>
 
         <main className="container mx-auto">
           <div className="mb-8 md:mb-12">
-            <h1 className="text-2xl font-semibold md:text-5xl">{t("title")}</h1>
+            <h1 className="font-display-tight text-4xl leading-[0.95] font-extrabold tracking-[-0.01em] text-balance [font-variation-settings:'wdth'_88,'opsz'_96] [word-spacing:0.06em] md:text-6xl lg:text-7xl">
+              {t("title")}
+            </h1>
           </div>
+
+          {lowContrastFallback && (
+            <p
+              role="status"
+              className="mb-8 flex items-start gap-3 rounded-lg border-3 border-dashed border-ink px-4 py-3 font-semibold"
+            >
+              <Info className="mt-0.5 size-5 shrink-0" aria-hidden />
+              {t(`notice.low-contrast.${lowContrastFallback}`)}
+            </p>
+          )}
 
           <ContrastSummary report={report} />
 
@@ -239,7 +270,7 @@ export function ContrastChecker({ initial }: { initial: CheckerState }) {
             {/* Font and Color Blindness Dropdowns */}
             <div className="flex flex-col gap-x-8 gap-y-4 md:flex-row">
               <div className="flex flex-1 flex-col gap-y-2">
-                <span id="typeface-label" className="text-base md:text-lg">
+                <span id="typeface-label" className="label-mono">
                   {t("labels.selects.typeface")}
                 </span>
                 <FontPicker
@@ -250,10 +281,7 @@ export function ContrastChecker({ initial }: { initial: CheckerState }) {
               </div>
 
               <div className="flex flex-1 flex-col gap-y-2">
-                <label
-                  htmlFor="colorblind-select"
-                  className="text-base md:text-lg"
-                >
+                <label htmlFor="colorblind-select" className="label-mono">
                   {t("labels.selects.color-blindness")}
                 </label>
                 <SimulationSelect value={simulation} onChange={setSimulation} />
@@ -262,7 +290,7 @@ export function ContrastChecker({ initial }: { initial: CheckerState }) {
 
             {/* Sample Text */}
             <section className="flex flex-col gap-y-4" id="sample-text">
-              <h3 className="text-xl font-semibold md:text-2xl">
+              <h3 className="font-display-tight text-2xl font-extrabold tracking-[-0.01em] md:text-3xl">
                 {t("sections.sample-text")}
               </h3>
 
@@ -297,63 +325,82 @@ export function ContrastChecker({ initial }: { initial: CheckerState }) {
   );
 }
 
-/** The big contrast number plus the pass/fail badges for each level of the active standard. */
+/** The big contrast number, pass/fail badges for each level of the active standard, and the contrast meter. */
 function ContrastSummary({ report }: { report: ContrastReport }) {
   const t = useTranslations("ContrastChecker");
   const isApca = report.standard === "apca";
 
-  const value = report.range ? (
-    isApca ? (
-      <>
-        {report.range.min} to {report.range.max} L<sup>c</sup>
-      </>
-    ) : (
-      <>
-        {report.range.min} : 1 to {report.range.max} : 1
-      </>
-    )
-  ) : isApca ? (
-    <>
-      {report.value} L<sup>c</sup>
-    </>
-  ) : (
-    <>{report.value} : 1</>
+  // Remember the previous levels so a badge can "stamp" only when it flips from fail to pass (not on page load)
+  const [prevLevels, setPrevLevels] = useState(report.levels);
+  const [stamped, setStamped] = useState<string[]>([]);
+  if (prevLevels !== report.levels) {
+    setPrevLevels(report.levels);
+    setStamped(
+      Object.keys(report.levels).filter(
+        (level) => report.levels[level] && prevLevels[level] === false,
+      ),
+    );
+  }
+
+  const unit = (text: string) => (
+    <span className="ml-[0.06em] text-[0.42em] font-medium tracking-normal">
+      {text}
+    </span>
   );
+  const unitText = isApca ? "Lc" : ":1";
 
   return (
-    <section
-      className="mb-8 flex flex-col items-start gap-y-4"
-      id="contrast-info"
-    >
-      <div className="flex w-full flex-col flex-wrap justify-between gap-x-8 gap-y-4 md:flex-row md:items-end">
-        <div className="flex w-fit flex-col gap-y-2 text-nowrap">
-          <span id="contrast-label" className="text-base md:text-lg">
+    <section className="mb-8 flex flex-col gap-y-4" id="contrast-info">
+      <div className="flex w-full flex-col justify-between gap-x-8 gap-y-4 md:flex-row md:items-end">
+        <div className="flex min-w-0 flex-col gap-y-2">
+          <span id="contrast-label" className="label-mono">
             {t("labels.contrast")}
           </span>
-          <div className="rounded-lg border-3 border-ink px-2.5 py-4">
+          {/* Inverted "poster" block: shows the pair in the other polarity, background on text */}
+          <div className="w-fit max-w-full rounded-lg bg-ink px-4 pt-3 pb-4 text-on-ink md:px-6">
             <h2
               aria-labelledby="contrast-label"
-              className="text-5xl font-bold tabular-nums sm:text-6xl md:text-7xl lg:text-8xl [&_sup]:-top-[0.9em] [&_sup]:-ml-[0.2em] [&_sup]:text-[0.45em]"
+              className={cn(
+                "font-display-tight leading-[0.82] font-extrabold tracking-tight whitespace-nowrap tabular-nums",
+                report.range
+                  ? "text-5xl sm:text-6xl md:text-7xl"
+                  : "text-7xl sm:text-8xl md:text-9xl lg:text-[10rem]",
+              )}
             >
-              {value}
+              {report.range ? (
+                <>
+                  {report.range.min}
+                  {unit(unitText)}{" "}
+                  <span className="text-[0.4em] font-medium">to</span>{" "}
+                  {report.range.max}
+                  {unit(unitText)}
+                </>
+              ) : (
+                <>
+                  {report.value}
+                  {unit(unitText)}
+                </>
+              )}
             </h2>
           </div>
         </div>
 
-        <div className="flex flex-col gap-y-2">
-          <span id="levels-label" className="text-base md:text-lg">
+        <div className="flex flex-col gap-y-2 md:items-end">
+          <span id="levels-label" className="label-mono">
             {isApca ? t("labels.badges.apca") : t("labels.badges.wcag")}
           </span>
           <ul
             aria-labelledby="levels-label"
-            className="ml-auto flex flex-wrap gap-2"
+            className="flex flex-wrap gap-2 md:justify-end"
           >
             {Object.entries(report.levels).map(([level, passes]) => (
               <li
-                key={level}
+                // Remounting on change replays the stamp animation each time a level flips to pass
+                key={`${report.standard}-${level}-${passes}`}
                 className={cn(
                   "inline-flex items-center justify-between gap-x-2 rounded-full border-3 border-ink px-4 py-2 text-base font-semibold transition-colors md:text-lg",
                   passes ? "bg-ink text-on-ink" : "bg-transparent text-ink",
+                  stamped.includes(level) && "motion-safe:animate-stamp",
                 )}
               >
                 {t(`badges.${report.standard}.${level}`)}
@@ -369,6 +416,8 @@ function ContrastSummary({ report }: { report: ContrastReport }) {
           </ul>
         </div>
       </div>
+
+      <ContrastMeter report={report} />
     </section>
   );
 }

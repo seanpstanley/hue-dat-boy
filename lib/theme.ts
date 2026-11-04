@@ -1,6 +1,8 @@
 import { ColorBlindnessType, RgbaColor } from "@/lib/types";
 import {
+  blendColors,
   getDisplayColor,
+  opaque,
   parseHex,
   rgbaToHex,
   rgbToHex,
@@ -39,4 +41,18 @@ export function themeVarsToCss(vars: Record<string, string>): string {
   return `:root{${Object.entries(vars)
     .map(([name, value]) => `${name}:${value}`)
     .join(";")}}`;
+}
+
+/**
+ * Whether the UI had to fall back to black or white because the text color is too low-contrast against the
+ * background to build an interface with ("low contrast mode"). Returns which color it switched to, or null.
+ */
+export function getLowContrastFallback(
+  foreground: RgbaColor,
+  background: RgbaColor,
+): "black" | "white" | null {
+  const ink = getDisplayColor(background, foreground);
+  const blended = rgbToHex(blendColors(foreground, opaque(background)));
+  if (ink === blended) return null;
+  return ink === "#000000" ? "black" : "white";
 }

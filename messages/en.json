@@ -54,6 +54,12 @@
         "typeface": "typeface",
         "color-blindness": "simulate color blindness"
       }
+    },
+    "notice": {
+      "low-contrast": {
+        "black": "These colors are too close to build the interface with, so it switched to black. The samples below still show your real colors.",
+        "white": "These colors are too close to build the interface with, so it switched to white. The samples below still show your real colors."
+      }
     }
   },
   "FontPicker": {
@@ -94,8 +100,12 @@
   "Footer": {
     "text": "© {year} Sean Stanley. Built with {tech}.",
     "links": {
-      "github": { "alt": "Sean's GitHub" },
-      "linkedin": { "alt": "Sean's LinkedIn" }
+      "github": {
+        "alt": "Sean's GitHub"
+      },
+      "linkedin": {
+        "alt": "Sean's LinkedIn"
+      }
     }
   },
   "WcagInfo": {
