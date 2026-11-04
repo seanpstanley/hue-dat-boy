@@ -274,7 +274,11 @@ export function ContrastChecker({ initial }: ContrastCheckerProps) {
                 onClick={handleCopyUrl}
                 variant="primary"
                 size="xl"
-                className="w-full gap-x-1 text-base sm:w-fit"
+                className={cn(
+                  "w-full gap-x-1 text-base sm:w-fit",
+                  // Hold the hovered (inverted) look while "copied url!" shows
+                  urlCopied && "bg-transparent text-ink",
+                )}
               >
                 {/* Both labels share one grid cell so the button keeps the wider width (no layout shift) */}
                 <span className="grid place-items-center">
