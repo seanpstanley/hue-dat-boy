@@ -20,6 +20,19 @@ const alertVariants = cva(
   },
 );
 
+/**
+ * A callout box with an optional leading icon. Variants: `default` (solid border) and `notice` (dashed, for notes
+ * about the app itself). Defaults to `role="alert"`; pass `role="status"` for anything that isn't urgent.
+ *
+ * @example
+ * ```tsx
+ * <Alert variant="notice" role="status">
+ *   <Info aria-hidden />
+ *   <AlertTitle>low contrast mode</AlertTitle>
+ *   <AlertDescription>The interface switched to black so it stays usable.</AlertDescription>
+ * </Alert>
+ * ```
+ */
 function Alert({
   className,
   variant,

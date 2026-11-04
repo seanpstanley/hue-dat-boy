@@ -9,7 +9,9 @@ import {
 } from "@/components/ui/tooltip";
 
 interface TooltipButtonProps {
+  /** The tooltip text. */
   tooltip: string;
+  /** The element that triggers the tooltip. It must accept a ref and props (any `Button` does). */
   children: ReactElement;
 }
 

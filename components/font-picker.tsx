@@ -5,8 +5,6 @@ import { memo, useState } from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { useGoogleFonts } from "@/app/hooks/use-google-fonts";
-import { useMediaQuery } from "@/app/hooks/use-media-query";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -27,13 +25,17 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useGoogleFonts } from "@/hooks/use-google-fonts";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { GoogleFontFamily } from "@/lib/types";
 import { cn } from "@/lib/utils/cn";
 
 interface FontPickerProps {
-  /** id of the element labelling the picker. */
+  /** `id` of the element labelling the picker. */
   labelledBy: string;
+  /** The selected font family, or `""` for none. */
   value: string;
+  /** Called with the chosen family, or `""` when the selected font is chosen again (to clear it). */
   onChange: (font: string) => void;
 }
 
@@ -116,12 +118,19 @@ const FontPicker = memo(({ labelledBy, value, onChange }: FontPickerProps) => {
 FontPicker.displayName = "FontPicker";
 
 interface FontListProps {
+  /** Every font to list. */
   fonts: GoogleFontFamily[];
+  /** The selected family, which gets a check mark. */
   selectedFont: string;
+  /** Called with the family of the clicked font. */
   onSelect: (font: string) => void;
+  /** Placeholder for the search input. */
   placeholder: string;
+  /** Shown when the search matches nothing. */
   emptyText: string;
 }
+
+/** The searchable list shared by the desktop popover and the mobile drawer. */
 
 const FontList = ({
   fonts,

@@ -5,10 +5,20 @@ import { KeyboardEvent, useRef } from "react";
 import { cn } from "@/lib/utils/cn";
 
 interface SegmentedControlProps<T extends string> {
+  /** The selected option's value. */
   value: T;
+  /** Called with the newly selected value (on click, or as arrow keys move the selection). */
   onChange: (value: T) => void;
-  options: { value: T; label: string }[];
+  /** The options, in display order. */
+  options: {
+    /** The value passed to `onChange`. */
+    value: T;
+    /** The visible text. */
+    label: string;
+  }[];
+  /** Accessible name for the group. */
   label: string;
+  /** Classes for the group container. */
   className?: string;
 }
 
@@ -16,6 +26,19 @@ interface SegmentedControlProps<T extends string> {
  * A two-or-more option picker drawn as connected segments, with the active one filled in ink.
  *
  * Semantically it's a radio group: arrow keys move (and select), and only the selected option is in the tab order.
+ *
+ * @example
+ * ```tsx
+ * <SegmentedControl
+ *   label="contrast standard"
+ *   value={standard}
+ *   onChange={setStandard}
+ *   options={[
+ *     { value: "wcag", label: "WCAG 2.2" },
+ *     { value: "apca", label: "APCA" },
+ *   ]}
+ * />
+ * ```
  */
 function SegmentedControl<T extends string>({
   value,

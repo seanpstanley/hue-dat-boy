@@ -58,7 +58,10 @@
         "typeface": "tipografía",
         "color-blindness": "simular daltonismo"
       },
-      "standard": "estándar de contraste"
+      "standard": "estándar de contraste",
+      "pass": "aprueba",
+      "fail": "no aprueba",
+      "range-to": "a"
     },
     "notice": {
       "low-contrast": {
@@ -344,5 +347,14 @@
     "hex": "valor hex",
     "eyedropper": "elegir un color de la pantalla",
     "recent": "colores recientes"
+  },
+  "Metadata": {
+    "title": "Verificador de contraste de color para WCAG y APCA",
+    "description": "Calcula la relación de contraste entre los colores de texto y fondo para comprobar los estándares de accesibilidad WCAG y APCA."
+  },
+  "NotFound": {
+    "title": "404",
+    "description": "No se encontró el recurso solicitado.",
+    "home": "Volver al inicio"
   }
 }

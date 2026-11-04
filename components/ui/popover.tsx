@@ -6,6 +6,19 @@ import * as PopoverPrimitive from "@radix-ui/react-popover";
 
 import { cn } from "@/lib/utils/cn";
 
+/**
+ * A themed popover (Radix Popover): ink border on the page background color.
+ *
+ * @example
+ * ```tsx
+ * <Popover>
+ *   <PopoverTrigger asChild>
+ *     <Button>enhance contrast</Button>
+ *   </PopoverTrigger>
+ *   <PopoverContent className="w-fit p-2">...</PopoverContent>
+ * </Popover>
+ * ```
+ */
 const Popover = PopoverPrimitive.Root;
 
 const PopoverTrigger = PopoverPrimitive.Trigger;

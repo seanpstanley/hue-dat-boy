@@ -5,13 +5,13 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowLeftRight, Check, Clipboard, Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { useAnimeQuote } from "@/app/hooks/use-anime-quote";
 import { ApcaInfo } from "@/components/apca-info";
 import { ColorField } from "@/components/color-field";
-import { ContrastMeter } from "@/components/contrast-meter";
+import { ContrastSummary } from "@/components/contrast-summary";
 import { FontPicker } from "@/components/font-picker";
 import { Footer } from "@/components/footer";
-import { SampleIconCard, SampleTextCard } from "@/components/sample-text-card";
+import { SampleIconCard, SampleTextCard } from "@/components/sample-cards";
+import { SimulationSelect } from "@/components/simulation-select";
 import { TooltipButton } from "@/components/tooltip-button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -21,44 +21,40 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { SegmentedControl } from "@/components/ui/segmented-control";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { WcagInfo } from "@/components/wcag-info";
+import { useAnimeQuote } from "@/hooks/use-anime-quote";
+import {
+  ENHANCE_GOALS,
+  EnhanceGoal,
+  enhanceContrast,
+  EnhanceTarget,
+  getContrastReport,
+  nextEnhanceGoal,
+} from "@/lib/contrast";
 import {
   buildFaviconHref,
   buildThemeVars,
   getLowContrastFallback,
   themeVarsToCss,
 } from "@/lib/theme";
-import { ColorBlindnessType, RgbaColor } from "@/lib/types";
-import {
-  CheckerState,
-  COLOR_BLINDNESS_TYPES,
-  serializeUrlState,
-} from "@/lib/url-state";
+import { CheckerState, serializeUrlState } from "@/lib/url-state";
 import { cn } from "@/lib/utils/cn";
-import { rgbToHex, simulateColorBlindness } from "@/lib/utils/color";
-import {
-  APCA_THRESHOLDS,
-  ContrastReport,
-  nextEnhanceGoal,
-  ENHANCE_GOALS,
-  EnhanceGoal,
-  enhanceContrast,
-  getContrastReport,
-  WCAG_THRESHOLDS,
-} from "@/lib/utils/contrast";
 
 /** How long the URL waits for changes to settle before updating (dragging the picker fires on every pointer move). */
 const URL_UPDATE_DELAY = 250;
 
-export function ContrastChecker({ initial }: { initial: CheckerState }) {
+interface ContrastCheckerProps {
+  /** The starting state, parsed from the URL on the server so the first paint already has the right colors. */
+  initial: CheckerState;
+}
+
+/**
+ * The whole checker: owns the color, standard, font and simulation state, keeps the URL and favicon in sync with it,
+ * and lays out the page. Rendered once by the locale page.
+ */
+export function ContrastChecker({ initial }: ContrastCheckerProps) {
   const [foreground, setForeground] = useState(initial.foreground);
   const [background, setBackground] = useState(initial.background);
   const [standard, setStandard] = useState(initial.standard);
@@ -78,11 +74,11 @@ export function ContrastChecker({ initial }: { initial: CheckerState }) {
   );
 
   const themeCss = useMemo(
-    () => themeVarsToCss(buildThemeVars(foreground, background, simulation)),
+    () => themeVarsToCss(buildThemeVars(background, foreground, simulation)),
     [foreground, background, simulation],
   );
 
-  const lowContrastFallback = getLowContrastFallback(foreground, background);
+  const lowContrastFallback = getLowContrastFallback(background, foreground);
 
   const queryString = serializeUrlState({
     foreground,
@@ -105,7 +101,7 @@ export function ContrastChecker({ initial }: { initial: CheckerState }) {
   // the server; pointing all of them at one generated SVG means the browser can't fall back to the static pink icon.
   // Debounced like the URL so dragging the picker doesn't regenerate it every frame.
   const faviconHref = useMemo(
-    () => buildFaviconHref(foreground, background),
+    () => buildFaviconHref(background, foreground),
     [foreground, background],
   );
   useEffect(() => {
@@ -146,7 +142,7 @@ export function ContrastChecker({ initial }: { initial: CheckerState }) {
   const goalLabel = (goal: EnhanceGoal) =>
     standard === "apca" ? `Lc ${ENHANCE_GOALS.apca[goal]}` : goal.toUpperCase();
 
-  const handleEnhanceContrast = (type: "text" | "background" | "both") => {
+  const handleEnhanceContrast = (type: EnhanceTarget) => {
     const enhanced = enhanceContrast(
       background,
       foreground,
@@ -355,6 +351,7 @@ export function ContrastChecker({ initial }: { initial: CheckerState }) {
                   {t("labels.selects.color-blindness")}
                 </label>
                 <SimulationSelect
+                  id="colorblind-select"
                   value={simulation}
                   onChange={setSimulation}
                   foreground={foreground}
@@ -397,177 +394,5 @@ export function ContrastChecker({ initial }: { initial: CheckerState }) {
         <Footer />
       </div>
     </TooltipProvider>
-  );
-}
-
-/** The big contrast number, pass/fail badges for each level of the active standard, and the contrast meter. */
-function ContrastSummary({ report }: { report: ContrastReport }) {
-  const t = useTranslations("ContrastChecker");
-  const isApca = report.standard === "apca";
-
-  // Remember the previous levels so a badge can "stamp" only when it flips from fail to pass (not on page load)
-  const [prevLevels, setPrevLevels] = useState(report.levels);
-  const [stamped, setStamped] = useState<string[]>([]);
-  if (prevLevels !== report.levels) {
-    setPrevLevels(report.levels);
-    setStamped(
-      Object.keys(report.levels).filter(
-        (level) => report.levels[level] && prevLevels[level] === false,
-      ),
-    );
-  }
-
-  const unit = (text: string) => (
-    <span className="ml-[0.06em] text-[0.42em] font-medium tracking-normal">
-      {text}
-    </span>
-  );
-  const unitText = isApca ? "Lc" : ":1";
-  const thresholds: Record<string, number> = isApca
-    ? APCA_THRESHOLDS
-    : WCAG_THRESHOLDS;
-
-  return (
-    <section className="mb-8 flex flex-col gap-y-4" id="contrast-info">
-      <div className="flex w-full flex-col justify-between gap-x-8 gap-y-4 md:flex-row md:items-end">
-        <div className="flex min-w-0 flex-col gap-y-2">
-          <span id="contrast-label" className="label-mono">
-            {t("labels.contrast")}
-          </span>
-          {/* Inverted "poster" block: shows the pair in the other polarity, background on text */}
-          <div className="w-fit max-w-full rounded-lg bg-ink px-4 pt-3 pb-4 text-on-ink md:px-6">
-            <h2
-              aria-labelledby="contrast-label"
-              className={cn(
-                "font-display-tight leading-[0.82] font-extrabold tracking-tight whitespace-nowrap tabular-nums",
-                report.range
-                  ? "text-5xl sm:text-6xl md:text-7xl"
-                  : "text-7xl sm:text-8xl md:text-9xl lg:text-[10rem]",
-              )}
-            >
-              {report.range ? (
-                <>
-                  {report.range.min}
-                  {unit(unitText)}{" "}
-                  <span className="text-[0.4em] font-medium">to</span>{" "}
-                  {report.range.max}
-                  {unit(unitText)}
-                </>
-              ) : (
-                <>
-                  {report.value}
-                  {unit(unitText)}
-                </>
-              )}
-            </h2>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-y-2 md:items-end">
-          <span id="levels-label" className="label-mono">
-            {isApca ? t("labels.badges.apca") : t("labels.badges.wcag")}
-          </span>
-          <ul
-            aria-labelledby="levels-label"
-            className="flex flex-wrap gap-2 md:justify-end"
-          >
-            {Object.entries(report.levels).map(([level, passes]) => (
-              <li
-                // Remounting on change replays the stamp animation each time a level flips to pass
-                key={`${report.standard}-${level}-${passes}`}
-                className={cn(
-                  "inline-grid grid-cols-[auto_auto] overflow-hidden rounded-lg border-3 border-ink text-base font-semibold md:text-lg",
-                  !passes && "border-dashed",
-                  stamped.includes(level) && "motion-safe:animate-stamp",
-                )}
-              >
-                <span
-                  className={cn(
-                    "inline-flex items-center gap-x-2 px-3 py-1.5",
-                    passes ? "bg-ink text-on-ink" : "line-through decoration-2",
-                  )}
-                >
-                  {t(`badges.${report.standard}.${level}`)}
-                  {passes && <Check className="size-5" aria-hidden />}
-                  <span className="sr-only">{passes ? "Pass" : "Fail"}</span>
-                </span>
-                {/* The required score, so the numbers sink in just by using the tool */}
-                <span
-                  className={cn(
-                    "inline-flex items-center border-l-3 border-ink px-2.5 font-mono text-sm",
-                    !passes && "border-dashed",
-                  )}
-                >
-                  {thresholds[level]}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      <ContrastMeter report={report} />
-    </section>
-  );
-}
-
-function SimulationSelect({
-  value,
-  onChange,
-  foreground,
-  background,
-}: {
-  value: ColorBlindnessType;
-  onChange: (value: ColorBlindnessType) => void;
-  foreground: RgbaColor;
-  background: RgbaColor;
-}) {
-  const t = useTranslations("ContrastChecker");
-  const labelFor = (simulation: ColorBlindnessType) =>
-    simulation === "normal vision"
-      ? t("selects.color-blindness.normal-vision")
-      : simulation;
-
-  // A preview of what the current pair looks like under each simulation
-  const swatches = (simulation: ColorBlindnessType) => (
-    <span aria-hidden className="inline-flex shrink-0 gap-1">
-      {[foreground, background].map((color, i) => (
-        <span
-          key={i}
-          className="size-4 rounded-[4px] border-2 border-current md:size-5"
-          style={{
-            backgroundColor: rgbToHex(
-              simulateColorBlindness(color, simulation),
-            ),
-          }}
-        />
-      ))}
-    </span>
-  );
-
-  return (
-    <Select value={value} onValueChange={onChange}>
-      <SelectTrigger
-        id="colorblind-select"
-        className="h-fit py-2 font-display-tight text-lg font-bold md:text-2xl"
-      >
-        <div className="flex min-w-0 items-center gap-3">
-          {swatches(value)}
-          <span className="truncate">{labelFor(value)}</span>
-        </div>
-      </SelectTrigger>
-      <SelectContent>
-        {COLOR_BLINDNESS_TYPES.map((simulation) => (
-          <SelectItem
-            key={simulation}
-            value={simulation}
-            aside={swatches(simulation)}
-            className="text-lg md:text-2xl"
-          >
-            {labelFor(simulation)}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
   );
 }

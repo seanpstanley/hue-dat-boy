@@ -10,9 +10,10 @@ import { TooltipButton } from "@/components/tooltip-button";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils/cn";
 
-interface CopyButtonProps {
-  /** The text to copy. */
+interface CopyColorButtonProps {
+  /** The text to copy, e.g. a hex color. */
   value: string;
+  /** Classes for the button, e.g. its size and position. */
   className?: string;
 }
 
@@ -24,7 +25,7 @@ interface CopyButtonProps {
  * <CopyColorButton value={rgbaToHex(foreground)} />
  * ```
  */
-const CopyColorButton = ({ value, className }: CopyButtonProps) => {
+const CopyColorButton = ({ value, className }: CopyColorButtonProps) => {
   const [copied, setCopied] = useState(false);
   const t = useTranslations("CopyColorButton");
 

@@ -58,7 +58,10 @@
         "typeface": "typeface",
         "color-blindness": "simulate color blindness"
       },
-      "standard": "contrast standard"
+      "standard": "contrast standard",
+      "pass": "pass",
+      "fail": "fail",
+      "range-to": "to"
     },
     "notice": {
       "low-contrast": {
@@ -345,5 +348,14 @@
     "hex": "hex value",
     "eyedropper": "pick a color from the screen",
     "recent": "recent colors"
+  },
+  "Metadata": {
+    "title": "Color Contrast Checker for WCAG & APCA",
+    "description": "Calculate the contrast ratio of text and background colors to test against WCAG and APCA accessibility standards."
+  },
+  "NotFound": {
+    "title": "404",
+    "description": "Could not find requested resource.",
+    "home": "Return home"
   }
 }

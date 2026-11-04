@@ -6,6 +6,14 @@ import * as SeparatorPrimitive from "@radix-ui/react-separator";
 
 import { cn } from "@/lib/utils/cn";
 
+/**
+ * A 2px rule in the ink color. Decorative (hidden from screen readers) unless `decorative={false}`.
+ *
+ * @example
+ * ```tsx
+ * <Separator className="my-8" />
+ * ```
+ */
 function Separator({
   className,
   orientation = "horizontal",

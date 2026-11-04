@@ -1,10 +1,15 @@
 import { useSyncExternalStore } from "react";
 
 /**
- * React hook to determine if a given media query matches. Returns `false` during server rendering.
+ * Tracks whether a CSS media query matches, updating when it changes.
+ *
+ * @param query - The media query, e.g. `"(min-width: 768px)"`.
+ * @returns Whether it matches. Always `false` during server rendering.
  *
  * @example
+ * ```tsx
  * const isDesktop = useMediaQuery("(min-width: 768px)");
+ * ```
  */
 export function useMediaQuery(query: string): boolean {
   return useSyncExternalStore(
