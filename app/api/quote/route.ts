@@ -1,27 +1,28 @@
-const BASE_URL = "https://animechan.io/api/v1";
+import { AnimechanQuote } from "@/lib/types";
+
+const BASE_URL = "https://api.animechan.io/v1";
+
+// Always fetch a fresh random quote
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
     const res = await fetch(`${BASE_URL}/quotes/random`, {
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization",
-      },
+      cache: "no-store",
     });
 
-    const data = await res.json();
+    if (!res.ok) {
+      // The free tier is rate limited, so this is expected occasionally; the client falls back to a pangram
+      return Response.json(
+        { error: `Animechan responded with ${res.status}` },
+        { status: 502 },
+      );
+    }
+
+    const { data }: { data: AnimechanQuote } = await res.json();
 
     return Response.json(data);
   } catch (error: unknown) {
-    // console.log(error);
-
-    return Response.json(`Error: ${error}`, {
-      status: 500,
-    });
-    //   return Response.json(
-    //     { message: error.message },
-    //     { status: 500 },
-    // );
+    return Response.json({ error: String(error) }, { status: 500 });
   }
 }

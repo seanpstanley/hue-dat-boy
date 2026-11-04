@@ -1,13 +1,13 @@
 /**
- * Fetches data from the specified URL and parses the response as JSON.
- *
- * @param {string} url - The URL to fetch data from.
- * @returns {Promise<any>} A promise that resolves to the parsed JSON response.
+ * Fetches JSON from the specified URL for SWR, throwing on non-2xx responses so SWR reports them as errors.
  *
  * @example
  * ```typescript
- * const data = await fetcher("https://api.example.com/data");
- * console.log(data);
+ * const data = await fetcher("/api/fonts");
  * ```
  */
-export const fetcher = (url: string) => fetch(url).then((res) => res.json());
+export const fetcher = async (url: string) => {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Request to ${url} failed with ${res.status}`);
+  return res.json();
+};

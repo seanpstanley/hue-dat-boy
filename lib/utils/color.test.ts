@@ -57,7 +57,7 @@ describe("Color Contrast Functions", () => {
 
   it("should calculate WCAG contrast ratio correctly", () => {
     expect(calculateWCAGContrast(white, black)).toBeCloseTo(21, 1);
-    expect(calculateWCAGContrast(white, red)).toBeCloseTo(4, 2);
+    expect(calculateWCAGContrast(white, red)).toBe(3.99); // 3.998, truncated (WCAG says never round up)
   });
 
   it("should determine display color for two low contrast colors correctly", () => {
@@ -113,5 +113,29 @@ describe("simulateColorBlindness", () => {
     expect(simulateColorBlindness(sampleColor, "unknown" as any)).toEqual(
       sampleColor,
     );
+  });
+});
+
+describe("hue handling", () => {
+  it("round-trips non-red hues through HSLA", () => {
+    const teal = { r: 0, g: 128, b: 128, a: 1 };
+    expect(hslaToRgba(rgbaToHsla(teal))).toEqual(teal);
+  });
+});
+
+describe("getDisplayColor with alpha", () => {
+  it("switches to black/white when semi-transparent text is too faint", () => {
+    expect(getDisplayColor(white, { ...black, a: 0.1 })).toBe("#000000");
+    expect(getDisplayColor(black, { ...white, a: 0.1 })).toBe("#ffffff");
+  });
+});
+
+describe("parseHex", () => {
+  it("accepts shorthand and rejects invalid values", async () => {
+    const { parseHex } = await import("./color");
+    expect(parseHex("#f00")).toEqual(red);
+    expect(parseHex("f008")).toEqual({ ...red, a: 0x88 / 255 });
+    expect(parseHex("#12345")).toBeNull();
+    expect(parseHex("nope")).toBeNull();
   });
 });

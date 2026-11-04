@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 import { MathJax, MathJaxContext } from "better-react-mathjax";
 import { useTranslations } from "next-intl";
 
@@ -15,8 +17,6 @@ declare global {
 /**
  * A section with information and links related to the WCAG standard.
  *
- * @param   {string}      displayColor  The display color calculated by getDisplayColor, necessary for styling
- *                                      the tooltip's border and text color.
  *
  * @returns                             The 'WcagInfo' component, containing details and links related to the WCAG standard.
  *
@@ -24,14 +24,10 @@ declare global {
  * ```tsx
  * import { WcagInfo } from "@/components/wcag-info";
  *
- * const displayColor = "#000000";
- *
- * <WcagInfo
- *   displayColor={displayColor}
- * />
+ * <WcagInfo />
  * ```
  */
-const WcagInfo = ({ displayColor }: { displayColor: string }) => {
+const WcagInfo = memo(() => {
   const t = useTranslations("WcagInfo");
 
   return (
@@ -62,11 +58,7 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
         },
       }}
     >
-      <section
-        id="wcag-info"
-        className="flex flex-col gap-y-6"
-        style={{ color: displayColor }}
-      >
+      <section id="wcag-info" className="flex flex-col gap-y-6">
         <h3 className="mb-0 text-xl font-bold md:text-2xl">{t("title")}</h3>
 
         <div className="flex flex-col gap-y-2">
@@ -227,13 +219,7 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
 
           <ul className="list-inside list-disc">
             <li>
-              <Button
-                asChild
-                variant="link"
-                size="auto"
-                className="text-base"
-                style={{ color: displayColor }}
-              >
+              <Button asChild variant="link" size="auto" className="text-base">
                 <a
                   href={t(
                     "content.attributions.more-info-list.wcag-overview.link-url",
@@ -248,13 +234,7 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
               </Button>
             </li>
             <li>
-              <Button
-                asChild
-                variant="link"
-                size="auto"
-                className="text-base"
-                style={{ color: displayColor }}
-              >
+              <Button asChild variant="link" size="auto" className="text-base">
                 <a
                   href={t(
                     "content.attributions.more-info-list.wcag-understanding.link-url",
@@ -293,13 +273,7 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
 
           <ul className="list-inside list-disc">
             <li>
-              <Button
-                asChild
-                variant="link"
-                size="auto"
-                className="text-base"
-                style={{ color: displayColor }}
-              >
+              <Button asChild variant="link" size="auto" className="text-base">
                 <a
                   href={t(
                     "content.further-reading.further-reading-list.wcag3-intro.link-url",
@@ -314,13 +288,7 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
               </Button>
             </li>
             <li>
-              <Button
-                asChild
-                variant="link"
-                size="auto"
-                className="text-base"
-                style={{ color: displayColor }}
-              >
+              <Button asChild variant="link" size="auto" className="text-base">
                 <a
                   href={t(
                     "content.further-reading.further-reading-list.color-contrast.link-url",
@@ -339,7 +307,7 @@ const WcagInfo = ({ displayColor }: { displayColor: string }) => {
       </section>
     </MathJaxContext>
   );
-};
+});
 
 WcagInfo.displayName = "WcagInfo";
 

@@ -2,11 +2,9 @@
 
 import * as React from "react";
 
-import { type DialogProps } from "@radix-ui/react-dialog";
 import { Command as CommandPrimitive } from "cmdk";
 import { Search } from "lucide-react";
 
-import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils/cn";
 
 const Command = React.forwardRef<
@@ -16,7 +14,7 @@ const Command = React.forwardRef<
   <CommandPrimitive
     ref={ref}
     className={cn(
-      "flex h-full w-full flex-col overflow-hidden rounded-md bg-transparent text-popover-foreground",
+      "flex h-full w-full flex-col overflow-hidden rounded-md bg-transparent text-ink",
       className,
     )}
     {...props}
@@ -24,24 +22,12 @@ const Command = React.forwardRef<
 ));
 Command.displayName = CommandPrimitive.displayName;
 
-const CommandDialog = ({ children, ...props }: DialogProps) => {
-  return (
-    <Dialog {...props}>
-      <DialogContent className="overflow-hidden p-0 shadow-lg">
-        <Command className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
-          {children}
-        </Command>
-      </DialogContent>
-    </Dialog>
-  );
-};
-
 const CommandInput = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Input>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
 >(({ className, ...props }, ref) => (
   <div
-    className="border-fg-display text-fg-display flex items-center border-b-2 px-3"
+    className="flex items-center border-b-3 border-ink px-3 text-ink"
     cmdk-input-wrapper=""
     {...props}
   >
@@ -49,7 +35,7 @@ const CommandInput = React.forwardRef<
     <CommandPrimitive.Input
       ref={ref}
       className={cn(
-        "flex h-11 w-full rounded-md bg-transparent py-2 text-lg outline-none placeholder:text-white/60 disabled:cursor-not-allowed disabled:opacity-50 md:text-xl",
+        "flex h-11 w-full rounded-md bg-transparent py-2 text-lg outline-hidden placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 md:text-xl",
         className,
       )}
       {...props}
@@ -66,7 +52,7 @@ const CommandList = React.forwardRef<
   <CommandPrimitive.List
     ref={ref}
     className={cn(
-      "max-h-[300px] overflow-y-auto overflow-x-hidden p-1",
+      "max-h-[300px] overflow-x-hidden overflow-y-auto p-1",
       className,
     )}
     {...props}
@@ -95,7 +81,7 @@ const CommandGroup = React.forwardRef<
   <CommandPrimitive.Group
     ref={ref}
     className={cn(
-      "overflow-hidden p-1 text-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground",
+      "overflow-hidden p-1 text-ink [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground",
       className,
     )}
     {...props}
@@ -110,7 +96,7 @@ const CommandSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Separator
     ref={ref}
-    className={cn("-mx-1 h-px bg-border", className)}
+    className={cn("-mx-1 h-px bg-ink", className)}
     {...props}
   />
 ));
@@ -123,7 +109,7 @@ const CommandItem = React.forwardRef<
   <CommandPrimitive.Item
     ref={ref}
     className={cn(
-      "border-ghost-command text-fg-display relative flex cursor-default select-none items-center gap-2 rounded-sm border-3 px-2 py-1.5 text-lg outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:border-[--fg-display] data-[disabled=true]:opacity-50 md:text-2xl [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+      "relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-lg text-ink outline-hidden select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 data-[selected=true]:bg-ink data-[selected=true]:text-on-ink md:text-2xl [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
       className,
     )}
     {...props}
@@ -150,7 +136,6 @@ CommandShortcut.displayName = "CommandShortcut";
 
 export {
   Command,
-  CommandDialog,
   CommandInput,
   CommandList,
   CommandEmpty,

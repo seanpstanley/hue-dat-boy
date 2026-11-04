@@ -46,7 +46,7 @@ export interface AnimechanQuote {
 export interface GoogleFont {
   family: string;
   variants: string[];
-  subets: string[];
+  subsets: string[];
   version: string;
   lastModified: string;
   files: Record<string, string>;
@@ -54,3 +54,6 @@ export interface GoogleFont {
   kind: string;
   menu: string;
 }
+
+/* The trimmed-down font info returned by /api/fonts */
+export type GoogleFontFamily = Pick<GoogleFont, "family" | "category">;

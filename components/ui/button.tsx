@@ -6,56 +6,57 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils/cn";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap focus-ring transition-colors disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 ",
-        destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90 ",
-        outline: "bg-opacity-0 hover:bg-opacity-100 border-3",
+        // Outlined in the ink color, fills in on hover/focus
+        outline:
+          "border-3 border-ink bg-transparent text-ink hover:bg-ink hover:text-on-ink focus-visible:bg-ink focus-visible:text-on-ink",
+        // Borderless until hovered/focused
         "ghost-outline":
-          "border-3 border-opacity-0 hover:border-opacity-100 focus-visible:ring-0 focus-visible:ring-transparent",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-white/30 hover:backdrop-blur-sm",
-        link: "text-primary underline-offset-4 hover:underline text-wrap focus-visible:ring-offset-0",
+          "border-3 border-transparent hover:border-ink focus-visible:border-ink",
+        // Menu-style item, fills in on hover/focus
+        ghost:
+          "hover:bg-ink hover:text-on-ink focus-visible:bg-ink focus-visible:text-on-ink",
+        link: "text-wrap text-ink underline underline-offset-4 hover:decoration-2",
         naked: "",
       },
       size: {
         default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md px-3",
-        lg: "h-11 rounded-md px-8",
-        xl: "h-12 rounded-md px-6",
-        icon: "h-10 w-10",
-        auto: "w-auto h-auto",
+        sm: "h-9 px-3",
+        lg: "h-11 px-8",
+        xl: "h-12 px-6",
+        icon: "size-10",
+        auto: "h-auto w-auto",
       },
     },
     defaultVariants: {
-      variant: "default",
+      variant: "outline",
       size: "default",
     },
   },
 );
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  extends React.ComponentProps<"button">, VariantProps<typeof buttonVariants> {
   asChild?: boolean;
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : "button";
-    return (
-      <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
-        ref={ref}
-        {...props}
-      />
-    );
-  },
-);
-Button.displayName = "Button";
+function Button({
+  className,
+  variant,
+  size,
+  asChild = false,
+  ...props
+}: ButtonProps) {
+  const Comp = asChild ? Slot : "button";
+  return (
+    <Comp
+      className={cn(buttonVariants({ variant, size, className }))}
+      {...props}
+    />
+  );
+}
 
 export { Button, buttonVariants };
