@@ -83,8 +83,8 @@ const SampleCard = ({
         <SheetClose asChild>
           <Button
             size="auto"
-            variant="naked"
-            className="absolute top-4 right-4 size-10 border-3 border-ink bg-surface p-1.5 text-ink hover:bg-ink hover:text-on-ink"
+            variant="ghost-outline"
+            className="absolute top-4 right-4 size-10 p-1.5 text-sim-ink hover:border-sim-ink focus-visible:border-sim-ink focus-visible:outline-sim-ink"
           >
             <X className="size-full!" />
             <span className="sr-only">{t("buttons.close.alt")}</span>

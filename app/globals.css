@@ -16,6 +16,7 @@
  *   --on-ink         readable color on --ink (always the surface color)
  *   --fg / --bg      the exact user colors, alpha included
  *   --sim-*          the same, run through the selected color blindness simulation
+ *                    (--sim-ink is the readable UI color on the simulated background)
  */
 :root {
   --surface: #f5b4c5;
@@ -25,6 +26,7 @@
   --bg: #f5b4c5;
   --sim-fg: #322e2b;
   --sim-bg: #f5b4c5;
+  --sim-ink: #322e2b;
   --sim-frame: #322e2b;
   --sim-on-frame: #f5b4c5;
 
@@ -41,6 +43,7 @@
   --color-bg: var(--bg);
   --color-sim-fg: var(--sim-fg);
   --color-sim-bg: var(--sim-bg);
+  --color-sim-ink: var(--sim-ink);
   --color-sim-frame: var(--sim-frame);
   --color-sim-on-frame: var(--sim-on-frame);
 

@@ -31,6 +31,8 @@ export function buildThemeVars(
     "--bg": rgbaToHex(background),
     "--sim-fg": rgbaToHex(simFg),
     "--sim-bg": rgbaToHex(simBg),
+    // Readable UI color on the simulated background (e.g. the fullscreen sheet's close button)
+    "--sim-ink": getDisplayColor(simBg, simFg),
     "--sim-frame": simFrame,
     "--sim-on-frame": getDisplayColor(parseHex(simFrame)!, simBg),
   };
