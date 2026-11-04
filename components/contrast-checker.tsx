@@ -13,6 +13,7 @@ import { FontPicker } from "@/components/font-picker";
 import { Footer } from "@/components/footer";
 import { SampleIconCard, SampleTextCard } from "@/components/sample-text-card";
 import { TooltipButton } from "@/components/tooltip-button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -45,7 +46,9 @@ import { rgbToHex, simulateColorBlindness } from "@/lib/utils/color";
 import {
   APCA_THRESHOLDS,
   ContrastReport,
-  ENHANCE_MINIMUM,
+  nextEnhanceGoal,
+  ENHANCE_GOALS,
+  EnhanceGoal,
   enhanceContrast,
   getContrastReport,
   WCAG_THRESHOLDS,
@@ -62,6 +65,7 @@ export function ContrastChecker({ initial }: { initial: CheckerState }) {
   const [simulation, setSimulation] = useState(initial.simulation);
 
   const [enhanceMenuOpen, setEnhanceMenuOpen] = useState(false);
+  const [enhanceGoal, setEnhanceGoal] = useState<EnhanceGoal>("aa");
   const [urlCopied, setUrlCopied] = useState(false);
 
   const t = useTranslations("ContrastChecker");
@@ -118,26 +122,22 @@ export function ContrastChecker({ initial }: { initial: CheckerState }) {
     setBackground(foreground);
   };
 
+  const nextGoal = nextEnhanceGoal(report.score, standard);
+  const goalLabel = (goal: EnhanceGoal) =>
+    standard === "apca" ? `Lc ${ENHANCE_GOALS.apca[goal]}` : goal.toUpperCase();
+
   const handleEnhanceContrast = (type: "text" | "background" | "both") => {
-    const enhanced = enhanceContrast(background, foreground, type, standard);
+    const enhanced = enhanceContrast(
+      background,
+      foreground,
+      type,
+      standard,
+      enhanceGoal,
+    );
     setBackground(enhanced.background);
     setForeground(enhanced.foreground);
     setEnhanceMenuOpen(false);
   };
-
-  const isOpaque = foreground.a === 1 && background.a === 1;
-  const enhanceBlockedReason = !isOpaque
-    ? t("buttons.enhance.reason.alpha")
-    : report.score >= ENHANCE_MINIMUM[standard]
-      ? t("buttons.enhance.reason.passes", {
-          level: standard === "apca" ? "Lc 75" : "AA",
-        })
-      : null;
-
-  const canEnhance =
-    report.score < ENHANCE_MINIMUM[standard] &&
-    foreground.a === 1 &&
-    background.a === 1; // only usable on fully opaque colors
 
   return (
     <TooltipProvider>
@@ -172,13 +172,13 @@ export function ContrastChecker({ initial }: { initial: CheckerState }) {
           </div>
 
           {lowContrastFallback && (
-            <p
-              role="status"
-              className="mb-8 flex items-start gap-3 rounded-lg border-3 border-dashed border-ink px-4 py-3 font-semibold"
-            >
-              <Info className="mt-0.5 size-5 shrink-0" aria-hidden />
-              {t(`notice.low-contrast.${lowContrastFallback}`)}
-            </p>
+            // role="status" rather than "alert": it's an explanation, not something urgent to interrupt for
+            <Alert variant="notice" role="status" className="mb-8">
+              <Info aria-hidden />
+              <AlertDescription className="font-semibold">
+                {t(`notice.low-contrast.${lowContrastFallback}`)}
+              </AlertDescription>
+            </Alert>
           )}
 
           <ContrastSummary report={report} />
@@ -197,22 +197,49 @@ export function ContrastChecker({ initial }: { initial: CheckerState }) {
               />
 
               {/* Enhance Colors */}
-              <Popover open={enhanceMenuOpen} onOpenChange={setEnhanceMenuOpen}>
+              <Popover
+                open={enhanceMenuOpen}
+                onOpenChange={(open) => {
+                  // Each time the menu opens, default to the next level the pair doesn't meet yet
+                  if (open && nextGoal) setEnhanceGoal(nextGoal);
+                  setEnhanceMenuOpen(open);
+                }}
+              >
                 <PopoverTrigger asChild>
                   <Button
                     size="xl"
-                    disabled={!canEnhance}
+                    disabled={!nextGoal}
                     className="w-full text-base sm:ml-auto sm:w-fit"
                   >
                     {t("buttons.enhance.title")}
-                    {enhanceBlockedReason && (
+                    {!nextGoal && (
                       <span className="font-mono text-xs font-semibold tracking-wide uppercase">
-                        {enhanceBlockedReason}
+                        {t("buttons.enhance.reason.passes", {
+                          level: goalLabel("aaa"),
+                        })}
                       </span>
                     )}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="grid w-fit p-2">
+                <PopoverContent className="grid w-fit min-w-52 gap-1 p-2">
+                  {/* Only offer a choice when neither goal is met yet */}
+                  {nextGoal === "aa" && (
+                    <div className="mb-1 flex items-center justify-between gap-3 px-2 pt-1">
+                      <span className="label-mono">
+                        {t("buttons.enhance.goal")}
+                      </span>
+                      <SegmentedControl
+                        label={t("buttons.enhance.goal")}
+                        value={enhanceGoal}
+                        onChange={setEnhanceGoal}
+                        options={(["aa", "aaa"] as const).map((goal) => ({
+                          value: goal,
+                          label: goalLabel(goal),
+                        }))}
+                        className="[&_button]:px-2.5 [&_button]:py-1 [&_button]:text-sm"
+                      />
+                    </div>
+                  )}
                   {(["text", "background", "both"] as const).map((type) => (
                     <Button
                       key={type}

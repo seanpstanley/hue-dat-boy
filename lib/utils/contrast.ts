@@ -1,13 +1,8 @@
 import { calcAPCA } from "apca-w3";
 
 import { RgbaColor } from "@/lib/types";
-import {
-  blendColors,
-  calculateWCAGContrast,
-  hslaToRgba,
-  opaque,
-  rgbaToHsla,
-} from "@/lib/utils/color";
+import { blendColors, calculateWCAGContrast, opaque } from "@/lib/utils/color";
+import { deltaEOK, oklchToRgba, rgbaToOklch } from "@/lib/utils/oklch";
 
 export type ContrastStandard = "wcag" | "apca";
 
@@ -28,17 +23,30 @@ export const APCA_THRESHOLDS: Record<ApcaLevel, number> = {
   non_text: 45,
 };
 
-/** Score at which the "enhance contrast" button is no longer needed. */
-export const ENHANCE_MINIMUM: Record<ContrastStandard, number> = {
-  wcag: WCAG_THRESHOLDS.aa_normal,
-  apca: APCA_THRESHOLDS.normal_text,
+export type EnhanceGoal = "aa" | "aaa";
+
+/**
+ * What "enhance contrast" can aim for. "aa" is the body text minimum (WCAG AA normal / APCA Lc 75); "aaa" is the
+ * enhanced level (WCAG AAA normal / APCA Lc 90, APCA's preferred level for body text).
+ */
+export const ENHANCE_GOALS: Record<
+  ContrastStandard,
+  Record<EnhanceGoal, number>
+> = {
+  wcag: { aa: WCAG_THRESHOLDS.aa_normal, aaa: WCAG_THRESHOLDS.aaa_normal },
+  apca: { aa: APCA_THRESHOLDS.normal_text, aaa: 90 },
 };
 
-/** Score "enhance contrast" aims for. */
-const ENHANCE_TARGET: Record<ContrastStandard, number> = {
-  wcag: WCAG_THRESHOLDS.aaa_normal,
-  apca: APCA_THRESHOLDS.normal_text,
-};
+/** The lowest goal the pair doesn't meet yet, or null if it already meets every goal. */
+export function nextEnhanceGoal(
+  score: number,
+  standard: ContrastStandard,
+): EnhanceGoal | null {
+  const goals = ENHANCE_GOALS[standard];
+  if (score < goals.aa) return "aa";
+  if (score < goals.aaa) return "aaa";
+  return null;
+}
 
 /**
  * Calculates the signed APCA lightness contrast (Lc) of `fg` text on an opaque `bg`. Text alpha is blended over the
@@ -130,52 +138,115 @@ export function getContrastReport(
 }
 
 /**
- * Finds the smallest lightness change to `color` that reaches the target score against `other`. If the target can't
- * be reached, returns the best candidate found (the lightness sweep ends at pure black and pure white, which are the
- * highest-contrast options available).
+ * The pass/fail score for a pair, including transparency: text alpha is blended over the background, and a
+ * semi-transparent background is judged by its worst case across backdrops (the same rule the score display uses).
  */
-function adjustLightness(
-  color: RgbaColor,
-  other: RgbaColor,
-  isBackground: boolean,
+function worstCaseScore(
+  bg: RgbaColor,
+  fg: RgbaColor,
   standard: ContrastStandard,
-): RgbaColor {
-  const target = ENHANCE_TARGET[standard];
-  const hsl = rgbaToHsla(color);
-  const score = (candidate: RgbaColor) =>
-    isBackground
-      ? contrastScore(candidate, other, standard)
-      : contrastScore(other, candidate, standard);
-
-  let best = color;
-  let bestScore = score(color);
-
-  for (let delta = 1; delta <= 100; delta++) {
-    for (const l of [hsl.l + delta, hsl.l - delta]) {
-      if (l < 0 || l > 100) continue;
-
-      const candidate = hslaToRgba({ ...hsl, l });
-      const candidateScore = score(candidate);
-
-      if (candidateScore >= target) return candidate;
-      if (candidateScore > bestScore) {
-        best = candidate;
-        bestScore = candidateScore;
-      }
-    }
-  }
-
-  return best;
+): number {
+  return bg.a < 1
+    ? calculateContrastRange(bg, fg, standard).min
+    : contrastScore(bg, fg, standard);
 }
 
 /**
- * Enhances the contrast between a background and a foreground color by adjusting lightness (keeping hue and
- * saturation) as little as possible.
+ * Returns a function that gives `color` at any OKLCH lightness (keeping its hue, chroma where displayable, and alpha).
+ * Results are cached, since the searches below revisit the same lightness values.
+ */
+function lightnessLadder(color: RgbaColor) {
+  const base = rgbaToOklch(color);
+  const cache = new Map<number, RgbaColor>();
+
+  return {
+    l: base.l,
+    at(l: number) {
+      const key = Math.round(Math.min(1, Math.max(0, l)) * 1e4) / 1e4;
+      let result = cache.get(key);
+      if (!result) {
+        result = oklchToRgba({ ...base, l: key });
+        cache.set(key, result);
+      }
+      return result;
+    },
+  };
+}
+
+const COARSE_STEP = 0.01;
+const BISECT_ITERATIONS = 12;
+
+/**
+ * Finds the smallest lightness change to a color that reaches `target`, trying both lighter and darker. Each
+ * direction walks in coarse steps until it passes, then bisects back to land just above the threshold instead of
+ * overshooting it.
+ *
+ * @returns `found`: the closest passing color (or null if neither direction can reach the target), and `best`: the
+ *          highest-scoring color seen, as a fallback.
+ */
+function searchLightness(
+  ladder: ReturnType<typeof lightnessLadder>,
+  scoreOf: (candidate: RgbaColor) => number,
+  target: number,
+) {
+  const original = ladder.at(ladder.l);
+  let best = { color: original, score: scoreOf(original) };
+  if (best.score >= target) {
+    return { found: { color: original, delta: 0 }, best };
+  }
+
+  let found: { color: RgbaColor; delta: number } | null = null;
+
+  for (const direction of [1, -1]) {
+    let previous = ladder.l;
+
+    for (let step = 1; step <= 100; step++) {
+      const l = Math.min(
+        1,
+        Math.max(0, ladder.l + direction * step * COARSE_STEP),
+      );
+      const score = scoreOf(ladder.at(l));
+      if (score > best.score) best = { color: ladder.at(l), score };
+
+      if (score >= target) {
+        let failing = previous;
+        let passing = l;
+        for (let i = 0; i < BISECT_ITERATIONS; i++) {
+          const mid = (failing + passing) / 2;
+          if (scoreOf(ladder.at(mid)) >= target) passing = mid;
+          else failing = mid;
+        }
+        const delta = Math.abs(passing - ladder.l);
+        if (!found || delta < found.delta) {
+          found = { color: ladder.at(passing), delta };
+        }
+        break;
+      }
+
+      previous = l;
+      if (l === 0 || l === 1) break;
+    }
+  }
+
+  return { found, best };
+}
+
+/**
+ * Enhances the contrast between a background and a foreground color as gently as possible.
+ *
+ * Colors are adjusted along OKLCH lightness, so they keep their hue and colorfulness (HSL lightness, used previously,
+ * shifts how saturated and even which hue a color looks). The result lands just above the goal rather than past it.
+ * For "both", it searches combinations of text and background lightness for the smallest combined perceived change
+ * (sum of squared ΔEOK, which favors sharing the change between the two colors over moving just one). Transparency is
+ * preserved, and semi-transparent backgrounds are judged by their worst case.
+ *
+ * If the goal can't be reached at all (e.g. very transparent text), the highest-contrast option found is returned.
  *
  * @param background - The RGBA color object representing the background color.
  * @param foreground - The RGBA color object representing the foreground color.
  * @param type - Specifies which color(s) to adjust: "text", "background", or "both".
  * @param standard - Which contrast standard to target.
+ * @param goal - Which level to aim for (defaults to the body text minimum).
  * @returns An object containing the adjusted background and foreground colors as RGBA objects.
  */
 export function enhanceContrast(
@@ -183,55 +254,80 @@ export function enhanceContrast(
   foreground: RgbaColor,
   type: "text" | "background" | "both",
   standard: ContrastStandard,
+  goal: EnhanceGoal = "aa",
 ): { background: RgbaColor; foreground: RgbaColor } {
+  const target = ENHANCE_GOALS[standard][goal];
+  const fgLadder = lightnessLadder(foreground);
+  const bgLadder = lightnessLadder(background);
+
   if (type === "text") {
-    return {
-      background,
-      foreground: adjustLightness(foreground, background, false, standard),
-    };
+    const { found, best } = searchLightness(
+      fgLadder,
+      (fg) => worstCaseScore(background, fg, standard),
+      target,
+    );
+    return { background, foreground: (found ?? best).color };
   }
 
   if (type === "background") {
-    return {
-      background: adjustLightness(background, foreground, true, standard),
-      foreground,
-    };
+    const { found, best } = searchLightness(
+      bgLadder,
+      (bg) => worstCaseScore(bg, foreground, standard),
+      target,
+    );
+    return { background: (found ?? best).color, foreground };
   }
 
-  // "both": push the two colors apart symmetrically, so each one changes about half as much
-  const target = ENHANCE_TARGET[standard];
-  const fgHsl = rgbaToHsla(foreground);
-  const bgHsl = rgbaToHsla(background);
-  const clamp = (l: number) => Math.min(100, Math.max(0, l));
+  // "both": for each candidate text lightness, find the closest passing background, and keep the cheapest pair
+  type Pair = { background: RgbaColor; foreground: RgbaColor };
+  const result: {
+    cheapest: { pair: Pair; cost: number } | null;
+    strongest: { pair: Pair; score: number };
+  } = {
+    cheapest: null,
+    strongest: {
+      pair: { background, foreground },
+      score: worstCaseScore(background, foreground, standard),
+    },
+  };
 
-  let best = { background, foreground };
-  let bestScore = contrastScore(background, foreground, standard);
+  const tryTextLightness = (l: number) => {
+    const fg = fgLadder.at(l);
+    const { found, best } = searchLightness(
+      bgLadder,
+      (bg) => worstCaseScore(bg, fg, standard),
+      target,
+    );
 
-  for (let delta = 1; delta <= 100; delta++) {
-    for (const direction of [1, -1]) {
-      const candidate = {
-        foreground: hslaToRgba({
-          ...fgHsl,
-          l: clamp(fgHsl.l + direction * delta),
-        }),
-        background: hslaToRgba({
-          ...bgHsl,
-          l: clamp(bgHsl.l - direction * delta),
-        }),
-      };
-      const candidateScore = contrastScore(
-        candidate.background,
-        candidate.foreground,
-        standard,
-      );
-
-      if (candidateScore >= target) return candidate;
-      if (candidateScore > bestScore) {
-        best = candidate;
-        bestScore = candidateScore;
+    if (found) {
+      const cost =
+        deltaEOK(fg, foreground) ** 2 + deltaEOK(found.color, background) ** 2;
+      if (!result.cheapest || cost < result.cheapest.cost) {
+        result.cheapest = {
+          pair: { background: found.color, foreground: fg },
+          cost,
+        };
       }
+    } else if (best.score > result.strongest.score) {
+      result.strongest = {
+        pair: { background: best.color, foreground: fg },
+        score: best.score,
+      };
+    }
+  };
+
+  // Coarse pass over the whole lightness range (coarser when the background is transparent, since every score then
+  // samples 18 backdrops), then a fine pass around the cheapest pair found
+  const coarse = background.a < 1 ? 0.05 : 0.02;
+  for (let l = 0; l <= 1 + 1e-9; l += coarse) tryTextLightness(l);
+  tryTextLightness(fgLadder.l);
+
+  if (result.cheapest) {
+    const center = rgbaToOklch(result.cheapest.pair.foreground).l;
+    for (let l = center - coarse; l <= center + coarse; l += coarse / 10) {
+      tryTextLightness(l);
     }
   }
 
-  return best;
+  return result.cheapest?.pair ?? result.strongest.pair;
 }
