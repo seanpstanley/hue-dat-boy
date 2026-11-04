@@ -140,15 +140,6 @@
   text-transform: uppercase;
 }
 
-/* Faint diagonal hatch in the ink color, behind the hero */
-@utility hatch {
-  background-image: repeating-linear-gradient(
-    -45deg,
-    transparent 0 18px,
-    color-mix(in srgb, var(--ink) 9%, transparent) 18px 21px
-  );
-}
-
 /* Badge "stamp" when a level flips from fail to pass */
 @keyframes stamp {
   0% {
@@ -164,4 +155,67 @@
 
 @utility animate-stamp {
   animation: stamp 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/*
+ * Color picker (react-colorful). Its own styles are injected at runtime, so these are scoped under .color-picker
+ * to win on specificity.
+ */
+.color-picker .react-colorful {
+  width: 100%;
+  height: auto;
+  gap: 12px;
+}
+
+.color-picker .react-colorful__saturation {
+  height: 160px;
+  flex-grow: 0;
+  border-radius: 0;
+  border-bottom: 3px solid var(--ink);
+  box-shadow: none;
+}
+
+.color-picker .react-colorful__hue,
+.color-picker .react-colorful__alpha {
+  height: 22px;
+  margin-inline: 12px;
+  border: 3px solid var(--ink);
+  border-radius: 6px;
+}
+
+.color-picker .react-colorful__alpha-gradient {
+  border-radius: 3px;
+}
+
+/* Saturation handle: a fat white ring with an ink outline, visible on any color */
+.color-picker .react-colorful__pointer {
+  width: 24px;
+  height: 24px;
+  border: 4px solid #fff;
+  box-shadow: 0 0 0 3px var(--ink);
+}
+
+/* Slider handles: tall rounded bars */
+.color-picker .react-colorful__hue-pointer,
+.color-picker .react-colorful__alpha-pointer {
+  width: 12px;
+  height: calc(100% + 12px);
+  border-radius: 4px;
+  border: 3px solid var(--ink);
+  background: var(--surface);
+  box-shadow: none;
+}
+
+.color-picker .react-colorful__hue-pointer .react-colorful__pointer-fill,
+.color-picker .react-colorful__alpha-pointer .react-colorful__pointer-fill {
+  display: none;
+}
+
+.color-picker
+  .react-colorful__interactive:focus-visible
+  .react-colorful__pointer {
+  box-shadow:
+    0 0 0 3px var(--ink),
+    0 0 0 6px var(--surface),
+    0 0 0 9px var(--ink);
 }

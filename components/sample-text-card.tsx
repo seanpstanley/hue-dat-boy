@@ -47,7 +47,7 @@ const SampleCard = ({
           className,
         )}
       >
-        <div className="relative px-4 pt-2 pb-2.5">
+        <div className="flex items-center justify-between gap-2 py-1 pr-1 pl-4">
           <h4 className="text-base leading-none font-normal text-sim-on-frame md:text-lg">
             {title}
           </h4>
@@ -57,7 +57,7 @@ const SampleCard = ({
               <Button
                 variant="ghost-outline"
                 size="icon"
-                className="absolute top-1/2 right-0.5 size-8 -translate-y-1/2 p-1 text-sim-on-frame hover:border-sim-on-frame focus-visible:border-sim-on-frame focus-visible:outline-none md:right-1 md:size-10 md:p-2"
+                className="size-9 shrink-0 p-1.5 text-sim-on-frame hover:border-sim-on-frame focus-visible:border-sim-on-frame focus-visible:outline-none md:size-10 md:p-2"
               >
                 <AccessibleIcon label={t("buttons.expand.alt")}>
                   <Maximize2 className="size-full!" />

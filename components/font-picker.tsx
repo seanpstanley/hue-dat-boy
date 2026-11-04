@@ -64,7 +64,7 @@ const FontPicker = memo(({ labelledBy, value, onChange }: FontPickerProps) => {
       role="combobox"
       aria-labelledby={labelledBy}
       aria-expanded={open}
-      className="h-fit justify-between border-3 border-ink bg-transparent px-3 py-2 text-lg font-normal text-ink md:text-2xl"
+      className="h-fit justify-between rounded-md border-3 border-ink bg-transparent px-3 py-2 font-display-tight text-lg font-bold text-ink md:text-2xl"
       disabled={!!error}
     >
       <span className="truncate">
@@ -92,7 +92,10 @@ const FontPicker = memo(({ labelledBy, value, onChange }: FontPickerProps) => {
     return (
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>{trigger}</PopoverTrigger>
-        <PopoverContent className="w-(--radix-popover-trigger-width) p-0">
+        <PopoverContent
+          sideOffset={-3}
+          className="w-(--radix-popover-trigger-width) p-0 data-[side=bottom]:rounded-t-none data-[side=top]:rounded-b-none"
+        >
           {list}
         </PopoverContent>
       </Popover>
@@ -144,7 +147,10 @@ const FontList = ({
                 selectedFont === font.family ? "opacity-100" : "opacity-0",
               )}
             />
-            {font.family}
+            <span className="flex-1 truncate">{font.family}</span>
+            <span className="font-mono text-xs font-semibold tracking-wider uppercase opacity-75">
+              {font.category.replace("-", " ")}
+            </span>
           </CommandItem>
         ))}
       </CommandGroup>

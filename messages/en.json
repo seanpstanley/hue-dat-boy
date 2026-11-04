@@ -11,6 +11,10 @@
           "text": "text",
           "background": "background",
           "both": "both"
+        },
+        "reason": {
+          "passes": "passes {level}",
+          "alpha": "opaque colors only"
         }
       },
       "share": {
@@ -53,7 +57,8 @@
       "selects": {
         "typeface": "typeface",
         "color-blindness": "simulate color blindness"
-      }
+      },
+      "standard": "contrast standard"
     },
     "notice": {
       "low-contrast": {
@@ -335,5 +340,10 @@
         }
       }
     }
+  },
+  "ColorPicker": {
+    "hex": "hex value",
+    "eyedropper": "pick a color from the screen",
+    "recent": "recent colors"
   }
 }

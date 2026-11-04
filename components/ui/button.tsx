@@ -6,10 +6,13 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils/cn";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap focus-ring transition-colors disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap focus-ring transition-colors disabled:pointer-events-none disabled:cursor-not-allowed disabled:border-dashed [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
+        // Filled in the ink color: the main action in a group
+        primary:
+          "border-3 border-ink bg-ink text-on-ink hover:bg-transparent hover:text-ink focus-visible:bg-transparent focus-visible:text-ink disabled:bg-transparent disabled:text-ink",
         // Outlined in the ink color, fills in on hover/focus
         outline:
           "border-3 border-ink bg-transparent text-ink hover:bg-ink hover:text-on-ink focus-visible:bg-ink focus-visible:text-on-ink",
