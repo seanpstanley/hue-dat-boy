@@ -13,9 +13,9 @@
           "both": "both"
         },
         "reason": {
-          "passes": "passes {level}",
-          "alpha": "opaque colors only"
-        }
+          "passes": "passes {level}"
+        },
+        "goal": "aim for"
       },
       "share": {
         "title": "share these colors",

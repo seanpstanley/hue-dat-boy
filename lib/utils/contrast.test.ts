@@ -1,12 +1,14 @@
 import { describe, expect, it } from "vitest";
 
-import { rgbaToHsla } from "./color";
+import { calculateWCAGContrast } from "./color";
 import {
   calculateAPCAContrast,
   calculateContrastRange,
   enhanceContrast,
   getContrastReport,
+  nextEnhanceGoal,
 } from "./contrast";
+import { deltaEOK, oklchToRgba, rgbaToOklch } from "./oklch";
 
 const black = { r: 0, g: 0, b: 0, a: 1 };
 const white = { r: 255, g: 255, b: 255, a: 1 };
@@ -60,32 +62,126 @@ describe("getContrastReport", () => {
   });
 });
 
+describe("nextEnhanceGoal", () => {
+  it("picks the lowest goal not met yet", () => {
+    expect(nextEnhanceGoal(3, "wcag")).toBe("aa");
+    expect(nextEnhanceGoal(5, "wcag")).toBe("aaa");
+    expect(nextEnhanceGoal(7.5, "wcag")).toBeNull();
+    expect(nextEnhanceGoal(80, "apca")).toBe("aaa");
+  });
+});
+
 describe("enhanceContrast", () => {
   const fg = { r: 204, g: 102, b: 102, a: 1 }; // #cc6666
   const bg = { r: 221, g: 136, b: 136, a: 1 }; // #dd8888
+  const hue = (c: typeof fg) => rgbaToOklch(c).h;
+  const hueDiff = (x: number, y: number) =>
+    Math.abs(((x - y + 540) % 360) - 180);
 
-  it("keeps the hue when adjusting text", () => {
+  it("aims for AA by default and lands just above it instead of overshooting", () => {
     const { foreground, background } = enhanceContrast(bg, fg, "text", "wcag");
+    const score = calculateWCAGContrast(background, foreground);
     expect(background).toEqual(bg);
-    expect(Math.round(rgbaToHsla(foreground).h)).toBe(0);
+    expect(score).toBeGreaterThanOrEqual(4.5);
+    expect(score).toBeLessThan(4.7);
+  });
+
+  it("can aim for AAA", () => {
+    const { foreground } = enhanceContrast(bg, fg, "text", "wcag", "aaa");
+    const score = calculateWCAGContrast(bg, foreground);
+    expect(score).toBeGreaterThanOrEqual(7);
+    expect(score).toBeLessThan(7.3);
+  });
+
+  it.each([
+    ["yellow on white", { r: 230, g: 200, b: 0, a: 1 }, white],
+    [
+      "blue on navy",
+      { r: 70, g: 90, b: 200, a: 1 },
+      { r: 20, g: 30, b: 80, a: 1 },
+    ],
+    ["red on pink", fg, bg],
+    [
+      "teal on mint",
+      { r: 0, g: 150, b: 140, a: 1 },
+      { r: 180, g: 230, b: 210, a: 1 },
+    ],
+  ])("keeps the perceived hue of %s", (_, text, back) => {
+    const { foreground } = enhanceContrast(back, text, "text", "wcag");
+    expect(calculateWCAGContrast(back, foreground)).toBeGreaterThanOrEqual(4.5);
+    expect(hueDiff(hue(foreground), hue(text))).toBeLessThan(6);
   });
 
   it("improves light-on-dark pairs under APCA (negative Lc)", () => {
     const dark = { r: 40, g: 40, b: 80, a: 1 };
     const dim = { r: 90, g: 90, b: 140, a: 1 };
-    const before = Math.abs(calculateAPCAContrast(dark, dim));
     const { foreground } = enhanceContrast(dark, dim, "text", "apca");
-    expect(Math.abs(calculateAPCAContrast(dark, foreground))).toBeGreaterThan(
-      before,
-    );
-    expect(
-      Math.abs(calculateAPCAContrast(dark, foreground)),
-    ).toBeGreaterThanOrEqual(75);
+    const lc = Math.abs(calculateAPCAContrast(dark, foreground));
+    expect(lc).toBeGreaterThanOrEqual(75);
+    expect(lc).toBeLessThan(78);
   });
 
-  it("moves both colors when asked to adjust both", () => {
-    const result = enhanceContrast(bg, fg, "both", "wcag");
-    expect(result.foreground).not.toEqual(fg);
-    expect(result.background).not.toEqual(bg);
+  it("splits the change between both colors with the smallest combined change", () => {
+    const cost = (r: { foreground: typeof fg; background: typeof fg }) =>
+      deltaEOK(r.foreground, fg) ** 2 + deltaEOK(r.background, bg) ** 2;
+    const both = enhanceContrast(bg, fg, "both", "wcag");
+    expect(
+      calculateWCAGContrast(both.background, both.foreground),
+    ).toBeGreaterThanOrEqual(4.5);
+    expect(both.foreground).not.toEqual(fg);
+    expect(both.background).not.toEqual(bg);
+    expect(cost(both)).toBeLessThanOrEqual(
+      cost(enhanceContrast(bg, fg, "text", "wcag")),
+    );
+    expect(cost(both)).toBeLessThanOrEqual(
+      cost(enhanceContrast(bg, fg, "background", "wcag")),
+    );
+  });
+
+  it("keeps transparency and passes in the worst case for semi-transparent backgrounds", () => {
+    const glass = { r: 240, g: 240, b: 255, a: 0.7 };
+    const text = { r: 120, g: 120, b: 140, a: 1 };
+    const { background, foreground } = enhanceContrast(
+      glass,
+      text,
+      "text",
+      "wcag",
+    );
+    expect(background).toEqual(glass);
+    expect(
+      getContrastReport(background, foreground, "wcag").score,
+    ).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it("keeps text alpha and returns its best effort when the goal is unreachable", () => {
+    const ghost = { r: 0, g: 0, b: 0, a: 0.1 };
+    const { foreground } = enhanceContrast(white, ghost, "text", "wcag");
+    expect(foreground.a).toBe(0.1);
+    expect(calculateWCAGContrast(white, foreground)).toBeGreaterThanOrEqual(
+      calculateWCAGContrast(white, ghost),
+    );
+  });
+});
+
+describe("oklch", () => {
+  it("round-trips sRGB colors", () => {
+    for (const c of [
+      black,
+      white,
+      { r: 204, g: 102, b: 102, a: 1 },
+      { r: 0, g: 128, b: 128, a: 0.5 },
+    ]) {
+      expect(oklchToRgba(rgbaToOklch(c))).toEqual(c);
+    }
+  });
+
+  it("maps out-of-gamut colors into sRGB by reducing chroma", () => {
+    const vivid = rgbaToOklch({ r: 255, g: 0, b: 0, a: 1 });
+    const result = oklchToRgba({ ...vivid, l: 0.95 });
+    for (const v of [result.r, result.g, result.b]) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(255);
+    }
+    expect(Math.abs(rgbaToOklch(result).l - 0.95)).toBeLessThan(0.01);
   });
 });

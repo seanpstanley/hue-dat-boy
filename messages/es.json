@@ -13,9 +13,9 @@
           "both": "ambos"
         },
         "reason": {
-          "passes": "cumple {level}",
-          "alpha": "solo colores opacos"
-        }
+          "passes": "cumple {level}"
+        },
+        "goal": "objetivo"
       },
       "share": {
         "title": "compartir estos colores",

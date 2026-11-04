@@ -13,9 +13,9 @@
           "both": "abu"
         },
         "reason": {
-          "passes": "atitinka {level}",
-          "alpha": "tik nepermatomos spalvos"
-        }
+          "passes": "atitinka {level}"
+        },
+        "goal": "siekti"
       },
       "share": {
         "title": "dalintis šiomis spalvomis",
