@@ -2,8 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import { AccessibleIcon } from "@radix-ui/react-accessible-icon";
-import { ArrowLeftRight, Check, Clipboard, Info, X } from "lucide-react";
+import { ArrowLeftRight, Check, Clipboard, Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { useAnimeQuote } from "@/app/hooks/use-anime-quote";
@@ -20,6 +19,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { SegmentedControl } from "@/components/ui/segmented-control";
 import {
   Select,
   SelectContent,
@@ -27,7 +27,6 @@ import {
   SelectTrigger,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { WcagInfo } from "@/components/wcag-info";
 import {
@@ -35,18 +34,21 @@ import {
   getLowContrastFallback,
   themeVarsToCss,
 } from "@/lib/theme";
-import { ColorBlindnessType } from "@/lib/types";
+import { ColorBlindnessType, RgbaColor } from "@/lib/types";
 import {
   CheckerState,
   COLOR_BLINDNESS_TYPES,
   serializeUrlState,
 } from "@/lib/url-state";
 import { cn } from "@/lib/utils/cn";
+import { rgbToHex, simulateColorBlindness } from "@/lib/utils/color";
 import {
+  APCA_THRESHOLDS,
   ContrastReport,
   ENHANCE_MINIMUM,
   enhanceContrast,
   getContrastReport,
+  WCAG_THRESHOLDS,
 } from "@/lib/utils/contrast";
 
 /** How long the URL waits for changes to settle before updating (dragging the picker fires on every pointer move). */
@@ -123,6 +125,15 @@ export function ContrastChecker({ initial }: { initial: CheckerState }) {
     setEnhanceMenuOpen(false);
   };
 
+  const isOpaque = foreground.a === 1 && background.a === 1;
+  const enhanceBlockedReason = !isOpaque
+    ? t("buttons.enhance.reason.alpha")
+    : report.score >= ENHANCE_MINIMUM[standard]
+      ? t("buttons.enhance.reason.passes", {
+          level: standard === "apca" ? "Lc 75" : "AA",
+        })
+      : null;
+
   const canEnhance =
     report.score < ENHANCE_MINIMUM[standard] &&
     foreground.a === 1 &&
@@ -175,17 +186,15 @@ export function ContrastChecker({ initial }: { initial: CheckerState }) {
           <section className="flex flex-col gap-y-8" id="controls">
             <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
               {/* Standards Toggle */}
-              <div className="flex items-center gap-x-2 text-base md:text-lg">
-                <label htmlFor="contrast-standard">wcag 2.2</label>
-                <Switch
-                  id="contrast-standard"
-                  checked={standard === "apca"}
-                  onCheckedChange={(checked) =>
-                    setStandard(checked ? "apca" : "wcag")
-                  }
-                />
-                <label htmlFor="contrast-standard">apca</label>
-              </div>
+              <SegmentedControl
+                label={t("labels.standard")}
+                value={standard}
+                onChange={setStandard}
+                options={[
+                  { value: "wcag", label: "WCAG 2.2" },
+                  { value: "apca", label: "APCA" },
+                ]}
+              />
 
               {/* Enhance Colors */}
               <Popover open={enhanceMenuOpen} onOpenChange={setEnhanceMenuOpen}>
@@ -196,6 +205,11 @@ export function ContrastChecker({ initial }: { initial: CheckerState }) {
                     className="w-full text-base sm:ml-auto sm:w-fit"
                   >
                     {t("buttons.enhance.title")}
+                    {enhanceBlockedReason && (
+                      <span className="font-mono text-xs font-semibold tracking-wide uppercase">
+                        {enhanceBlockedReason}
+                      </span>
+                    )}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="grid w-fit p-2">
@@ -215,6 +229,7 @@ export function ContrastChecker({ initial }: { initial: CheckerState }) {
               {/* Copy URL */}
               <Button
                 onClick={handleCopyUrl}
+                variant="primary"
                 size="xl"
                 className="w-full gap-x-1 text-base sm:w-fit"
               >
@@ -292,7 +307,12 @@ export function ContrastChecker({ initial }: { initial: CheckerState }) {
                 <label htmlFor="colorblind-select" className="label-mono">
                   {t("labels.selects.color-blindness")}
                 </label>
-                <SimulationSelect value={simulation} onChange={setSimulation} />
+                <SimulationSelect
+                  value={simulation}
+                  onChange={setSimulation}
+                  foreground={foreground}
+                  background={background}
+                />
               </div>
             </div>
 
@@ -356,6 +376,9 @@ function ContrastSummary({ report }: { report: ContrastReport }) {
     </span>
   );
   const unitText = isApca ? "Lc" : ":1";
+  const thresholds: Record<string, number> = isApca
+    ? APCA_THRESHOLDS
+    : WCAG_THRESHOLDS;
 
   return (
     <section className="mb-8 flex flex-col gap-y-4" id="contrast-info">
@@ -406,19 +429,30 @@ function ContrastSummary({ report }: { report: ContrastReport }) {
                 // Remounting on change replays the stamp animation each time a level flips to pass
                 key={`${report.standard}-${level}-${passes}`}
                 className={cn(
-                  "inline-flex items-center justify-between gap-x-2 rounded-full border-3 border-ink px-4 py-2 text-base font-semibold transition-colors md:text-lg",
-                  passes ? "bg-ink text-on-ink" : "bg-transparent text-ink",
+                  "inline-grid grid-cols-[auto_auto] overflow-hidden rounded-lg border-3 border-ink text-base font-semibold md:text-lg",
+                  !passes && "border-dashed",
                   stamped.includes(level) && "motion-safe:animate-stamp",
                 )}
               >
-                {t(`badges.${report.standard}.${level}`)}
-                <AccessibleIcon label={passes ? "Pass" : "Fail"}>
-                  {passes ? (
-                    <Check className="size-6" />
-                  ) : (
-                    <X className="size-6" />
+                <span
+                  className={cn(
+                    "inline-flex items-center gap-x-2 px-3 py-1.5",
+                    passes ? "bg-ink text-on-ink" : "line-through decoration-2",
                   )}
-                </AccessibleIcon>
+                >
+                  {t(`badges.${report.standard}.${level}`)}
+                  {passes && <Check className="size-5" aria-hidden />}
+                  <span className="sr-only">{passes ? "Pass" : "Fail"}</span>
+                </span>
+                {/* The required score, so the numbers sink in just by using the tool */}
+                <span
+                  className={cn(
+                    "inline-flex items-center border-l-3 border-ink px-2.5 font-mono text-sm",
+                    !passes && "border-dashed",
+                  )}
+                >
+                  {thresholds[level]}
+                </span>
               </li>
             ))}
           </ul>
@@ -433,9 +467,13 @@ function ContrastSummary({ report }: { report: ContrastReport }) {
 function SimulationSelect({
   value,
   onChange,
+  foreground,
+  background,
 }: {
   value: ColorBlindnessType;
   onChange: (value: ColorBlindnessType) => void;
+  foreground: RgbaColor;
+  background: RgbaColor;
 }) {
   const t = useTranslations("ContrastChecker");
   const labelFor = (simulation: ColorBlindnessType) =>
@@ -443,19 +481,40 @@ function SimulationSelect({
       ? t("selects.color-blindness.normal-vision")
       : simulation;
 
+  // A preview of what the current pair looks like under each simulation
+  const swatches = (simulation: ColorBlindnessType) => (
+    <span aria-hidden className="inline-flex shrink-0 gap-1">
+      {[foreground, background].map((color, i) => (
+        <span
+          key={i}
+          className="size-4 rounded-[4px] border-2 border-current md:size-5"
+          style={{
+            backgroundColor: rgbToHex(
+              simulateColorBlindness(color, simulation),
+            ),
+          }}
+        />
+      ))}
+    </span>
+  );
+
   return (
     <Select value={value} onValueChange={onChange}>
       <SelectTrigger
         id="colorblind-select"
-        className="h-fit py-2 text-lg md:text-2xl"
+        className="h-fit py-2 font-display-tight text-lg font-bold md:text-2xl"
       >
-        {labelFor(value)}
+        <div className="flex min-w-0 items-center gap-3">
+          {swatches(value)}
+          <span className="truncate">{labelFor(value)}</span>
+        </div>
       </SelectTrigger>
       <SelectContent>
         {COLOR_BLINDNESS_TYPES.map((simulation) => (
           <SelectItem
             key={simulation}
             value={simulation}
+            aside={swatches(simulation)}
             className="text-lg md:text-2xl"
           >
             {labelFor(simulation)}

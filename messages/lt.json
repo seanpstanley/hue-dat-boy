@@ -11,6 +11,10 @@
           "text": "tekstas",
           "background": "fonas",
           "both": "abu"
+        },
+        "reason": {
+          "passes": "atitinka {level}",
+          "alpha": "tik nepermatomos spalvos"
         }
       },
       "share": {
@@ -53,7 +57,8 @@
       "selects": {
         "typeface": "šriftas",
         "color-blindness": "simuliuoti spalvų aklumą"
-      }
+      },
+      "standard": "kontrasto standartas"
     },
     "notice": {
       "low-contrast": {
@@ -335,5 +340,10 @@
         }
       }
     }
+  },
+  "ColorPicker": {
+    "hex": "hex reikšmė",
+    "eyedropper": "paimti spalvą iš ekrano",
+    "recent": "naujausios spalvos"
   }
 }
