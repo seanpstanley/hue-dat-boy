@@ -27,7 +27,7 @@ const Footer = memo(() => {
   return (
     <footer className="container mx-auto mt-12 py-6 text-ink">
       <div className="flex flex-col items-center justify-between gap-4 sm:flex-row-reverse">
-        <div className="flex gap-x-4">
+        <div className="flex gap-x-2">
           <Button
             asChild
             variant="ghost-outline"
