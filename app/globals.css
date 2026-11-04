@@ -140,15 +140,6 @@
   text-transform: uppercase;
 }
 
-/* Faint diagonal hatch in the ink color, behind the hero */
-@utility hatch {
-  background-image: repeating-linear-gradient(
-    -45deg,
-    transparent 0 18px,
-    color-mix(in srgb, var(--ink) 9%, transparent) 18px 21px
-  );
-}
-
 /* Badge "stamp" when a level flips from fail to pass */
 @keyframes stamp {
   0% {

@@ -142,13 +142,7 @@ export function ContrastChecker({ initial }: { initial: CheckerState }) {
         />
       )}
 
-      <div className="relative isolate min-h-screen overflow-hidden bg-surface p-4 text-ink transition-colors">
-        {/* Decorative hatch behind the right side of the page */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-y-0 right-0 -z-10 w-[38%] hatch"
-        />
-
+      <div className="min-h-screen bg-surface p-4 text-ink transition-colors">
         <header className="container mx-auto mb-6 md:mt-2 md:mb-10">
           <span className="font-display-tight text-lg font-extrabold tracking-tight md:text-xl">
             hue dat boy
@@ -224,14 +218,28 @@ export function ContrastChecker({ initial }: { initial: CheckerState }) {
                 size="xl"
                 className="w-full gap-x-1 text-base sm:w-fit"
               >
-                {urlCopied
-                  ? t("buttons.share.popover")
-                  : t("buttons.share.title")}
-                {urlCopied ? (
-                  <Check className="size-4" />
-                ) : (
-                  <Clipboard className="size-4" />
-                )}
+                {/* Both labels share one grid cell so the button keeps the wider width (no layout shift) */}
+                <span className="grid place-items-center">
+                  <span
+                    className={cn(
+                      "col-start-1 row-start-1 inline-flex items-center gap-x-1",
+                      urlCopied && "invisible",
+                    )}
+                  >
+                    {t("buttons.share.title")}
+                    <Clipboard className="size-4" />
+                  </span>
+                  <span
+                    aria-hidden
+                    className={cn(
+                      "col-start-1 row-start-1 inline-flex items-center gap-x-1",
+                      !urlCopied && "invisible",
+                    )}
+                  >
+                    {t("buttons.share.popover")}
+                    <Check className="size-4" />
+                  </span>
+                </span>
                 <span className="sr-only" aria-live="polite">
                   {urlCopied ? t("buttons.share.popover") : ""}
                 </span>

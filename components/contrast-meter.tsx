@@ -47,7 +47,7 @@ export function ContrastMeter({ report }: { report: ContrastReport }) {
         {/* Possible range for semi-transparent backgrounds */}
         {report.range && (
           <div
-            className="absolute inset-y-0 left-0 hatch motion-safe:transition-[width] motion-safe:duration-500"
+            className="absolute inset-y-0 left-0 bg-ink/25 motion-safe:transition-[width] motion-safe:duration-500"
             style={{ width: `${max}%` }}
           />
         )}
