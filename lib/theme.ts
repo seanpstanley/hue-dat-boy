@@ -58,3 +58,18 @@ export function getLowContrastFallback(
   if (ink === blended) return null;
   return ink === "#000000" ? "black" : "white";
 }
+
+/**
+ * The favicon (the wordmark dot on a rounded tile) in the current colors, as an SVG data URI. Uses the same colors as
+ * the wordmark: the page background for the tile and the UI ink color for the dot, so the dot stays visible even
+ * when the text color is too low-contrast.
+ */
+export function buildFaviconHref(
+  foreground: RgbaColor,
+  background: RgbaColor,
+): string {
+  const tile = rgbToHex(background);
+  const dot = getDisplayColor(background, foreground);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="${tile}"/><circle cx="16" cy="16" r="8.5" fill="${dot}"/></svg>`;
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+}
