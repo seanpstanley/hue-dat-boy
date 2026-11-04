@@ -159,7 +159,7 @@ export function ContrastChecker({ initial }: { initial: CheckerState }) {
             hue dat boy
             <span
               aria-hidden
-              className="ml-0.5 inline-block size-[0.55em] rounded-full border-2 border-ink bg-fg"
+              className="ml-0.5 inline-block size-[0.55em] rounded-full bg-ink"
             />
           </span>
         </header>
