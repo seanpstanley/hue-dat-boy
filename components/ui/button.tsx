@@ -22,7 +22,7 @@ const buttonVariants = cva(
         // Menu-style item, fills in on hover/focus
         ghost:
           "hover:bg-ink hover:text-on-ink focus-visible:bg-ink focus-visible:text-on-ink",
-        link: "text-wrap text-ink underline underline-offset-4 hover:decoration-2",
+        link: "text-left whitespace-normal text-ink underline underline-offset-4 hover:decoration-2",
         naked: "",
       },
       size: {
