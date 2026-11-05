@@ -13,6 +13,28 @@ import {
 } from "@/lib/contrast";
 import { cn } from "@/lib/utils/cn";
 
+/**
+ * How big the contrast number gets: `max` is its full size, and `em` is the widest the text can be in ems (measured
+ * with the display font: e.g. "10.95:1" is ~2.1em wide, "72.87Lc to 107.88Lc" is ~5.25em). On narrower screens the
+ * number shrinks just enough that its widest possible value still fits the section, so it can never overflow its
+ * block or push the page sideways.
+ */
+const NUMBER_SIZES = {
+  wcag: { max: "10rem", em: 2.2 },
+  apca: { max: "10rem", em: 2.9 },
+  wcagRange: { max: "4.5rem", em: 4.5 },
+  apcaRange: { max: "4.5rem", em: 5.4 },
+};
+
+/** Horizontal padding of the number's block (px-6 at most), which the number can't use. */
+const BLOCK_PADDING = "3rem";
+
+function numberFontSize({ standard, range }: ContrastReport) {
+  const { max, em } =
+    NUMBER_SIZES[range ? (`${standard}Range` as const) : standard];
+  return `min(${max}, calc((100cqi - ${BLOCK_PADDING}) / ${em}))`;
+}
+
 interface ContrastSummaryProps {
   /** The contrast report for the current pair, from `getContrastReport`. */
   report: ContrastReport;
@@ -57,9 +79,14 @@ function ContrastSummary({ report }: ContrastSummaryProps) {
     : WCAG_THRESHOLDS;
 
   return (
-    <section className="mb-8 flex flex-col gap-y-4" id="contrast-info">
-      <div className="flex w-full flex-col justify-between gap-x-8 gap-y-4 md:flex-row md:items-end">
-        <div className="flex min-w-0 flex-col gap-y-2">
+    // A size container, so the number can scale to the section's width (see NUMBER_SIZES)
+    <section
+      className="@container mb-8 flex flex-col gap-y-4"
+      id="contrast-info"
+    >
+      {/* Wraps instead of switching to a row at a breakpoint: the tickets only sit beside the number when both fit */}
+      <div className="flex w-full flex-wrap items-end justify-between gap-x-8 gap-y-4">
+        <div className="flex max-w-full shrink-0 flex-col gap-y-2">
           <span id="contrast-label" className="label-mono">
             {t("labels.contrast")}
           </span>
@@ -67,12 +94,8 @@ function ContrastSummary({ report }: ContrastSummaryProps) {
           <div className="w-fit max-w-full rounded-lg bg-ink px-4 pt-3 pb-4 text-on-ink md:px-6">
             <h2
               aria-labelledby="contrast-label"
-              className={cn(
-                "font-display-tight leading-[0.82] font-extrabold tracking-tight whitespace-nowrap tabular-nums",
-                report.range
-                  ? "text-5xl sm:text-6xl md:text-7xl"
-                  : "text-7xl sm:text-8xl md:text-9xl lg:text-[10rem]",
-              )}
+              className="font-display-tight leading-[0.82] font-extrabold tracking-tight whitespace-nowrap tabular-nums"
+              style={{ fontSize: numberFontSize(report) }}
             >
               {report.range ? (
                 <>
@@ -94,13 +117,13 @@ function ContrastSummary({ report }: ContrastSummaryProps) {
           </div>
         </div>
 
-        <div className="flex flex-col gap-y-2 md:items-end">
+        <div className="ml-auto flex flex-col items-end gap-y-2">
           <span id="levels-label" className="label-mono">
             {isApca ? t("labels.badges.apca") : t("labels.badges.wcag")}
           </span>
           <ul
             aria-labelledby="levels-label"
-            className="flex flex-wrap gap-2 md:justify-end"
+            className="flex flex-wrap justify-end gap-2"
           >
             {Object.entries(report.levels).map(([level, passes]) => (
               <li
