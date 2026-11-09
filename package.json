@@ -22,6 +22,8 @@
     "@radix-ui/react-switch": "^1.4.1",
     "@radix-ui/react-tooltip": "^1.4.1",
     "@radix-ui/react-visually-hidden": "^1.2.13",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.1.0",
     "apca-w3": "^0.1.9",
     "better-react-mathjax": "^3.0.3",
     "class-variance-authority": "^0.7.1",
