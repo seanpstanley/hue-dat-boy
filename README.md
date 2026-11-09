@@ -16,7 +16,7 @@ Hue Dat Boy is a color contrast checker for WCAG 2.2 and APCA. The whole interfa
 
 ## Getting started
 
-This project uses [pnpm](https://pnpm.io/) and Node 24.
+This project uses [pnpm](https://pnpm.io/) and Node 24 or newer (production runs on Node 26).
 
 ```bash
 git clone https://github.com/seanpstanley/hue-dat-boy.git

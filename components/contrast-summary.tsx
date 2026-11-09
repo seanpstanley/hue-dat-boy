@@ -138,7 +138,7 @@ function ContrastSummary({ report }: ContrastSummaryProps) {
                 <span
                   className={cn(
                     "inline-flex items-center gap-x-2 px-3 py-1.5",
-                    passes ? "bg-ink text-on-ink" : "line-through decoration-2",
+                    passes && "bg-ink text-on-ink",
                   )}
                 >
                   {t(`badges.${report.standard}.${level}`)}
